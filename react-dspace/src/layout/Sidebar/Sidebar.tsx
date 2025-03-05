@@ -1,0 +1,61 @@
+import { useEffect, useState, useContext } from 'react';
+import { personsImgs } from '../../utils/images';
+import { navigationLinks } from '../../data/data';
+import "./Sidebar.css";
+import { SidebarContext } from '../../contexts/sidebarContext';
+import { useNavigate } from 'react-router-dom';
+
+const Sidebar: React.FC = () => {
+  const [activeLinkIdx, setActiveLinkIdx] = useState(1);
+  const [sidebarClass, setSidebarClass] = useState("");
+  const context = useContext(SidebarContext);
+  const navigate = useNavigate();
+
+  if (!context) {
+    throw new Error("Sidebar must be used within a SidebarProvider");
+  }
+
+  const { isSidebarOpen } = context;
+
+  useEffect(() => {
+    setSidebarClass(isSidebarOpen ? 'sidebar-change' : '');
+  }, [isSidebarOpen]);
+
+  const handleNavigation = (id: number, path: string) => {
+    setActiveLinkIdx(id);
+    navigate(path);
+  };
+
+  return (
+    <div className={`sidebar ${sidebarClass}`}>
+      <div className="user-info">
+          <div className="info-img img-fit-cover">
+              <img src={personsImgs.person_one} alt="profile" />
+          </div>
+          <span className="info-name">Abhishek</span>
+      </div>
+
+      <nav className="navigation">
+          <ul className="nav-list">
+            {navigationLinks.map((navigationLink) => (
+              <li className="nav-item" key={navigationLink.id}>
+                <a 
+                  href="#" 
+                  className={`nav-link ${navigationLink.id === activeLinkIdx ? 'active' : ''}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleNavigation(navigationLink.id, navigationLink.path);
+                  }}
+                >
+                    <img src={navigationLink.image} className="nav-link-icon" alt={navigationLink.title} />
+                    <span className="nav-link-text">{navigationLink.title}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+      </nav>
+    </div>
+  );
+};
+
+export default Sidebar;
