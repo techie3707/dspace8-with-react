@@ -1,10 +1,15 @@
 import { iconsImgs } from "../../utils/images";
+import { useNavigate } from "react-router-dom";
+import { personsImgs } from '../../utils/images';
 import "./ContentTop.css";
 import { useContext } from "react";
 import { SidebarContext } from "../../contexts/sidebarContext";
+import { useAuth } from "../../contexts/AuthContext";
 
 const ContentTop: React.FC = () => {
+  const { isAuthenticated } = useAuth();
   const context = useContext(SidebarContext);
+  const navigate = useNavigate();
 
   if (!context) {
     throw new Error("ContentTop must be used within a SidebarProvider");
@@ -15,10 +20,13 @@ const ContentTop: React.FC = () => {
   return (
     <div className="main-content-top">
       <div className="content-top-left">
-        <button type="button" className="sidebar-toggler" onClick={toggleSidebar}>
-          <img src={iconsImgs.menu} alt="Menu" />
-        </button>
-        <h3 className="content-top-title">Home</h3>
+        {isAuthenticated && (
+          <button type="button" className="sidebar-toggler" onClick={toggleSidebar}>
+            <img src={iconsImgs.menu} alt="Menu" />
+          </button>
+
+        )}
+        <img className="brand-logo" src={personsImgs.brand_one} alt="profile" onClick={() => navigate("/")} />
       </div>
       <div className="content-top-btns">
         <button type="button" className="search-btn content-top-btn">
@@ -28,6 +36,16 @@ const ContentTop: React.FC = () => {
           <img src={iconsImgs.bell} alt="Notifications" />
           <span className="notification-btn-dot"></span>
         </button>
+        {isAuthenticated ? (
+          <button className="profile-btn">
+            <img src={personsImgs.person_one} alt="profile" className="profile-img" />
+          </button>
+        ) : (
+          <button className="login-btn content-top-btn" onClick={() => navigate("/login")}>
+            <img src={iconsImgs.login} alt="Login" />
+          </button>
+        )}
+
       </div>
     </div>
   );

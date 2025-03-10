@@ -1,0 +1,90 @@
+.login-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 9rem 0px;
+}
+
+.login-box {
+    width: 100%;
+    max-width: 600px;
+    padding: 2rem;
+    background: #ffffff;
+    box-shadow: 0px 30px 46px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    text-align: center;
+}
+
+.login-title {
+    font-size: 1.8rem !important;
+    font-weight: bold !important;
+    color: var(--clr-primary);
+    margin-bottom: 1rem !important;
+}
+
+.forgot-link {
+    margin-top: 1.5rem !important;
+    cursor: pointer;
+    text-decoration: underline;
+    color: var(--clr-primary) !important;
+}
+
+/* TextField Styling */
+.MuiTextField-root {
+    margin-bottom: 1rem !important;
+}
+
+.MuiOutlinedInput-root {
+    color: var(--clr-primary) !important;
+    border-radius: 6px !important;
+}
+
+.MuiInputLabel-root {
+    color: var(--clr-primary) !important;
+}
+
+.remember-me .Mui-checked {
+    color: var(--clr-primary) !important;
+}
+
+.MuiInputLabel-root.Mui-focused {
+    color: var(--clr-primary) !important;
+}
+
+.MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline {
+    border-color: var(--clr-primary) !important;
+    color: var(--clr-primary) !important;
+}
+
+.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+    border-color: var(--clr-primary) !important;
+    color: var(--clr-primary) !important;
+}
+
+.login-button {
+    background-color: var(--clr-primary) !important;
+    color: var(--clr-white) !important;
+    font-size: 1rem !important;
+    font-weight: bold !important;
+    padding: 10px !important;
+    border-radius: 6px !important;
+    margin-top: 1rem !important;
+}
+
+.create-account-button {
+    border-color: var(--clr-primary) !important;
+    color: var(--clr-primary) !important;
+    font-weight: bold !important;
+    padding: 10px !important;
+    border-radius: 6px !important;
+    margin-top: 1rem !important;
+}
+
+.remember-me {
+    margin-top: 1rem !important;
+    color: var(--clr-primary) !important;
+}
+
+.account-section {
+    margin-top: 2rem !important;
+}

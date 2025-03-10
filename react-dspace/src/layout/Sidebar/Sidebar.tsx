@@ -6,7 +6,8 @@ import { SidebarContext } from '../../contexts/sidebarContext';
 import { useNavigate } from 'react-router-dom';
 
 const Sidebar: React.FC = () => {
-  const [activeLinkIdx, setActiveLinkIdx] = useState(1);
+  const [activeLinkIdx, setActiveLinkIdx] = useState<number | null>(1);
+  const [openSubMenuIdx, setOpenSubMenuIdx] = useState<number | null>(null);
   const [sidebarClass, setSidebarClass] = useState("");
   const context = useContext(SidebarContext);
   const navigate = useNavigate();
@@ -24,6 +25,10 @@ const Sidebar: React.FC = () => {
   const handleNavigation = (id: number, path: string) => {
     setActiveLinkIdx(id);
     navigate(path);
+  };
+
+  const toggleSubMenu = (id: number) => {
+    setOpenSubMenuIdx(openSubMenuIdx === id ? null : id);
   };
 
   return (
@@ -44,12 +49,34 @@ const Sidebar: React.FC = () => {
                   className={`nav-link ${navigationLink.id === activeLinkIdx ? 'active' : ''}`}
                   onClick={(e) => {
                     e.preventDefault();
-                    handleNavigation(navigationLink.id, navigationLink.path);
+                    navigationLink.submenu
+                      ? toggleSubMenu(navigationLink.id)
+                      : handleNavigation(navigationLink.id, navigationLink.path);
                   }}
                 >
                     <img src={navigationLink.image} className="nav-link-icon" alt={navigationLink.title} />
                     <span className="nav-link-text">{navigationLink.title}</span>
                 </a>
+
+                {/* Submenu Logic */}
+                {navigationLink.submenu && openSubMenuIdx === navigationLink.id && (
+                  <ul className="submenu">
+                    {navigationLink.submenu.map((subLink) => (
+                      <li key={subLink.id}>
+                        <a 
+                          href="#"
+                          className={`submenu-link ${subLink.id === activeLinkIdx ? 'active' : ''}`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleNavigation(subLink.id, subLink.path);
+                          }}
+                        >
+                          {subLink.title}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </li>
             ))}
           </ul>

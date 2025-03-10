@@ -1,0 +1,116 @@
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
+
+.home-container {
+    width: 100%;
+    max-width: none; 
+    padding: 0 16px; 
+    box-sizing: border-box;
+  }
+  
+  .feature-section {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+  }
+  
+  .feature-section img {
+    width: 100% !important;
+    max-width: 400px !important; 
+    height: auto !important;
+    border-radius: 12px !important; 
+  }
+  .key-features {
+    text-align: left !important;
+    flex-direction: column !important;
+}
+
+
+.key-features .MuiGrid-item {
+    display: flex;
+    align-items: center;
+}
+
+
+  @media (min-width: 1440px) {
+    .home-container  {
+        max-width: 100% !important;
+    }
+}
+  
+  @media (max-width: 900px) { 
+    .feature-section {
+      flex-direction: column; 
+      text-align: center;
+    }
+  
+    .feature-section img {
+      max-width: 300px;
+      margin-top: 24px; 
+    }
+  }
+  
+  @media (max-width: 600px) { 
+    .feature-section {
+      padding: 24px 16px;
+    }
+  
+    .feature-section img {
+      width: 100%;
+      max-width: 100%;
+    }
+  }
+
+  .home-container {
+    padding: 40px 0;
+}
+
+.feature-card {
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+}
+
+.feature-card .MuiTypography-h6 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.feature-card .MuiChip-root {
+    border-radius: 8px;
+}
+
+.cards-section {
+    display: flex;
+    flex-wrap: wrap;
+   
+    justify-content: center;
+}
+
+.feature-card {
+    width: 100%;
+    max-width: 260px;
+    height: 220px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+}
+
+.cards-section-header {
+    text-align: center;
+    text-decoration: underline;
+    margin-bottom: 24px;
+}
+

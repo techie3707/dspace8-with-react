@@ -1,4 +1,3 @@
-// icons svg images
 import alert from "../assets/icons/alert.svg";
 import bell from "../assets/icons/bell.svg";
 import bills from "../assets/icons/bills.svg";
@@ -16,11 +15,13 @@ import search from "../assets/icons/search.svg";
 import user from "../assets/icons/user.svg";
 import wallet from "../assets/icons/wallet.svg";
 import wealth from "../assets/icons/wealth.svg";
+import login from "../assets/icons/login.svg";
 
-// person images
+
 import person_one from "../assets/images/person_one.jpg";
+import brand_one from "../assets/images/Final LogoESD.png"
+import home_main from "../assets/images/homepage.svg"
 
-// Define the type for icon images
 interface IconsImages {
     alert: string;
     bell: string;
@@ -39,18 +40,21 @@ interface IconsImages {
     user: string;
     wallet: string;
     wealth: string;
+    login: string;
 }
 
-// Define the type for person images
+
 interface PersonsImages {
     person_one: string;
+    brand_one: string;
+    home_main: string;
 }
 
 // Export typed objects
 export const iconsImgs: IconsImages = {
-    alert, bell, bills, budget, card, check, empty_check, gears, home, menu, plane, plus, report, search, user, wallet, wealth
+    alert, bell, bills, budget, card, check, empty_check, gears, home, menu, plane, plus, report, search, user, wallet, wealth, login
 };
 
 export const personsImgs: PersonsImages = {
-    person_one
+    person_one, brand_one,home_main
 };

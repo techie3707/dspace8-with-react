@@ -33,7 +33,6 @@ export const SidebarProvider: React.FC<SidebarProviderProps> = ({ children }) =>
   );
 };
 
-// Custom hook for safe context access
 export const useSidebarContext = (): SidebarContextType => {
   const context = useContext(SidebarContext);
   if (!context) {

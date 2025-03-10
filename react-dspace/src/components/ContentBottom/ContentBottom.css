@@ -1,0 +1,102 @@
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+.footer a {
+    font-family: 'Lato', sans-serif;
+    color: inherit;
+    text-decoration: none; /* Optional: Removes underline by default */
+    transition: color 0.3s ease; /* Smooth hover effect */
+}
+
+.footer a:hover {
+    color: #4CAF50; /* Optional: Change link color on hover */
+}
+
+.footer {
+    background-color: #43515f;
+    color: #ffffff;
+    padding: 3rem 0;
+}
+
+
+.footer__container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+
+}
+
+.footer__heading {
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid #ffcc00;
+    display: inline-block;
+    padding-bottom: 5px;
+}
+
+.footer__logo {
+    font-size: 1.8rem;
+    font-weight: bold;
+}
+
+.footer__description {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    line-height: 1.5;
+}
+
+
+.footer__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer__link {
+    color: #ffcc00;
+    text-decoration: none;
+    display: block;
+    margin: 0.5rem 0;
+    transition: all 0.3s ease-in-out;
+}
+
+.footer__link:hover {
+    color: #ffffff;
+    transform: translateX(5px);
+}
+
+
+.footer__contact-item {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+
+.footer__icons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.footer__icon {
+    font-size: 1.5rem;
+    text-decoration: none;
+    color: #ffcc00;
+    transition: transform 0.3s ease-in-out;
+}
+
+.footer__icon:hover {
+    transform: scale(1.2);
+    color: #ffffff;
+}
+
+
+.footer__bottom {
+    text-align: center;
+    margin-top: 2rem;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}

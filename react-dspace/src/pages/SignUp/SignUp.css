@@ -1,0 +1,43 @@
+.signup-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 9rem 0px;
+}
+
+.signup-box {
+    width: 100%;
+    max-width: 500px;
+    padding: 2rem;
+    background: #ffffff;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    text-align: center;
+}
+
+.signup-title {
+    font-size: 1.8rem !important;
+    font-weight: bold !important;
+    color: var(--clr-primary);
+    margin-bottom: 1rem !important;
+}
+
+.signup-button {
+    background-color: var(--clr-primary) !important;
+    color: var(--clr-white) !important;
+    font-size: 1rem !important;
+    font-weight: bold !important;
+    padding: 10px !important;
+    border-radius: 6px !important;
+    margin-top: 1rem !important;
+}
+
+.already-have-account {
+    margin-top: 2rem !important;
+}
+
+.login-link {
+    cursor: pointer;
+    text-decoration: underline;
+    color: var(--clr-primary) !important;
+}

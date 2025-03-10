@@ -7,10 +7,10 @@
 }
 
 :root {
-  --clr-primary: #601988;
+  --clr-primary: rgb(19.2541401274, 34.9261146497, 51.0458598726);
   --clr-primar-light: #473b33;
-  --clr-secondary: #1e1611;
-  --clr-white: #dadbdd;
+  --clr-secondary: #FCFCFC;
+  --clr-white: #ffffff;
   --clr-black: #000;
   --clr-pumpkin: #fe6c00;
   --clr-silver: #a8a5a6;
@@ -21,7 +21,7 @@
   --clr-yellow: #fec80a;
   --clr-jet: #302924;
   --clr-peach: #ffc397;
-  --font-family-bai: "Bai Jamjuree", sans-serif;
+  --font-family-bai: "Source Sans 3", sans-serif;
   --transition-default: all 300ms ease-in-out;
 }
 
