@@ -19,8 +19,9 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Pagination,
 } from "@mui/material";
-import { Edit, Delete } from "@mui/icons-material";
+import { Edit, Delete, Lock } from "@mui/icons-material";
 import "./userManagement.css";
 import { removeUser, userList } from "../../api/usermanagement";
 import { EPerson } from "../../api/usermanagement";
@@ -36,14 +37,18 @@ const UserManagement = () => {
   const [editUserModalOpen, setEditUserModalOpen] = useState<boolean>(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
   const [selectedUser, setSelectedUser] = useState<EPerson | null>(null);
+  const [page, setPage] = useState<number>(1);
+  const [size, setSize] = useState<number>(2);
+  const [totalPages, setTotalPages] = useState<number>(1);
 
   const authToken = getAuthToken() || "Bearer your_token_here";
 
-  const fetchUsers = async () => {
+  const fetchUsers = async (page: number, size: number) => {
     setLoading(true);
     try {
-      const data = await userList(authToken);
-      setUsers(data);
+      const data = await userList(authToken, page - 1, size);
+      setUsers(data.epersons);
+      setTotalPages(data.totalPages);
     } catch (error) {
       console.error("Failed to fetch users:", error);
     } finally {
@@ -52,26 +57,33 @@ const UserManagement = () => {
   };
 
   useEffect(() => {
-    fetchUsers();
-  }, []);
+    fetchUsers(page, size);
+  }, [page, size]);
 
   const handleDeleteClick = (user: EPerson) => {
     setSelectedUser(user);
     setDeleteModalOpen(true);
   };
+
   const handleEditClick = (userId: string) => {
     setSelectedUserId(userId);
     setEditUserModalOpen(true);
   };
+
   const handleConfirmDelete = async () => {
     if (selectedUser) {
       const success = await removeUser(selectedUser.id);
       if (success) {
-        await fetchUsers();
+        await fetchUsers(page, size);
       }
       setDeleteModalOpen(false);
     }
   };
+
+  const handleChangePage = (event: React.ChangeEvent<unknown>, newPage: number) => {
+    setPage(newPage);
+  };
+
   return (
     <Container>
       <Typography variant="h4" sx={{ mb: 3 }}>
@@ -105,42 +117,54 @@ const UserManagement = () => {
       {loading ? (
         <CircularProgress sx={{ display: "block", margin: "auto", my: 3 }} />
       ) : (
-        <TableContainer
-          component={Paper}
-          sx={{ border: "1px solid #ddd", borderRadius: "8px", overflow: "hidden" }}
-        >
-          <Table>
-            <TableHead>
-              <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
-                <TableCell><b>First Name</b></TableCell>
-                <TableCell><b>Last Name</b></TableCell>
-                <TableCell><b>Email</b></TableCell>
-                <TableCell><b>Actions</b></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {users.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell>
-                    {user.metadata?.["eperson.firstname"]?.[0]?.value || "N/A"}
-                  </TableCell>
-                  <TableCell>
-                    {user.metadata?.["eperson.lastname"]?.[0]?.value || "N/A"}
-                  </TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>
-                    <IconButton color="primary" onClick={() => handleEditClick(user.id)}>
-                      <Edit />
-                    </IconButton>
-                    <IconButton color="error" onClick={() => handleDeleteClick(user)}>
-                      <Delete />
-                    </IconButton>
-                  </TableCell>
+        <>
+          <TableContainer
+            component={Paper}
+            sx={{ border: "1px solid #ddd", borderRadius: "8px", overflow: "hidden" }}
+          >
+            <Table>
+              <TableHead>
+                <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
+                  <TableCell><b>First Name</b></TableCell>
+                  <TableCell><b>Last Name</b></TableCell>
+                  <TableCell><b>Email</b></TableCell>
+                  <TableCell><b>Actions</b></TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {users.map((user) => (
+                  <TableRow key={user.id}>
+                    <TableCell>
+                      {user.metadata?.["eperson.firstname"]?.[0]?.value || "N/A"}
+                    </TableCell>
+                    <TableCell>
+                      {user.metadata?.["eperson.lastname"]?.[0]?.value || "N/A"}
+                    </TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>
+                      <IconButton color="primary" onClick={() => handleEditClick(user.id)}>
+                        <Edit />
+                      </IconButton>
+                      <IconButton color="error" onClick={() => handleDeleteClick(user)}>
+                        <Delete />
+                      </IconButton>
+                      <IconButton color="secondary">
+                        <Lock />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+
+          <Pagination
+            count={totalPages}
+            page={page}
+            onChange={handleChangePage}
+            sx={{ display: "flex", justifyContent: "center", mt: 2 }}
+          />
+        </>
       )}
 
       <Dialog
@@ -150,8 +174,8 @@ const UserManagement = () => {
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to delete{" "}
-            <strong>{selectedUser?.metadata?.["eperson.firstname"]?.[0]?.value || "User"}</strong>{" "}
+            Are you sure you want to delete {" "}
+            <strong>{selectedUser?.metadata?.["eperson.firstname"]?.[0]?.value || "User"}</strong> {" "}
             (<em>{selectedUser?.email}</em>)?
           </DialogContentText>
         </DialogContent>
@@ -168,13 +192,13 @@ const UserManagement = () => {
       <AddUser
         open={addUserModalOpen}
         onClose={() => setAddUserModalOpen(false)}
-        fetchUsers={fetchUsers}
+        fetchUsers={() => fetchUsers(page, size)}
       />
-        <EditUser
+      <EditUser
         open={editUserModalOpen}
         onClose={() => setEditUserModalOpen(false)}
         userId={selectedUserId || ""}
-        fetchUsers={fetchUsers}
+        fetchUsers={() => fetchUsers(page, size)}
       />
     </Container>
   );

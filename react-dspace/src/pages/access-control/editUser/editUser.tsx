@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, CircularProgress } from "@mui/material";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Button,
+  CircularProgress,
+} from "@mui/material";
 import { getAuthToken } from "../../../api/authToken";
 import { getUserById, updateUser } from "../../../api/usermanagement";
 
@@ -12,6 +20,7 @@ interface EditUserProps {
 
 const EditUser: React.FC<EditUserProps> = ({ open, onClose, userId, fetchUsers }) => {
   const [userData, setUserData] = useState({ firstName: "", lastName: "", email: "" });
+  const [originalData, setOriginalData] = useState({ firstName: "", lastName: "", email: "" });
   const [loading, setLoading] = useState(false);
   const [updating, setUpdating] = useState(false);
 
@@ -26,11 +35,13 @@ const EditUser: React.FC<EditUserProps> = ({ open, onClose, userId, fetchUsers }
     try {
       const authToken = getAuthToken() || "Bearer your_token_here";
       const user = await getUserById(id, authToken);
-      setUserData({
+      const userDetails = {
         firstName: user.metadata?.["eperson.firstname"]?.[0]?.value || "",
         lastName: user.metadata?.["eperson.lastname"]?.[0]?.value || "",
-        email: user.email || ""
-      });
+        email: user.email || "",
+      };
+      setUserData(userDetails);
+      setOriginalData(userDetails); 
     } catch (error) {
       console.error("Failed to fetch user details:", error);
     } finally {
@@ -44,17 +55,27 @@ const EditUser: React.FC<EditUserProps> = ({ open, onClose, userId, fetchUsers }
   };
 
   const handleUpdate = async () => {
+    const updatedFields: any = {};
+  
+    if (userData.firstName !== originalData.firstName) {
+      updatedFields.firstName = userData.firstName;
+    }
+    if (userData.lastName !== originalData.lastName) {
+      updatedFields.lastName = userData.lastName;
+    }
+    if (userData.email !== originalData.email) {
+      updatedFields.email = userData.email;
+    }
+  
+    if (Object.keys(updatedFields).length === 0) {
+      console.log("No changes detected.");
+      return;
+    }
+  
     setUpdating(true);
     try {
       const authToken = getAuthToken() || "Bearer your_token_here";
-      await updateUser(userId, {
-        metadata: {
-          "eperson.firstname": [{ value: userData.firstName }],
-          "eperson.lastname": [{ value: userData.lastName }]
-        },
-        email: userData.email
-      }, authToken);  
-  
+      await updateUser(userId, updatedFields, authToken); // Ensure authToken is passed
       fetchUsers();
       onClose();
     } catch (error) {
@@ -96,13 +117,14 @@ const EditUser: React.FC<EditUserProps> = ({ open, onClose, userId, fetchUsers }
               onChange={handleInputChange}
               fullWidth
               margin="normal"
-              disabled
             />
           </>
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="primary">Cancel</Button>
+        <Button onClick={onClose} color="primary">
+          Cancel
+        </Button>
         <Button onClick={handleUpdate} color="primary" disabled={updating || loading}>
           {updating ? <CircularProgress size={24} /> : "Update"}
         </Button>

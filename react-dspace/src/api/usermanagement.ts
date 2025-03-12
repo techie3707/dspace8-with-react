@@ -1,7 +1,6 @@
 import axios from "axios";
 import { siteConfig } from "../data/data";
 import { fetchCsrfToken, getCsrfToken } from "./csrf";
-import { getAuthToken } from "./authToken";
 
 export interface EPerson {
   id: string;
@@ -14,16 +13,24 @@ export interface EPerson {
   };
 }
 
-export interface UserListResponse {
-  _embedded?: {
-    epersons: EPerson[];
+
+interface UserListResponse {
+  _embedded: {
+      epersons: EPerson[];
+  };
+  page?: { 
+      size: number;
+      totalElements: number;
+      totalPages: number;
+      number: number;
   };
 }
 
-export const userList = async (authToken: string): Promise<EPerson[]> => {
+
+export const userList = async (authToken: string, page: number = 0, size: number = 10) => {
   try {
     const response = await axios.get<UserListResponse>(
-      `${siteConfig.apiEndpoint}/api/eperson/epersons`,
+      `${siteConfig.apiEndpoint}/api/eperson/epersons/search/byMetadata?page=${page}&size=${size}&query=`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -33,12 +40,22 @@ export const userList = async (authToken: string): Promise<EPerson[]> => {
       }
     );
 
-    return response.data._embedded?.epersons || [];
+    console.log("Size:", response.data.page?.size);
+    console.log("Total Elements:", response.data.page?.totalElements);
+    console.log("Total Pages:", response.data.page?.totalPages);
+    console.log("Current Page Number:", response.data.page?.number);
+
+    return {
+      epersons: response.data._embedded?.epersons || [],
+      totalPages: response.data.page?.totalPages || 1,
+    };
   } catch (error: any) {
     console.error("Error fetching user list:", error?.response?.data || error.message);
     throw error;
   }
 };
+
+
 
 export const removeUser = async (userId: string) => {
   const authToken = localStorage.getItem("authToken");
@@ -116,28 +133,51 @@ export const getUserById = async (userId: string, authToken: string) => {
 };
 export const updateUser = async (userId: string, userData: Record<string, any>, authToken: string) => {
   try {
-    const csrfToken = getCsrfToken();
-
+    const csrfToken = localStorage.getItem("csrfToken");
+    
     if (!authToken || !csrfToken) {
       throw new Error("Missing authentication tokens");
     }
 
-    await axios.put(
-      `${siteConfig.apiEndpoint}/api/eperson/epersons/${userId}`,
-      userData,
-      {
+    const patchPayload: any[] = [];
+
+    if (userData.firstName !== undefined) {
+      patchPayload.push({
+        op: "replace",
+        path: "/metadata/eperson.firstname",
+        value: userData.firstName,
+      });
+    }
+    if (userData.lastName !== undefined) {
+      patchPayload.push({
+        op: "replace",
+        path: "/metadata/eperson.lastname",
+        value: userData.lastName,
+      });
+    }
+    if (userData.email !== undefined) {
+      patchPayload.push({
+        op: "replace",
+        path: "/email",
+        value: userData.email,
+      });
+    }
+
+    for (const patch of patchPayload) {
+      await axios.patch(`${siteConfig.apiEndpoint}/api/eperson/epersons/${userId}`, [patch], {
         headers: {
-          "X-XSRF-TOKEN": csrfToken,
-          Authorization: authToken,
-          "Content-Type": "application/json",
+          'X-XSRF-TOKEN': csrfToken,
+          'Authorization': authToken || '',
         },
-      }
-    );
+        withCredentials: true,
+      });
+    }
   } catch (error) {
     console.error("Error updating user:", error);
     throw error;
   }
 };
+
 
 
 
