@@ -51,7 +51,9 @@ const Home = () => {
     { title: "Academics", description: "Combine PDFs in the order you want with the easiest PDF merger available." },
     { title: "Accounts", description: "Separate one page or a whole set for easy conversion into independent PDF files." },
     { title: "General Administrative", description: "Reduce file size while optimizing for maximal PDF quality." },
-    { title: "Publication", description: "Add text, images, shapes or freehand annotations to a PDF document." }
+    { title: "Publication", description: "Add text, images, shapes or freehand annotations to a PDF document." },
+    { title: "Finance", description: "Add text, images, shapes or freehand annotations to a PDF document." },
+    { title: "R&D Development", description: "Add text, images, shapes or freehand annotations to a PDF document." }
   ].map((card, index) => (
     <Grid item xs={12} sm={6} md={2} key={index}>
       <Card className="feature-card">

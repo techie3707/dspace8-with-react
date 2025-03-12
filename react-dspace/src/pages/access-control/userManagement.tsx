@@ -1,36 +1,82 @@
 import React, { useEffect, useState } from "react";
-import { Container, Grid, TextField, Button, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, CircularProgress } from "@mui/material";
+import {
+  Container,
+  Grid,
+  TextField,
+  Button,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  IconButton,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
 import "./userManagement.css";
-import { userList } from "../../api/usermanagement";
+import { removeUser, userList } from "../../api/usermanagement";
 import { EPerson } from "../../api/usermanagement";
 import { getAuthToken } from "../../api/authToken";
+import AddUser from "./addUser/addUser";
+import EditUser from "./editUser/editUser";
 
 const UserManagement = () => {
   const [users, setUsers] = useState<EPerson[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [addUserModalOpen, setAddUserModalOpen] = useState<boolean>(false);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [editUserModalOpen, setEditUserModalOpen] = useState<boolean>(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
+  const [selectedUser, setSelectedUser] = useState<EPerson | null>(null);
 
-  const authToken = getAuthToken() || "Bearer your_token_here"; // Fallback value if token is null
-  
+  const authToken = getAuthToken() || "Bearer your_token_here";
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const data = await userList(authToken);
+      setUsers(data);
+    } catch (error) {
+      console.error("Failed to fetch users:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const data = await userList(authToken);
-        setUsers(data); // Now directly assigns correctly typed data
-      } catch (error) {
-        console.error("Failed to fetch users:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchUsers();
   }, []);
 
+  const handleDeleteClick = (user: EPerson) => {
+    setSelectedUser(user);
+    setDeleteModalOpen(true);
+  };
+  const handleEditClick = (userId: string) => {
+    setSelectedUserId(userId);
+    setEditUserModalOpen(true);
+  };
+  const handleConfirmDelete = async () => {
+    if (selectedUser) {
+      const success = await removeUser(selectedUser.id);
+      if (success) {
+        await fetchUsers();
+      }
+      setDeleteModalOpen(false);
+    }
+  };
   return (
     <Container>
-      <Typography variant="h4" sx={{ mb: 3 }}>EPeople</Typography>
+      <Typography variant="h4" sx={{ mb: 3 }}>
+        EPeople
+      </Typography>
 
       <Grid container spacing={2} alignItems="center" sx={{ mb: 2 }}>
         <Grid item xs={3}>
@@ -46,18 +92,26 @@ const UserManagement = () => {
           <Button variant="outlined">Browse All</Button>
         </Grid>
         <Grid item>
-          <Button variant="contained" color="success">+ Add User</Button>
+          <Button
+            variant="contained"
+            color="success"
+            onClick={() => setAddUserModalOpen(true)}
+          >
+            + Add User
+          </Button>
         </Grid>
       </Grid>
 
       {loading ? (
         <CircularProgress sx={{ display: "block", margin: "auto", my: 3 }} />
       ) : (
-        <TableContainer component={Paper} sx={{ border: "1px solid #ddd", borderRadius: "8px", overflow: "hidden" }}>
+        <TableContainer
+          component={Paper}
+          sx={{ border: "1px solid #ddd", borderRadius: "8px", overflow: "hidden" }}
+        >
           <Table>
             <TableHead>
               <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
-                <TableCell><b>ID</b></TableCell>
                 <TableCell><b>First Name</b></TableCell>
                 <TableCell><b>Last Name</b></TableCell>
                 <TableCell><b>Email</b></TableCell>
@@ -67,13 +121,20 @@ const UserManagement = () => {
             <TableBody>
               {users.map((user) => (
                 <TableRow key={user.id}>
-                  <TableCell>{user.id}</TableCell>
-                  <TableCell>{user.metadata?.['eperson.firstname']?.[0]?.value || 'N/A'}</TableCell>
-                  <TableCell>{user.metadata?.['eperson.lastname']?.[0]?.value || 'N/A'}</TableCell>
+                  <TableCell>
+                    {user.metadata?.["eperson.firstname"]?.[0]?.value || "N/A"}
+                  </TableCell>
+                  <TableCell>
+                    {user.metadata?.["eperson.lastname"]?.[0]?.value || "N/A"}
+                  </TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>
-                    <IconButton color="primary"><Edit /></IconButton>
-                    <IconButton color="error"><Delete /></IconButton>
+                    <IconButton color="primary" onClick={() => handleEditClick(user.id)}>
+                      <Edit />
+                    </IconButton>
+                    <IconButton color="error" onClick={() => handleDeleteClick(user)}>
+                      <Delete />
+                    </IconButton>
                   </TableCell>
                 </TableRow>
               ))}
@@ -81,6 +142,40 @@ const UserManagement = () => {
           </Table>
         </TableContainer>
       )}
+
+      <Dialog
+        open={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+      >
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete{" "}
+            <strong>{selectedUser?.metadata?.["eperson.firstname"]?.[0]?.value || "User"}</strong>{" "}
+            (<em>{selectedUser?.email}</em>)?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteModalOpen(false)} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleConfirmDelete} color="error">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <AddUser
+        open={addUserModalOpen}
+        onClose={() => setAddUserModalOpen(false)}
+        fetchUsers={fetchUsers}
+      />
+        <EditUser
+        open={editUserModalOpen}
+        onClose={() => setEditUserModalOpen(false)}
+        userId={selectedUserId || ""}
+        fetchUsers={fetchUsers}
+      />
     </Container>
   );
 };

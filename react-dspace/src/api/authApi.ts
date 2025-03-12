@@ -1,10 +1,10 @@
 import axios from "axios";
 import { siteConfig } from "../data/data";
-import { setAuthToken } from "./authToken"; 
+import { setAuthToken } from "./authToken";
+import { fetchCsrfToken } from "./csrf";
 
 export const login = async (email: string, password: string, csrfToken: string) => {
   try {
-    
     const response = await axios.post(
       `${siteConfig.apiEndpoint}/api/authn/login`,
       { user: email, password },
@@ -17,12 +17,13 @@ export const login = async (email: string, password: string, csrfToken: string) 
       }
     );
 
-
-
     const authToken = response.headers["authorization"];
     if (authToken) {
       setAuthToken(authToken);
+      localStorage.setItem("authToken", authToken);
     }
+
+    await fetchCsrfToken();
 
     return response.data;
   } catch (error: any) {
@@ -30,3 +31,4 @@ export const login = async (email: string, password: string, csrfToken: string) 
     throw error;
   }
 };
+

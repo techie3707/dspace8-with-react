@@ -4,6 +4,7 @@
     width: 260px;
     padding: 36px 20px;
     transition: var(--transition-default);
+    border-right: 1px solid white;
   }
   .user-info {
     display: flex;

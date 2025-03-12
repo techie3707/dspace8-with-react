@@ -1,6 +1,7 @@
 import axios from "axios";
 import { siteConfig } from "../data/data";
 
+let csrfToken: string | null = localStorage.getItem("csrfToken") || null;
 
 export const fetchCsrfToken = async (): Promise<string | null> => {
   try {
@@ -8,11 +9,20 @@ export const fetchCsrfToken = async (): Promise<string | null> => {
       withCredentials: true,
     });
 
-    const csrfToken = response.headers["dspace-xsrf-token"];
-    return csrfToken || null;
+    const token = response.headers["dspace-xsrf-token"] || null;
+    if (token) {
+      setCsrfToken(token);
+    }
+    return token;
   } catch (error) {
-    console.error("Error fetching CSRF token:", error);
+    console.error("Failed to fetch CSRF token:", error);
     return null;
   }
 };
 
+export const setCsrfToken = (token: string): void => {
+  csrfToken = token;
+  localStorage.setItem("csrfToken", token);
+};
+
+export const getCsrfToken = (): string | null => csrfToken;

@@ -58,7 +58,6 @@ const Sidebar: React.FC = () => {
                     <span className="nav-link-text">{navigationLink.title}</span>
                 </a>
 
-                {/* Submenu Logic */}
                 {navigationLink.submenu && openSubMenuIdx === navigationLink.id && (
                   <ul className="submenu">
                     {navigationLink.submenu.map((subLink) => (

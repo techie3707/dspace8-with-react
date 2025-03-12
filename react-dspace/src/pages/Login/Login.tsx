@@ -25,13 +25,13 @@ const Login = () => {
   const handleLogin = async () => {
     try {
       const response = await login(email, password);
-      toast.success("Login successful!", { position: "top-right" }); // ✅ Corrected
+      toast.success("Login successful!", { position: "top-right" }); 
       navigate("/");
     } catch (err: any) {
       if (err.response?.status === 401) {
-        toast.error("Invalid email or password.", { position: "top-right" }); // ✅ Corrected
+        toast.error("Invalid email or password.", { position: "top-right" }); 
       } else {
-        toast.error("An error occurred. Please try again.", { position: "top-right" }); // ✅ Corrected
+        toast.error("An error occurred. Please try again.", { position: "top-right" }); 
       }
       setError("Invalid email or password. Please try again.");
     }
