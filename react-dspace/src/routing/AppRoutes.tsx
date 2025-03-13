@@ -7,6 +7,7 @@ import Login from "../pages/Login/Login";
 import ForgotPassword from "../pages/ForgotPassword/ForgotPassword";
 import SignUp from "../pages/SignUp/SignUp";
 import UserManagement from "../pages/access-control/userManagement";
+import MetadataSchemas from "../pages/Registries/MetadataSchemas";
 
 const AppRoutes = () => {
   return (
@@ -18,6 +19,7 @@ const AppRoutes = () => {
       <Route path="/usermanagement" element={< UserManagement/>} />
       <Route path="/forgotPassword" element={<ForgotPassword />} />
       <Route path="/signUp" element={<SignUp />} />
+      <Route path="/metadataSchemas" element={<MetadataSchemas />} />
     </Routes>
   );
 };

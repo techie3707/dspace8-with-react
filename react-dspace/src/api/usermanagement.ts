@@ -27,10 +27,10 @@ interface UserListResponse {
 }
 
 
-export const userList = async (authToken: string, page: number = 0, size: number = 10) => {
+export const userList = async (authToken: string, page: number = 0, size: number = 10, query: string = "") => {
   try {
     const response = await axios.get<UserListResponse>(
-      `${siteConfig.apiEndpoint}/api/eperson/epersons/search/byMetadata?page=${page}&size=${size}&query=`,
+      `${siteConfig.apiEndpoint}/api/eperson/epersons/search/byMetadata?page=${page}&size=${size}&query=${encodeURIComponent(query)}`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -39,11 +39,6 @@ export const userList = async (authToken: string, page: number = 0, size: number
         withCredentials: true,
       }
     );
-
-    console.log("Size:", response.data.page?.size);
-    console.log("Total Elements:", response.data.page?.totalElements);
-    console.log("Total Pages:", response.data.page?.totalPages);
-    console.log("Current Page Number:", response.data.page?.number);
 
     return {
       epersons: response.data._embedded?.epersons || [],

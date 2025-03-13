@@ -22,12 +22,12 @@ import {
   Pagination,
 } from "@mui/material";
 import { Edit, Delete, Lock } from "@mui/icons-material";
-import "./userManagement.css";
 import { removeUser, userList } from "../../api/usermanagement";
 import { EPerson } from "../../api/usermanagement";
 import { getAuthToken } from "../../api/authToken";
 import AddUser from "./addUser/addUser";
 import EditUser from "./editUser/editUser";
+import "./userManagement.css";
 
 const UserManagement = () => {
   const [users, setUsers] = useState<EPerson[]>([]);
@@ -38,15 +38,15 @@ const UserManagement = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
   const [selectedUser, setSelectedUser] = useState<EPerson | null>(null);
   const [page, setPage] = useState<number>(1);
-  const [size, setSize] = useState<number>(2);
+  const [size, setSize] = useState<number>(10);
   const [totalPages, setTotalPages] = useState<number>(1);
-
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const authToken = getAuthToken() || "Bearer your_token_here";
 
-  const fetchUsers = async (page: number, size: number) => {
+  const fetchUsers = async (page: number, size: number, query: string) => {
     setLoading(true);
     try {
-      const data = await userList(authToken, page - 1, size);
+      const data = await userList(authToken, page - 1, size, query);
       setUsers(data.epersons);
       setTotalPages(data.totalPages);
     } catch (error) {
@@ -57,7 +57,7 @@ const UserManagement = () => {
   };
 
   useEffect(() => {
-    fetchUsers(page, size);
+    fetchUsers(page, size, searchQuery);
   }, [page, size]);
 
   const handleDeleteClick = (user: EPerson) => {
@@ -74,7 +74,7 @@ const UserManagement = () => {
     if (selectedUser) {
       const success = await removeUser(selectedUser.id);
       if (success) {
-        await fetchUsers(page, size);
+        await fetchUsers(page, size, searchQuery);
       }
       setDeleteModalOpen(false);
     }
@@ -95,10 +95,18 @@ const UserManagement = () => {
           <TextField label="Metadata" variant="outlined" fullWidth />
         </Grid>
         <Grid item xs={6}>
-          <TextField label="Search people..." variant="outlined" fullWidth />
+          <TextField
+            label="Search people..."
+            variant="outlined"
+            fullWidth
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </Grid>
         <Grid item>
-          <Button variant="contained" color="primary">Search</Button>
+          <Button variant="contained" color="primary" onClick={() => fetchUsers(1, size, searchQuery)}>
+            Search
+          </Button>
         </Grid>
         <Grid item>
           <Button variant="outlined">Browse All</Button>
@@ -192,14 +200,14 @@ const UserManagement = () => {
       <AddUser
         open={addUserModalOpen}
         onClose={() => setAddUserModalOpen(false)}
-        fetchUsers={() => fetchUsers(page, size)}
-      />
+        fetchUsers={() => fetchUsers(page, size, searchQuery)} />
       <EditUser
         open={editUserModalOpen}
         onClose={() => setEditUserModalOpen(false)}
         userId={selectedUserId || ""}
-        fetchUsers={() => fetchUsers(page, size)}
+        fetchUsers={() => fetchUsers(page, size, searchQuery)}
       />
+
     </Container>
   );
 };
