@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { addMetadataSchema, deleteMetadataSchema, fetchMetadataSchemas } from "../../api/registries";
 import { Paper, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Checkbox, Pagination, TextField, Button, Box } from "@mui/material";
-import axios from "axios";
 import "../../pages/Registries/MetadataSchemas.css"
+import { useNavigate } from "react-router-dom";
 
 interface MetadataSchema {
     id: number;
@@ -18,9 +18,8 @@ const MetadataSchemas = () => {
     const [namespace, setNamespace] = useState("");
     const [name, setName] = useState("");
     const [isSaveEnabled, setIsSaveEnabled] = useState(false);
-
+	const navigate = useNavigate();
     const authToken = localStorage.getItem("authToken") || "";
-    const csrfToken = localStorage.getItem("csrfToken") || "";
 
     useEffect(() => {
         setIsSaveEnabled(namespace.trim() !== "" && name.trim() !== "");
@@ -74,6 +73,10 @@ const MetadataSchemas = () => {
             console.error("Error deleting metadata schemas:", error);
         }
     };
+    const handleView = (prefix: string, schemaId: number) => {
+        navigate(`/bitstream/${schemaId}/${encodeURIComponent(prefix)}`);
+    };
+
 
     return (
 <Paper className="metadata-container">
@@ -113,6 +116,7 @@ const MetadataSchemas = () => {
                     <TableCell>ID</TableCell>
                     <TableCell>Namespace</TableCell>
                     <TableCell>Name</TableCell>
+                    <TableCell>Action</TableCell>
                 </TableRow>
             </TableHead>
             <TableBody>
@@ -127,6 +131,11 @@ const MetadataSchemas = () => {
                         <TableCell>{schema.id}</TableCell>
                         <TableCell>{schema.namespace}</TableCell>
                         <TableCell>{schema.prefix}</TableCell>
+                        <TableCell>
+                                    <Button variant="outlined" onClick={() => handleView(schema.prefix, schema.id)}>
+                                        View
+                                    </Button>
+                                </TableCell>
                     </TableRow>
                 ))}
             </TableBody>

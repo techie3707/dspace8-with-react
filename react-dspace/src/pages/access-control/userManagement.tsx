@@ -38,7 +38,7 @@ const UserManagement = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
   const [selectedUser, setSelectedUser] = useState<EPerson | null>(null);
   const [page, setPage] = useState<number>(1);
-  const [size, setSize] = useState<number>(10);
+  const [size] = useState<number>(10);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const authToken = getAuthToken() || "Bearer your_token_here";

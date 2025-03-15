@@ -8,6 +8,7 @@ import ForgotPassword from "../pages/ForgotPassword/ForgotPassword";
 import SignUp from "../pages/SignUp/SignUp";
 import UserManagement from "../pages/access-control/userManagement";
 import MetadataSchemas from "../pages/Registries/MetadataSchemas";
+import Bitstream from "../pages/Registries/Bitstream";
 
 const AppRoutes = () => {
   return (
@@ -20,6 +21,7 @@ const AppRoutes = () => {
       <Route path="/forgotPassword" element={<ForgotPassword />} />
       <Route path="/signUp" element={<SignUp />} />
       <Route path="/metadataSchemas" element={<MetadataSchemas />} />
+      <Route path="/bitstream/:schemaId/:schemaName" element={<Bitstream />} />
     </Routes>
   );
 };
