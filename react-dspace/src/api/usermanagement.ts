@@ -27,13 +27,16 @@ interface UserListResponse {
 }
 
 
-export const userList = async (authToken: string, page: number = 0, size: number = 10, query: string = "") => {
+export const userList = async (page: number = 0, size: number = 10, query: string = "") => {
   try {
+    const authToken = localStorage.getItem("authToken");
+    const csrfToken = localStorage.getItem("csrfToken");
     const response = await axios.get<UserListResponse>(
       `${siteConfig.apiEndpoint}/api/eperson/epersons/search/byMetadata?page=${page}&size=${size}&query=${encodeURIComponent(query)}`,
       {
         headers: {
           "Content-Type": "application/json",
+          'X-XSRF-TOKEN': csrfToken,
           "Authorization": authToken,
         },
         withCredentials: true,

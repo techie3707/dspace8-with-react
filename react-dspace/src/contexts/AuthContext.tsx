@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState } from "react";
-import { login as authLogin } from "../api/authApi"; // Import login function from authApi.ts
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { login as authLogin } from "../api/authApi"; 
 import { useCsrf } from "../contexts/CsrfContext";
 
 interface AuthContextType {
@@ -13,6 +13,10 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
     const { csrfToken } = useCsrf(); 
+    useEffect(() => {
+        const authToken = localStorage.getItem("authToken");
+        setIsAuthenticated(!!authToken);
+    }, []);
 
     const login = async (email: string, password: string) => {
         try {

@@ -20,7 +20,7 @@ export const siteConfig = {
 
 export const generateNavigationLinks = (collectionNames: string[]): NavigationLink[] => {
     return collectionNames.map((collection, index) => ({
-        id: index + 4,
+        id: index + 6,
         title: collection.charAt(0).toUpperCase() + collection.slice(1),
         image: iconsImgs.bills,
         path: `/collections/${collection.toLowerCase()}`,
@@ -38,6 +38,8 @@ export const navigationLinks: NavigationLink[] = [
     { id: 1, title: "Home", image: iconsImgs.home, path: "/" },
     { id: 2, title: "User Management", image: iconsImgs.gears, path: "/UserManagement" },
     { id: 3, title: "Metadata Schemas", image: iconsImgs.gears, path: "/metadataSchemas" },
+    { id: 4, title: "Groups", image: iconsImgs.gears, path: "/groups" },
+    { id: 5,title: "Batch Import", image: iconsImgs.gears, path: "/batchImport" },
     ...generateNavigationLinks(collectionNames)
 ];
 

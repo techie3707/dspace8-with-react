@@ -41,12 +41,11 @@ const UserManagement = () => {
   const [size] = useState<number>(10);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const authToken = getAuthToken() || "Bearer your_token_here";
 
   const fetchUsers = async (page: number, size: number, query: string) => {
     setLoading(true);
     try {
-      const data = await userList(authToken, page - 1, size, query);
+      const data = await userList(page - 1, size, query);
       setUsers(data.epersons);
       setTotalPages(data.totalPages);
     } catch (error) {
