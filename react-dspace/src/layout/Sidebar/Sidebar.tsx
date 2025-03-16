@@ -1,31 +1,45 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useRef } from "react";
 import { personsImgs } from "../../utils/images";
 import { navigationLinks } from "../../data/data";
 import "./Sidebar.css";
 import { SidebarContext } from "../../contexts/sidebarContext";
 import { useNavigate } from "react-router-dom";
-import { FaChevronDown, FaChevronRight } from "react-icons/fa"; // Import icons
+import { FaChevronDown, FaChevronRight, FaTimes } from "react-icons/fa";
 
 const Sidebar: React.FC = () => {
   const [activeLinkIdx, setActiveLinkIdx] = useState<number | null>(1);
   const [openSubMenuIdx, setOpenSubMenuIdx] = useState<number | null>(null);
-  const [sidebarClass, setSidebarClass] = useState("");
   const context = useContext(SidebarContext);
   const navigate = useNavigate();
+  const sidebarRef = useRef<HTMLDivElement>(null);
 
   if (!context) {
     throw new Error("Sidebar must be used within a SidebarProvider");
   }
 
-  const { isSidebarOpen } = context;
+  const { isSidebarOpen, toggleSidebar } = context;
 
+  // Close sidebar when clicking outside
   useEffect(() => {
-    setSidebarClass(isSidebarOpen ? "sidebar-change" : "");
-  }, [isSidebarOpen]);
+    const handleClickOutside = (event: MouseEvent) => {
+      if (sidebarRef.current && !sidebarRef.current.contains(event.target as Node)) {
+        toggleSidebar();
+      }
+    };
+
+    if (isSidebarOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isSidebarOpen, toggleSidebar]);
 
   const handleNavigation = (id: number, path: string) => {
     setActiveLinkIdx(id);
     navigate(path);
+    toggleSidebar(); // Close sidebar after navigation
   };
 
   const toggleSubMenu = (id: number) => {
@@ -33,7 +47,12 @@ const Sidebar: React.FC = () => {
   };
 
   return (
-    <div className={`sidebar ${sidebarClass}`}>
+    <div className={`sidebar ${isSidebarOpen ? "" : "sidebar-change"}`} ref={sidebarRef}>
+      {/* Close Button */}
+      <button className="close-btn" onClick={toggleSidebar}>
+        <FaTimes />
+      </button>
+
       {/* User Info */}
       <div className="user-info">
         <div className="info-img img-fit-cover">
@@ -52,9 +71,11 @@ const Sidebar: React.FC = () => {
                 className={`nav-link ${navigationLink.id === activeLinkIdx ? "active" : ""}`}
                 onClick={(e) => {
                   e.preventDefault();
-                  navigationLink.submenu
-                    ? toggleSubMenu(navigationLink.id)
-                    : handleNavigation(navigationLink.id, navigationLink.path);
+                  if (navigationLink.submenu) {
+                    toggleSubMenu(navigationLink.id);
+                  } else {
+                    handleNavigation(navigationLink.id, navigationLink.path);
+                  }
                 }}
               >
                 <img src={navigationLink.image} className="nav-link-icon" alt={navigationLink.title} />
