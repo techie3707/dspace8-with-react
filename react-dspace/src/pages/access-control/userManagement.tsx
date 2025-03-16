@@ -86,41 +86,35 @@ const UserManagement = () => {
 
   return (
     <Container>
-      <Typography variant="h4" sx={{ mb: 3 }}>
-        EPeople
-      </Typography>
-
-      <Grid container spacing={2} alignItems="center" sx={{ mb: 2 }}>
-        <Grid item xs={3}>
-          <TextField label="Metadata" variant="outlined" fullWidth />
-        </Grid>
-        <Grid item xs={6}>
-          <TextField
-            label="Search people..."
-            variant="outlined"
-            fullWidth
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </Grid>
-        <Grid item>
-          <Button variant="contained" color="primary" onClick={() => fetchUsers(1, size, searchQuery)}>
-            Search
-          </Button>
-        </Grid>
-        <Grid item>
-          <Button variant="outlined">Browse All</Button>
-        </Grid>
-        <Grid item>
-          <Button
-            variant="contained"
-            color="success"
-            onClick={() => setAddUserModalOpen(true)}
-          >
-            + Add User
-          </Button>
-        </Grid>
+      <Grid container justifyContent="space-between" alignItems="center" className="header_epeople">
+        <Typography variant="h4" sx={{ mb: 1 }}>
+          EPeople
+        </Typography>
+        <Button variant="contained" color="success" onClick={() => setAddUserModalOpen(true)}>
+          + Add User
+        </Button>
       </Grid>
+
+
+      <Grid container alignItems="center" className="search-container">
+  <Grid item xs={11}>
+    <TextField
+      label="Search people..."
+      variant="outlined"
+      fullWidth
+      value={searchQuery}
+      onChange={(e) => setSearchQuery(e.target.value)}
+      className="search-field"
+    />
+  </Grid>
+
+  <Grid item>
+    <Button className="button_search" variant="contained" color="primary" onClick={() => fetchUsers(1, size, searchQuery)}>
+      Search
+    </Button>
+  </Grid>
+</Grid>
+
 
       {loading ? (
         <CircularProgress sx={{ display: "block", margin: "auto", my: 3 }} />

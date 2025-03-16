@@ -12,6 +12,7 @@
 }
 .sidebar-toggler img {
   width: 20px;
+  background-color: rgb(129, 20, 246);
 }
 .content-top-title {
   color: var(--clr-white);
