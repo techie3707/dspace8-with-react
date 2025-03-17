@@ -12,12 +12,13 @@ import Bitstream from "../pages/Registries/Bitstream";
 import Groups from "../pages/Group/Group";
 import EditGroup from "../pages/Group/EditGroup";
 import BatchImport from "../pages/BatchImport/BatchImport";
+import { useAuth } from "../contexts/AuthContext";
 
 
 const ProtectedRoute = ({ element }: { element: React.ReactElement }) => {
-  const authToken = localStorage.getItem("authToken"); 
+  const { isAuthenticated } = useAuth();
 
-  return  authToken ? element : <Navigate to="/login" replace />;
+  return isAuthenticated ? element : <Navigate to="/login" replace />;
 };
 
 const AppRoutes = () => {

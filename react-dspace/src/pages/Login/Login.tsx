@@ -25,17 +25,19 @@ const Login = () => {
   const handleLogin = async () => {
     try {
       const response = await login(email, password);
-      toast.success("Login successful!", { position: "top-right" }); 
-      navigate("/");
+      toast.success("Login successful!", { position: "top-right" });
+  
+      window.location.href = "/"; 
     } catch (err: any) {
       if (err.response?.status === 401) {
-        toast.error("Invalid email or password.", { position: "top-right" }); 
+        toast.error("Invalid email or password.", { position: "top-right" });
       } else {
-        toast.error("An error occurred. Please try again.", { position: "top-right" }); 
+        toast.error("An error occurred. Please try again.", { position: "top-right" });
       }
       setError("Invalid email or password. Please try again.");
     }
   };
+  
 
   return (
     <Container maxWidth="sm" className="login-container">
