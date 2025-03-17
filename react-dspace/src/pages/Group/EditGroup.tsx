@@ -8,11 +8,13 @@ import {
     DialogContent,
     DialogContentText,
     DialogActions,
-    Grid
+    Grid,
+    Container
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import { addMemberToGroup, deleteGroup, editGroupDetail, EPerson, fetchGroupMembers, fetchNonMembers, removeMemberToGroup } from "../../api/group";
+import { Delete } from "@mui/icons-material";
 
 const EditGroup = () => {
     const location = useLocation();
@@ -111,81 +113,46 @@ const EditGroup = () => {
             console.error("Error updating group details:", error);
         }
     };
-    const handleDeleteClick = () => {
-        setOpenDeleteDialog(true);
-    };
-
-    const handleConfirmDelete = async () => {
-        try {
-            await deleteGroup(id);
-            setIsModified(false);
-            navigate("/groups");
-        } catch (error) {
-            console.error("Error deleting group:", error);
-        }
-    };
-
-
-    const handleCloseDeleteDialog = () => {
-        setOpenDeleteDialog(false);
-    };
-
 
     const handleSearch = () => {
-        setSearchTerm(searchQuery); // This will trigger the useEffect and fetch new data
+        setSearchTerm(searchQuery);
     };
     return (
-        <Box>
-            <Typography variant="h5" gutterBottom>
-                Edit Group
-            </Typography>
+        <Container>
+            <Grid container justifyContent="space-between" alignItems="center" className="header_group">
+                <Typography variant="h4">Edit Group</Typography>
+            </Grid>
 
             <TextField
-                fullWidth
                 label="Group Name"
-                value={groupName}
-                onChange={handleNameChange}
-                sx={{ marginTop: 2 }}
-            />
-
-            <TextField
+                variant="outlined"
                 fullWidth
-                label="Description"
-                value={groupDescription}
-                onChange={handleDescriptionChange}
-                sx={{ marginTop: 2 }}
+                value={groupName}
+                onChange={(e) => { setGroupName(e.target.value); setIsModified(true); }}
+                sx={{ mb: 2 }}
             />
-
-            <Box sx={{ display: "flex", justifyContent: "space-between", marginTop: 3 }}>
+            <TextField
+                label="Group Description"
+                variant="outlined"
+                fullWidth
+                value={groupDescription}
+                onChange={(e) => { setGroupDescription(e.target.value); setIsModified(true); }}
+                sx={{ mb: 2 }}
+            />
+            <Grid container justifyContent="flex-end">
                 <Button variant="contained" color="secondary" onClick={() => navigate("/groups")}>
                     Back
                 </Button>
-
-                <Button variant="contained" color="primary" onClick={handleSave} disabled={!isModified}>
-                    Save
+                <Button
+                    variant="contained"
+                    color="success"
+                    disabled={!isModified}
+                    onClick={handleSave}
+                >
+                    Save Changes
                 </Button>
+            </Grid>
 
-                {/* <Button variant="contained" color="error" onClick={handleDeleteClick}>
-                    Delete Group
-                </Button> */}
-            </Box>
-
-            <Dialog open={openDeleteDialog} onClose={handleCloseDeleteDialog}>
-                <DialogTitle>Confirm Delete</DialogTitle>
-                <DialogContent>
-                    <DialogContentText>Are you sure you want to delete the group?</DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseDeleteDialog} color="secondary">
-                        Cancel
-                    </Button>
-                    <Button onClick={handleConfirmDelete} color="error">
-                        Yes, Delete
-                    </Button>
-                </DialogActions>
-            </Dialog>
-
-            {/* Members Table */}
             <Typography variant="h6" sx={{ marginTop: 3 }}>Current Members</Typography>
             <TableContainer component={Paper} sx={{ marginTop: 1 }}>
                 <Table>
@@ -286,7 +253,7 @@ const EditGroup = () => {
                 onChange={(_event, value) => setNonMemberPage(value)}
                 sx={{ display: "flex", justifyContent: "center", marginTop: "15px" }}
             />
-        </Box>
+        </Container>
     );
 };
 

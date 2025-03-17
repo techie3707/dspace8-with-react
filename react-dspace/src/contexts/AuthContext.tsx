@@ -1,17 +1,18 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { login as authLogin } from "../api/authApi";
 
-
 interface AuthContextType {
     isAuthenticated: boolean;
     login: (email: string, password: string) => Promise<void>;
     logout: () => void;
+    loading: boolean; // Add loading state
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(true); // Loading state to prevent redirect before checking auth
     const csrfToken = localStorage.getItem("csrfToken") || "";
 
     useEffect(() => {
@@ -20,9 +21,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (authToken && !isTokenExpired(authToken)) {
             setIsAuthenticated(true);
         } else {
-            setIsAuthenticated(false);
             localStorage.removeItem("authToken");
+            setIsAuthenticated(false);
         }
+        setLoading(false); // Set loading to false after checking
     }, []);
 
     const login = async (email: string, password: string) => {
@@ -41,7 +43,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.removeItem("authToken");
     };
 
-    return <AuthContext.Provider value={{ isAuthenticated, login, logout }}>{children}</AuthContext.Provider>;
+    return (
+        <AuthContext.Provider value={{ isAuthenticated, login, logout, loading }}>
+            {children}
+        </AuthContext.Provider>
+    );
 };
 
 export const useAuth = () => {
