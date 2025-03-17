@@ -21,13 +21,12 @@ import {
   DialogTitle,
   Pagination,
 } from "@mui/material";
-import { Edit, Delete, Lock } from "@mui/icons-material";
 import { removeUser, userList } from "../../api/usermanagement";
 import { EPerson } from "../../api/usermanagement";
-import { getAuthToken } from "../../api/authToken";
 import AddUser from "./addUser/addUser";
 import EditUser from "./editUser/editUser";
 import "./userManagement.css";
+import { iconsImgs } from "../../utils/images";
 
 const UserManagement = () => {
   const [users, setUsers] = useState<EPerson[]>([]);
@@ -87,7 +86,7 @@ const UserManagement = () => {
     <Container>
       <Grid container justifyContent="space-between" alignItems="center" className="header_epeople">
         <Typography variant="h4" sx={{ mb: 1 }}>
-          EPeople
+          User Administration
         </Typography>
         <Button variant="contained" color="success" onClick={() => setAddUserModalOpen(true)}>
           + Add User
@@ -96,23 +95,24 @@ const UserManagement = () => {
 
 
       <Grid container alignItems="center" className="search-container">
-  <Grid item xs={11}>
-    <TextField
-      label="Search people..."
-      variant="outlined"
-      fullWidth
-      value={searchQuery}
-      onChange={(e) => setSearchQuery(e.target.value)}
-      className="search-field"
-    />
-  </Grid>
+        <Grid item xs={11}>
+          <TextField
+            label="Search people..."
+            variant="outlined"
+            fullWidth
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="search-field"
+            InputLabelProps={{ className: "custom-label" }}
+          />
+        </Grid>
 
-  <Grid item>
-    <Button className="button_search" variant="contained" color="primary" onClick={() => fetchUsers(1, size, searchQuery)}>
-      Search
-    </Button>
-  </Grid>
-</Grid>
+        <Grid item>
+          <Button className="button_search" variant="contained" color="primary" onClick={() => fetchUsers(1, size, searchQuery)}>
+            Search
+          </Button>
+        </Grid>
+      </Grid>
 
 
       {loading ? (
@@ -120,50 +120,56 @@ const UserManagement = () => {
       ) : (
         <>
           <TableContainer
-            component={Paper}
-            sx={{ border: "1px solid #ddd", borderRadius: "8px", overflow: "hidden" }}
-          >
-            <Table>
-              <TableHead>
-                <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
-                  <TableCell><b>First Name</b></TableCell>
-                  <TableCell><b>Last Name</b></TableCell>
-                  <TableCell><b>Email</b></TableCell>
-                  <TableCell><b>Actions</b></TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {users.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell>
-                      {user.metadata?.["eperson.firstname"]?.[0]?.value || "N/A"}
-                    </TableCell>
-                    <TableCell>
-                      {user.metadata?.["eperson.lastname"]?.[0]?.value || "N/A"}
-                    </TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>
-                      <IconButton color="primary" onClick={() => handleEditClick(user.id)}>
-                        <Edit />
-                      </IconButton>
-                      <IconButton color="error" onClick={() => handleDeleteClick(user)}>
-                        <Delete />
-                      </IconButton>
-                      <IconButton color="secondary">
-                        <Lock />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+  component={Paper}
+  sx={{ border: "1px solid #ddd", borderRadius: "8px", overflow: "hidden" }}
+>
+  <Table>
+    <TableHead>
+      <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
+        <TableCell><b>First Name</b></TableCell>
+        <TableCell><b>Last Name</b></TableCell>
+        <TableCell><b>Email</b></TableCell>
+        <TableCell><b>Actions</b></TableCell>
+      </TableRow>
+    </TableHead>
+    <TableBody>
+      {users.map((user) => (
+        <TableRow
+          key={user.id}
+          sx={{
+            "&:hover": { backgroundColor: "#f0f0f0" }, 
+            cursor: "pointer", 
+          }}
+        >
+          <TableCell>
+            {user.metadata?.["eperson.firstname"]?.[0]?.value || "N/A"}
+          </TableCell>
+          <TableCell>
+            {user.metadata?.["eperson.lastname"]?.[0]?.value || "N/A"}
+          </TableCell>
+          <TableCell>{user.email}</TableCell>
+          <TableCell className="table_btn_div">
+            <IconButton className="btn_table" color="primary" onClick={() => handleEditClick(user.id)}>
+              <img className="table_icon" src={iconsImgs.edit} alt="Edit" />
+            </IconButton>
+            <IconButton className="btn_table_dlt" color="error" onClick={() => handleDeleteClick(user)}>
+              <img className="table_icon" src={iconsImgs.remove} alt="Remove" />
+            </IconButton>
+            <IconButton className="btn_table" color="secondary">
+              <img className="table_icon" src={iconsImgs.access} alt="Access" />
+            </IconButton>
+          </TableCell>
+        </TableRow>
+      ))}
+    </TableBody>
+  </Table>
+</TableContainer>
 
           <Pagination
             count={totalPages}
             page={page}
             onChange={handleChangePage}
-            sx={{ display: "flex", justifyContent: "center", mt: 2 }}
+            sx={{ display: "flex", justifyContent: "center", mt: 2, mb:3 }}
           />
         </>
       )}

@@ -108,3 +108,50 @@ button {
     font-size: 14px !important;
   }
 }
+
+.table_icon{
+  width: 0.5em;
+  height: 0.5em;
+}
+.btn_table{
+  border: 1px solid black !important;
+  border-radius: 1px !important;
+}
+
+.btn_table_dlt{
+  border: 1px solid black !important;
+  border-radius: 1px !important;
+  border-right: none !important;
+  border-left: none !important;
+}
+
+.search-container {
+  display: flex;
+  align-items: center;
+}
+
+.search-field .MuiInputBase-root {
+  height: 40px !important;
+  border-radius: 5px 0px 0px 5px !important;
+}
+
+.search-field .MuiOutlinedInput-notchedOutline {
+  border-color: #ccc !important;
+}
+
+.search-field .MuiInputLabel-root {
+  color: gray !important;
+}
+
+.button_search {
+  height: 40px !important;
+  background-color: var(--clr-primary) !important;
+  color: white !important;
+  text-transform: none !important;
+  border-radius: 0px 5px 5px 0px !important;
+}
+
+.button_search:hover {
+  background-color: #0056b3 !important;
+}
+

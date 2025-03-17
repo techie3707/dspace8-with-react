@@ -16,8 +16,9 @@ import user from "../assets/icons/user.svg";
 import wallet from "../assets/icons/wallet.svg";
 import wealth from "../assets/icons/wealth.svg";
 import login from "../assets/icons/login.svg";
-
-
+import edit from "../assets/icons/edit.png";
+import remove from "../assets/icons/delete.png";
+import access from "../assets/icons/access-control.png";
 import person_one from "../assets/images/person_one.jpg";
 import brand_one from "../assets/images/Final LogoESD.png"
 import home_main from "../assets/images/homepage.svg"
@@ -41,6 +42,9 @@ interface IconsImages {
     wallet: string;
     wealth: string;
     login: string;
+    edit: string;
+    remove: string;
+    access: string;
 }
 
 
@@ -52,7 +56,7 @@ interface PersonsImages {
 
 // Export typed objects
 export const iconsImgs: IconsImages = {
-    alert, bell, bills, budget, card, check, empty_check, gears, home, menu, plane, plus, report, search, user, wallet, wealth, login
+    alert, bell, bills, budget, card, check, empty_check, gears, home, menu, plane, plus, report, search, user, wallet, wealth, login, edit, remove, access
 };
 
 export const personsImgs: PersonsImages = {
