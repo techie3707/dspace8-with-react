@@ -33,7 +33,7 @@ const EditUser: React.FC<EditUserProps> = ({ open, onClose, userId, fetchUsers }
   const fetchUserData = async (id: string) => {
     setLoading(true);
     try {
-      const authToken = getAuthToken() || "Bearer your_token_here";
+      const authToken = localStorage.getItem("authToken") || "";
       const user = await getUserById(id, authToken);
       const userDetails = {
         firstName: user.metadata?.["eperson.firstname"]?.[0]?.value || "",
@@ -74,7 +74,7 @@ const EditUser: React.FC<EditUserProps> = ({ open, onClose, userId, fetchUsers }
   
     setUpdating(true);
     try {
-      const authToken = getAuthToken() || "Bearer your_token_here";
+      const authToken = localStorage.getItem("authToken") || "";
       await updateUser(userId, updatedFields, authToken); // Ensure authToken is passed
       fetchUsers();
       onClose();
