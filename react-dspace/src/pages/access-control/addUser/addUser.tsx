@@ -36,9 +36,9 @@ const AddUser: React.FC<AddUserProps> = ({ open, onClose, fetchUsers }) => {
                 ]
             },
             email: formData.email,
-            canLogIn: true, 
+            canLogIn: true,
             requireCertificate: false,
-            selfRegistered: true, 
+            selfRegistered: true,
             type: "eperson"
         };
 
@@ -53,54 +53,54 @@ const AddUser: React.FC<AddUserProps> = ({ open, onClose, fetchUsers }) => {
     };
     return (
         <Modal open={open} onClose={onClose}>
-          <Paper className="modal-paper">
-          <div className="modal-header-container">
-        <Typography className="modal-header">Add New User</Typography>
-        <IconButton onClick={onClose} className="close-icon">
-          <CloseIcon />
-        </IconButton>
-      </div>
+            <Paper className="modal-paper">
+                <div className="modal-header-container">
+                    <Typography className="modal-header">Add New User</Typography>
+                    <IconButton onClick={onClose} className="close-icon">
+                        <CloseIcon />
+                    </IconButton>
+                </div>
 
-    <Box component="form" onSubmit={handleSubmit} className="modal-form">
-    <TextField
-  label="First Name"
-  name="firstname"
-  value={formData.firstname}
-  onChange={handleChange}
-  fullWidth
-  required
-  className="custom-textfield"
-/>
+                <Box component="form" onSubmit={handleSubmit} className="modal-form">
+                    <TextField
+                        label="First Name"
+                        name="firstname"
+                        value={formData.firstname}
+                        onChange={handleChange}
+                        fullWidth
+                        required
+                        className="custom-textfield"
+                    />
 
-<TextField
-  label="Last Name"
-  name="lastname"
-  value={formData.lastname}
-  onChange={handleChange}
-  fullWidth
-  required
-  className="custom-textfield"
-/>
+                    <TextField
+                        label="Last Name"
+                        name="lastname"
+                        value={formData.lastname}
+                        onChange={handleChange}
+                        fullWidth
+                        required
+                        className="custom-textfield"
+                    />
 
-<TextField
-  label="Email"
-  name="email"
-  value={formData.email}
-  onChange={handleChange}
-  type="email"
-  fullWidth
-  required
-  className="custom-textfield"
-/>
-<Box className="modal-footer">
-    <button type="submit" className="add-user-btn">
-        <span className="btn-text">Add User</span>
-        <span className="btn-icon">→</span>
-    </button>
-</Box>
+                    <TextField
+                        label="Email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        type="email"
+                        fullWidth
+                        required
+                        className="custom-textfield"
+                    />
+                    <Box className="modal-footer">
+                        <button type="submit" className="add-user-btn">
+                            <span className="btn-text">Add User</span>
+                            <span className="btn-icon">→</span>
+                        </button>
+                    </Box>
 
-    </Box>
-</Paper>
+                </Box>
+            </Paper>
 
         </Modal>
     );

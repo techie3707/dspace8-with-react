@@ -32,9 +32,10 @@
     height: 40px; 
   }
 
-  .header_epeople{
-    border-bottom: 1px solid #999595;
-  }
+.header_epeople {
+    border-bottom: 2px solid transparent; 
+    border-image: linear-gradient(to right, transparent, #999595, transparent) 1;
+}
   .TableRow.table_header {
     padding: 10px 5px 10px 20px !important;
   }
@@ -54,7 +55,7 @@
   }
   
   .button-search {
-    background-color: #1976d2; /* Default primary color */
+    background-color: #1976d2; 
     color: white;
     padding: 8px 16px;
     border-radius: 4px;
@@ -63,7 +64,11 @@
   }
   
   .button-search:hover {
-    background-color: #1565c0; /* Darker shade on hover */
+    background-color: #1565c0; 
   }
-  
+  .custom-label {
+    top: -9px !important; 
+    left: 5px;
+    font-size: 14px;
+  }
   
