@@ -29,7 +29,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const login = async (email: string, password: string) => {
         try {
-            const response = await authLogin(email, password, csrfToken ?? "");
+            const response = await authLogin(email, password);
             if (response) {
                 setIsAuthenticated(true);
             }

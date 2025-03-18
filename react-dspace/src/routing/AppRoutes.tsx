@@ -13,6 +13,8 @@ import Groups from "../pages/Group/Group";
 import EditGroup from "../pages/Group/EditGroup";
 import BatchImport from "../pages/BatchImport/BatchImport";
 import { useAuth } from "../contexts/AuthContext";
+import Forgot from "../pages/forgot/forgot";
+import Register from "../pages/Register/Register";
 
 
 const ProtectedRoute = ({ element }: { element: React.ReactElement }) => {
@@ -34,6 +36,8 @@ const AppRoutes = () => {
       <Route path="/contact" element={<Contact />} />
       <Route path="/login" element={<Login />} />
       <Route path="/forgotPassword" element={<ForgotPassword />} />
+      <Route path="/forgot/:token" element={<Forgot />} />
+      <Route path="/register/:token" element={<Register />} />
       <Route path="/signUp" element={<SignUp />} />
       <Route path="/usermanagement" element={<ProtectedRoute element={<UserManagement />} />} />
       <Route path="/metadataSchemas" element={<ProtectedRoute element={<MetadataSchemas />} />} />
