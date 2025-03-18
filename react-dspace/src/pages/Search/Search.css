@@ -1,0 +1,130 @@
+Search.css
+
+.search-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .filters-and-results {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .filters {
+    width: 25%;
+  }
+  
+  .search-results {
+    width: 75%;
+  }
+  
+  .search-input-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .search-input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  .search-button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+  }
+  
+  .results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .view-mode-button {
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    margin-right: 10px;
+  }
+  
+  .view-mode-button.active {
+    background-color: #007bff;
+    color: #fff;
+  }
+  
+  .results-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .results-list li {
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+  }
+  
+  .results-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  
+  .results-grid div {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+  }
+  
+  .pagination-controls {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+  .pagination-controls button {
+    margin: 0 5px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #f0f0f0;
+  }
+  
+  /* Responsive Styles */
+  @media (max-width: 768px) {
+    .filters-and-results {
+      flex-direction: column;
+    }
+  
+    .filters,
+    .search-results {
+      width: 100%;
+    }
+  
+    .results-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .results-grid {
+      grid-template-columns: 1fr;
+    }
+  
+    .search-input-container {
+      flex-direction: column;
+    }
+  
+    .search-button {
+      width: 100%;
+    }
+  }
+
+  

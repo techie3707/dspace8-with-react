@@ -20,7 +20,7 @@ const ContentTop: React.FC = () => {
   return (
     <div className="main-content-top">
       <div className="content-top-left">
-        {isAuthenticated && (
+        {!isAuthenticated && (
           <button type="button" className="sidebar-toggler" onClick={toggleSidebar}>
             <img src={iconsImgs.menu} alt="Menu" />
           </button>
@@ -36,7 +36,7 @@ const ContentTop: React.FC = () => {
           <img src={iconsImgs.bell} alt="Notifications" />
           <span className="notification-btn-dot"></span>
         </button>
-        {isAuthenticated ? (
+        {!isAuthenticated ? (
           <button className="profile-btn">
             <img src={personsImgs.person_one} alt="profile" className="profile-img" />
           </button>

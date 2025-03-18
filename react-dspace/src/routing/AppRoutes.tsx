@@ -12,6 +12,7 @@ import Bitstream from "../pages/Registries/Bitstream";
 import Groups from "../pages/Group/Group";
 import EditGroup from "../pages/Group/EditGroup";
 import BatchImport from "../pages/BatchImport/BatchImport";
+import Search from "../pages/Search/Search";
 
 
 const ProtectedRoute = ({ element }: { element: React.ReactElement }) => {
@@ -29,6 +30,7 @@ const AppRoutes = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/forgotPassword" element={<ForgotPassword />} />
       <Route path="/signUp" element={<SignUp />} />
+      <Route path="/adminSearch" element={<Search />} />
       <Route path="/usermanagement" element={<ProtectedRoute element={<UserManagement />} />} />
       <Route path="/metadataSchemas" element={<ProtectedRoute element={<MetadataSchemas />} />} />
       <Route path="/bitstream/:schemaId/:schemaName" element={<ProtectedRoute element={<Bitstream />} />} />

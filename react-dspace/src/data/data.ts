@@ -40,6 +40,7 @@ export const navigationLinks: NavigationLink[] = [
     { id: 3, title: "Metadata Schemas", image: iconsImgs.gears, path: "/metadataSchemas" },
     { id: 4, title: "Groups", image: iconsImgs.gears, path: "/groups" },
     { id: 5,title: "Batch Import", image: iconsImgs.gears, path: "/batchImport" },
+    { id: 6,title: "Admin Search", image: iconsImgs.gears, path: "/adminSearch" },
     ...generateNavigationLinks(collectionNames)
 ];
 
