@@ -15,6 +15,7 @@ import BatchImport from "../pages/BatchImport/BatchImport";
 import { useAuth } from "../contexts/AuthContext";
 import Forgot from "../pages/forgot/forgot";
 import Register from "../pages/Register/Register";
+import Search from "../pages/Search/Search";
 
 
 const ProtectedRoute = ({ element }: { element: React.ReactElement }) => {
@@ -39,6 +40,7 @@ const AppRoutes = () => {
       <Route path="/forgot/:token" element={<Forgot />} />
       <Route path="/register/:token" element={<Register />} />
       <Route path="/signUp" element={<SignUp />} />
+      <Route path="/adminSearch" element={<Search />} />
       <Route path="/usermanagement" element={<ProtectedRoute element={<UserManagement />} />} />
       <Route path="/metadataSchemas" element={<ProtectedRoute element={<MetadataSchemas />} />} />
       <Route path="/bitstream/:schemaId/:schemaName" element={<ProtectedRoute element={<Bitstream />} />} />
