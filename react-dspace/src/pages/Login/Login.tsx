@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   TextField,
   Button,
@@ -11,7 +11,6 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { siteConfig } from "../../data/data";
-import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./Login.css";
 
@@ -24,19 +23,13 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await login(email, password);
-      toast.success("Login successful!", { position: "top-right" });
-  
-      window.location.href = "/"; 
+      await login(email, password);
     } catch (err: any) {
-      if (err.response?.status === 401) {
-        toast.error("Invalid email or password.", { position: "top-right" });
-      } else {
-        toast.error("An error occurred. Please try again.", { position: "top-right" });
-      }
       setError("Invalid email or password. Please try again.");
     }
   };
+  
+  
   
 
   return (

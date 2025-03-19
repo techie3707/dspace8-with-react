@@ -1,12 +1,14 @@
 import { useEffect, useState, useContext, useRef } from "react";
-import { personsImgs } from "../../utils/images";
-import { navigationLinks } from "../../data/data";
-import "./Sidebar.css";
+import { iconsImgs, personsImgs } from "../../utils/images";
+import { navigationLinks as staticNavigationLinks, generateNavigationLinks, NavigationLink } from "../../data/data";
 import { SidebarContext } from "../../contexts/sidebarContext";
 import { useNavigate } from "react-router-dom";
 import { FaChevronDown, FaChevronRight, FaTimes } from "react-icons/fa";
+import "./Sidebar.css";
+import { fetchCollections } from "../../api/collection";
 
 const Sidebar: React.FC = () => {
+  const [navigationLinks, setNavigationLinks] = useState<NavigationLink[]>(staticNavigationLinks);
   const [activeLinkIdx, setActiveLinkIdx] = useState<number | null>(1);
   const [openSubMenuIdx, setOpenSubMenuIdx] = useState<number | null>(null);
   const context = useContext(SidebarContext);
@@ -19,7 +21,6 @@ const Sidebar: React.FC = () => {
 
   const { isSidebarOpen, toggleSidebar } = context;
 
-  // Close sidebar when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (sidebarRef.current && !sidebarRef.current.contains(event.target as Node)) {
@@ -39,12 +40,28 @@ const Sidebar: React.FC = () => {
   const handleNavigation = (id: number, path: string) => {
     setActiveLinkIdx(id);
     navigate(path);
-    toggleSidebar(); // Close sidebar after navigation
+    toggleSidebar();
   };
 
   const toggleSubMenu = (id: number) => {
     setOpenSubMenuIdx(openSubMenuIdx === id ? null : id);
   };
+
+  useEffect(() => {
+    const loadCollections = async () => {
+      try {
+        const collections = await fetchCollections();
+        const collectionNames = collections.map((col) => col.name);
+        const dynamicLinks = generateNavigationLinks(collectionNames);
+
+        setNavigationLinks([...staticNavigationLinks, ...dynamicLinks]);
+      } catch (error) {
+        console.error("Failed to load collections:", error);
+      }
+    };
+
+    loadCollections();
+  }, []);
 
   return (
     <div className={`sidebar ${isSidebarOpen ? "" : "sidebar-change"}`} ref={sidebarRef}>

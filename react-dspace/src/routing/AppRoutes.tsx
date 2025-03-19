@@ -16,13 +16,14 @@ import { useAuth } from "../contexts/AuthContext";
 import Forgot from "../pages/forgot/forgot";
 import Register from "../pages/Register/Register";
 import Search from "../pages/Search/Search";
+import { ToastProvider } from "../contexts/ToastProvider";
 
 
 const ProtectedRoute = ({ element }: { element: React.ReactElement }) => {
   const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
-    return <div>Loading...</div>; 
+    return <div>Loading...</div>;
   }
 
   return isAuthenticated ? element : <Navigate to="/login" replace />;
@@ -31,23 +32,26 @@ const ProtectedRoute = ({ element }: { element: React.ReactElement }) => {
 
 const AppRoutes = () => {
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/about" element={<About />} />
-      <Route path="/contact" element={<Contact />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/forgotPassword" element={<ForgotPassword />} />
-      <Route path="/forgot/:token" element={<Forgot />} />
-      <Route path="/register/:token" element={<Register />} />
-      <Route path="/signUp" element={<SignUp />} />
-      <Route path="/adminSearch" element={<Search />} />
-      <Route path="/usermanagement" element={<ProtectedRoute element={<UserManagement />} />} />
-      <Route path="/metadataSchemas" element={<ProtectedRoute element={<MetadataSchemas />} />} />
-      <Route path="/bitstream/:schemaId/:schemaName" element={<ProtectedRoute element={<Bitstream />} />} />
-      <Route path="/groups" element={<ProtectedRoute element={<Groups />} />} />
-      <Route path="/edit-group" element={<ProtectedRoute element={<EditGroup />} />} />
-      <Route path="/batchImport" element={<ProtectedRoute element={<BatchImport />} />} />
-    </Routes>
+    <>
+      <ToastProvider />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/forgotPassword" element={<ForgotPassword />} />
+        <Route path="/forgot/:token" element={<Forgot />} />
+        <Route path="/register/:token" element={<Register />} />
+        <Route path="/signUp" element={<SignUp />} />
+        <Route path="/adminSearch" element={<Search />} />
+        <Route path="/usermanagement" element={<ProtectedRoute element={<UserManagement />} />} />
+        <Route path="/metadataSchemas" element={<ProtectedRoute element={<MetadataSchemas />} />} />
+        <Route path="/bitstream/:schemaId/:schemaName" element={<ProtectedRoute element={<Bitstream />} />} />
+        <Route path="/groups" element={<ProtectedRoute element={<Groups />} />} />
+        <Route path="/edit-group" element={<ProtectedRoute element={<EditGroup />} />} />
+        <Route path="/batchImport" element={<ProtectedRoute element={<BatchImport />} />} />
+      </Routes>
+    </>
   );
 };
 

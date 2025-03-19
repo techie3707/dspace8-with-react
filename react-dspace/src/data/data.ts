@@ -1,6 +1,6 @@
 import { iconsImgs } from "../utils/images";
 
-interface NavigationLink {
+export interface NavigationLink {
     id: number;
     title: string;
     image?: string;
@@ -32,8 +32,6 @@ export const generateNavigationLinks = (collectionNames: string[]): NavigationLi
 };
 
 
-const collectionNames = ["news", "article", "reports", "journals"];
-
 export const navigationLinks: NavigationLink[] = [
     { id: 1, title: "Home", image: iconsImgs.home, path: "/" },
     { id: 2, title: "User Management", image: iconsImgs.gears, path: "/UserManagement" },
@@ -41,7 +39,6 @@ export const navigationLinks: NavigationLink[] = [
     { id: 4, title: "Groups", image: iconsImgs.gears, path: "/groups" },
     { id: 5,title: "Batch Import", image: iconsImgs.gears, path: "/batchImport" },
     { id: 6,title: "Admin Search", image: iconsImgs.gears, path: "/adminSearch" },
-    ...generateNavigationLinks(collectionNames)
 ];
 
 

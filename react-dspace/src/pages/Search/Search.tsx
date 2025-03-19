@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { searchObjects } from '../../api/searchApi';
-import './Search.css'; // Import the CSS file
+import './Search.css';
 
 
 
