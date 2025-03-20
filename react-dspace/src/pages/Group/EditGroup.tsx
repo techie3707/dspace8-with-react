@@ -139,7 +139,7 @@ const EditGroup = () => {
                 onChange={(e) => { setGroupDescription(e.target.value); setIsModified(true); }}
                 sx={{ mb: 2 }}
             />
-            <Grid container justifyContent="flex-end">
+            <Grid container justifyContent="flex-end" className="group_btn">
                 <Button variant="contained" color="secondary" onClick={() => navigate("/groups")}>
                     Back
                 </Button>
@@ -197,7 +197,7 @@ const EditGroup = () => {
 
             {/* Non-Members Table */}
             <Typography variant="h6" sx={{ marginTop: 3 }}>Non-Members</Typography>
-            <Grid container spacing={2} alignItems="center" className="search-container">
+            <Grid container alignItems="center" className="search-container">
                 <Grid item xs={11}>
                     <TextField
                         label="Search people..."
@@ -253,7 +253,7 @@ const EditGroup = () => {
                 count={nonMemberTotalPages}
                 page={nonMemberPage}
                 onChange={(_event, value) => setNonMemberPage(value)}
-                sx={{ display: "flex", justifyContent: "center", marginTop: "15px" }}
+                sx={{ display: "flex", justifyContent: "center", mt: 2, mb:2}}
             />
         </Container>
     );

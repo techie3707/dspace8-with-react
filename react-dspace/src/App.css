@@ -402,4 +402,6 @@ button {
 .css-1orzuox-MuiTableCell-root{
   text-align: left;
 }
-
+.group_btn{
+  gap: 5px;
+}
