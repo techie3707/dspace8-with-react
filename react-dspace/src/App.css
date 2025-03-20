@@ -46,11 +46,13 @@ body {
 ul {
   list-style-type: none;
 }
+
 a {
   color: unset;
   text-decoration: none;
   color: var(--clr-white);
 }
+
 button {
   background-color: transparent;
   border: none;
@@ -62,6 +64,7 @@ button {
   height: 100%;
   object-fit: cover;
 }
+
 .theme-toggle-btn {
   background: none;
   border: none;
@@ -75,18 +78,23 @@ button {
 .theme-toggle-btn:hover {
   transform: scale(1.1);
 }
+
 .text-white {
   color: var(--clr-white);
 }
+
 .text-silver-v1 {
   color: var(--clr-silver-v1);
 }
+
 .text-scarlet {
   color: var(--clr-scarlet);
 }
+
 .text-green {
   color: var(--clr-green);
 }
+
 .bg-jet {
   background: var(--clr-jet);
 }
@@ -105,6 +113,7 @@ button {
   font-size: 24px;
   font-weight: 600;
 }
+
 .grid-common {
   background-color: var(--clr-primary);
   border-radius: 12px;
@@ -112,16 +121,19 @@ button {
   color: var(--clr-white);
   padding: 24px;
 }
+
 .grid-c-title {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 16px;
 }
+
 .grid-c-title-text {
   font-weight: 400;
   color: var(--clr-silver);
 }
+
 .grid-c-title-icon img {
   width: 24px;
 }
@@ -130,21 +142,23 @@ button {
   .grid-common {
     padding: 16px;
   }
+
   body {
     font-size: 14px !important;
   }
 }
 
-.table_icon{
+.table_icon {
   width: 0.5em;
   height: 0.5em;
 }
-.btn_table{
+
+.btn_table {
   border: 1px solid black !important;
   border-radius: 1px !important;
 }
 
-.btn_table_dlt{
+.btn_table_dlt {
   border: 1px solid black !important;
   border-radius: 1px !important;
   border-right: none !important;
@@ -179,5 +193,213 @@ button {
 
 .button_search:hover {
   background-color: #0056b3 !important;
+}
+
+/* add user & group css */
+
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300..800&family=Roboto:wght@100..900&display=swap');
+
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.search-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.search-container .form-container {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  width: auto;
+}
+
+.header_shema {
+  white-space: nowrap;
+}
+
+.save-button {
+  height: 40px;
+}
+
+.add-user-button {
+  white-space: nowrap;
+  height: 40px;
+}
+
+.header_epeople {
+  border-bottom: 2px solid transparent;
+  border-image: linear-gradient(to right, transparent, #999595, transparent) 1;
+}
+
+.TableRow.table_header {
+  padding: 10px 5px 10px 20px !important;
+}
+
+.button_search {
+  height: 54px;
+  bottom: 8px;
+}
+
+.search-container {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.search-field {
+  width: 100%;
+}
+
+.button-search {
+  background-color: #1976d2;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out;
+}
+
+.button-search:hover {
+  background-color: #1565c0;
+}
+
+.custom-label {
+  top: -9px !important;
+  left: 5px;
+  font-size: 14px;
+}
+
+/* add user edit and group modal css  */
+
+
+.modal-paper {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: 650px !important;
+  border-radius: 8px !important;
+  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2) !important;
+  padding: 24px 12px 0px 12px !important;
+  background-color: #fff !important;
+  font-family: 'IBM Plex Sans' !important;
+}
+
+.modal-header {
+  font-size: 1.25rem !important;
+  font-family: 'IBM Plex Sans' !important;
+  padding-left: 5px !important;
+  font-weight: 900 !important;
+}
+
+.modal-subtext {
+  font-size: 0.875rem;
+  color: #666;
+  margin-bottom: 16px;
+}
+
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal-form .MuiTextField-root {
+  width: 100%;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  position: relative;
+  left: 12px;
+  margin-top: 30px;
+}
+
+
+.add-user-btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 12px 30px 12px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  width: 50%;
+}
+
+.btn-text {
+  flex-grow: 1;
+  text-align: left;
+}
+
+.btn-icon {
+  text-align: right;
+}
+
+.add-user-btn:hover {
+  background-color: #0040d4;
+}
+
+
+.custom-textfield {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 1rem !important;
+  color: #161616 !important;
+  background-color: #f4f4f4 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  border-bottom: 1px solid #8d8d8d !important;
+  font-size: 0.875rem !important;
+  height: 3rem !important;
+  letter-spacing: 0.16px !important;
+  line-height: 1.285 !important;
+  outline: 2px solid transparent !important;
+  outline-offset: -2px !important;
+  font-family: 'IBM Plex Sans' !important;
+}
+
+
+
+
+.custom-textfield .MuiOutlinedInput-notchedOutline {
+  border: none;
+}
+
+.modal-header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  bottom: 15px;
+
+}
+
+.close-icon {
+  cursor: pointer;
+}
+
+.group_form{
+    overflow-y: hidden !important;
+     padding: 0px !important;
+     padding-top: 8px !important;
+}
+.css-1dc80h3-MuiTableCell-root{
+  text-align: left;
+  align-items: flex-start;
+
+}
+.css-1orzuox-MuiTableCell-root{
+  text-align: left;
 }
 

@@ -197,18 +197,20 @@ const EditGroup = () => {
 
             {/* Non-Members Table */}
             <Typography variant="h6" sx={{ marginTop: 3 }}>Non-Members</Typography>
-            <Grid container spacing={2} alignItems="center">
-                <Grid item xs={6}>
+            <Grid container spacing={2} alignItems="center" className="search-container">
+                <Grid item xs={11}>
                     <TextField
                         label="Search people..."
                         variant="outlined"
                         fullWidth
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
+                        className="search-field"
+						InputLabelProps={{ className: "custom-label" }}
                     />
                 </Grid>
                 <Grid item>
-                    <Button variant="contained" color="primary" onClick={handleSearch}>
+                    <Button variant="contained"className="button_search" color="primary" onClick={handleSearch}>
                         Search
                     </Button>
                 </Grid>

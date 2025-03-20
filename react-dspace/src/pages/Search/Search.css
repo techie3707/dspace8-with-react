@@ -95,6 +95,7 @@ Search.css .search-container {
     background-color: #f0f0f0;
 }
 
+/* Responsive Styles */
 @media (max-width: 768px) {
     .filters-and-results {
         flex-direction: column;

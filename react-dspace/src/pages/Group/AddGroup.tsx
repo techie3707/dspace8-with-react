@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button } from "@mui/material";
+import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, IconButton, Box } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import { addGroup, GroupPayload } from "../../api/group";
-
 
 interface AddGroupProps {
   open: boolean;
@@ -23,16 +23,28 @@ const AddGroup = ({ open, onClose, onGroupAdded }: AddGroupProps) => {
 
     const success = await addGroup(payload);
     if (success) {
-      onGroupAdded(); 
+      onGroupAdded();
       onClose();
     }
   };
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>Create Group</DialogTitle>
-      <DialogContent>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      fullWidth
+      maxWidth="sm"
+      PaperProps={{ className: "modal-paper" }} // Apply custom styles
+    >
+      <div className="modal-header-container">
+        <DialogTitle className="modal-header">Create Group</DialogTitle>
+        <IconButton onClick={onClose} className="close-icon">
+          <CloseIcon />
+        </IconButton>
+      </div>
+      <DialogContent className="modal-form group_form">
         <TextField
+          className="custom-textfield"
           fullWidth
           label="Group name *"
           variant="outlined"
@@ -41,6 +53,7 @@ const AddGroup = ({ open, onClose, onGroupAdded }: AddGroupProps) => {
           onChange={(e) => setGroupName(e.target.value)}
         />
         <TextField
+          className="custom-textfield"
           fullWidth
           label="Description"
           variant="outlined"
@@ -51,10 +64,13 @@ const AddGroup = ({ open, onClose, onGroupAdded }: AddGroupProps) => {
           onChange={(e) => setDescription(e.target.value)}
         />
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} color="secondary">Cancel</Button>
-        <Button onClick={handleSave} color="primary" variant="contained">Save</Button>
-      </DialogActions>
+      <Box className="modal-footer">
+        <button type="button" className="add-user-btn" onClick={handleSave}>
+          <span className="btn-text">Save</span>
+          <span className="btn-icon">→</span>
+        </button>
+      </Box>
+
     </Dialog>
   );
 };

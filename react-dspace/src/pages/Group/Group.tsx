@@ -25,6 +25,7 @@ import { Edit } from "@mui/icons-material";
 import { fetchGroups, Group } from "../../api/group";
 import AddGroup from "./AddGroup";
 import { useNavigate } from "react-router-dom";
+import { iconsImgs } from "../../utils/images";
 
 const Groups = () => {
     const authToken = localStorage.getItem("authToken") || "";
@@ -75,7 +76,7 @@ const Groups = () => {
 
     return (
         <Container>
-            <Grid container justifyContent="space-between" alignItems="center" className="header_groups">
+            <Grid container justifyContent="space-between" alignItems="center" className="header_groups header_epeople">
                 <Typography variant="h4" sx={{ mb: 1 }}>
                     Groups
                 </Typography>
@@ -93,6 +94,8 @@ const Groups = () => {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="search-field"
+                        InputLabelProps={{ className: "custom-label" }}
+
                     />
                 </Grid>
 
@@ -118,13 +121,18 @@ const Groups = () => {
                             </TableHead>
                             <TableBody>
                                 {groups.map((group) => (
-                                    <TableRow key={group.id}>
+                                    <TableRow key={group.id}
+                                        sx={{
+                                            "&:hover": { backgroundColor: "#f0f0f0" },
+                                            cursor: "pointer",
+                                        }}>
                                         <TableCell>{group.name || "N/A"}</TableCell>
                                         <TableCell>{group.metadata?.["dc.description"]?.[0]?.value || "N/A"}</TableCell>
                                         <TableCell>
-                                            <IconButton color="primary" onClick={() => handleEditClick(group)}>
-                                                <Edit />
+                                            <IconButton color="primary" className="btn_table" onClick={() => handleEditClick(group)} title="Edit">
+                                                <img className="table_icon" src={iconsImgs.edit} alt="Edit" />
                                             </IconButton>
+
                                         </TableCell>
                                     </TableRow>
                                 ))}
@@ -132,7 +140,7 @@ const Groups = () => {
                         </Table>
                     </TableContainer>
 
-                    <Pagination count={totalPages} page={page} onChange={handlePageChange} sx={{ display: "flex", justifyContent: "center", mt: 2 }} />
+                    <Pagination count={totalPages} page={page} onChange={handlePageChange} sx={{ display: "flex", justifyContent: "center", mt: 2, mb:2 }} />
                 </>
             )}
 

@@ -149,13 +149,13 @@ const UserManagement = () => {
           </TableCell>
           <TableCell>{user.email}</TableCell>
           <TableCell className="table_btn_div">
-            <IconButton className="btn_table" color="primary" onClick={() => handleEditClick(user.id)}>
+            <IconButton className="btn_table" color="primary" onClick={() => handleEditClick(user.id)} title="Edit">
               <img className="table_icon" src={iconsImgs.edit} alt="Edit" />
             </IconButton>
-            <IconButton className="btn_table_dlt" color="error" onClick={() => handleDeleteClick(user)}>
+            <IconButton className="btn_table_dlt" color="error" onClick={() => handleDeleteClick(user)} title="Delete">
               <img className="table_icon" src={iconsImgs.remove} alt="Remove" />
             </IconButton>
-            <IconButton className="btn_table" color="secondary">
+            <IconButton className="btn_table" color="secondary" title="Give Access">
               <img className="table_icon" src={iconsImgs.access} alt="Access" />
             </IconButton>
           </TableCell>

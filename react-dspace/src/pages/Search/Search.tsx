@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { searchObjects } from '../../api/searchApi';
 import './Search.css';
+import PaginationComponent from '../../components/Pagination/PaginationComponent';
 
 
 
@@ -30,9 +31,15 @@ const Search: React.FC = () => {
         itemType: false,
     });
     const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
+    const [page, setPage] = useState(1);
+    const [size] = useState(10);
+    const [totalData, setTotalData] = useState(0);
 
 
-    const handleSearch = async (filters: { author?: string[]; subject?: string[]; date?: string[]; itemType?: string[]; hasFile?: boolean | null } = {}) => {
+    const handleSearch = async (filters: { author?: string[]; subject?: string[]; date?: string[]; itemType?: string[]; hasFile?: boolean | null } = {},
+        currentPage: number = page,
+        itemsPerPage: number = size
+    ) => {
         try {
             const queryParams = new URLSearchParams();
             queryParams.append('sort', 'score');
@@ -54,8 +61,10 @@ const Search: React.FC = () => {
                 queryParams.append('f.has_content_in_original_bundle', filters.hasFile.toString() + ',equals');
             }
 
-            const results = await searchObjects(inputValue, queryParams.toString());
-            setSearchResults(results);
+            const data = await searchObjects(inputValue, queryParams.toString(), currentPage - 1, itemsPerPage);
+            setSearchResults(data.results);
+            setTotalData(data.totalElements);
+
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -63,7 +72,12 @@ const Search: React.FC = () => {
 
     useEffect(() => {
         handleSearch();
-    }, []);
+    }, [page, size]);
+
+    const handlePageChange = (page: number) => {
+        setPage(page);
+        handleSearch({ author: authorFilter, subject: subjectFilter, date: dateFilter, itemType: itemTypeFilter, hasFile: hasFileFilter }, page);
+    };
 
     const toggleSection = (section: string) => {
         setExpandedSections({
@@ -194,25 +208,6 @@ const Search: React.FC = () => {
         handleSearch();
     };
 
-    //   const getCurrentItems = () => {
-    //     const startIndex = (currentPage - 1) * itemsPerPage;
-    //     const endIndex = startIndex + itemsPerPage;
-    //     return searchResults.slice(startIndex, endIndex);
-    //   };
-
-    //   const PaginationControls = () => {
-    //     const totalPages = Math.ceil(searchResults.length / itemsPerPage);
-
-    //     return (
-    //       <div className="pagination-controls">
-    //         {Array.from({ length: totalPages }, (_, i) => (
-    //           <button key={i} onClick={() => setCurrentPage(i + 1)}>
-    //             {i + 1}
-    //           </button>
-    //         ))}
-    //       </div>
-    //     );
-    //   };
 
     const authors = extractAuthors();
     const itemTypes = extractItemTypes();
@@ -486,8 +481,12 @@ const Search: React.FC = () => {
                         </ul>
                     )}
 
-                    {/* Pagination Controls */}
-                    {/* <PaginationControls /> */}
+                    <PaginationComponent
+                        totalData={totalData}
+                        perPage={size}
+                        currentPage={page}
+                        onPageChange={handlePageChange} 
+                    />
                 </div>
             </div>
         </div>
