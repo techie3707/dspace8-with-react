@@ -14,7 +14,7 @@ const AppContent: React.FC = () => {
   return (
     <SidebarProvider>
       <div className="app">
-        {isAuthenticated && <Sidebar />}
+        {!isAuthenticated && <Sidebar />}
         <Content /> 
       </div>
     </SidebarProvider>
