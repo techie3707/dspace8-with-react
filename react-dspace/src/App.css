@@ -183,6 +183,9 @@ button {
   color: gray !important;
 }
 
+.search-field_double .MuiInputLabel-root {
+  color: gray !important;
+}
 .button_search {
   height: 40px !important;
   background-color: var(--clr-primary) !important;
@@ -404,4 +407,23 @@ button {
 }
 .group_btn{
   gap: 5px;
+}
+
+
+/* bitstream ralated css  */
+.search-field_double{
+  height: 22px !important;
+  border-radius: 5px !important;
+  position: relative;
+  bottom: 9px;
+}
+
+.button_search_double {
+  height: 40px !important;
+  background-color: var(--clr-primary) !important;
+  color: white !important;
+  text-transform: none !important;
+  border-radius: 0px 5px 5px 0px !important;
+  position: relative;
+  right: 11px;
 }

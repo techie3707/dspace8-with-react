@@ -14,14 +14,8 @@ import {
     Paper,
     IconButton,
     CircularProgress,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
     Pagination,
 } from "@mui/material";
-import { Edit } from "@mui/icons-material";
 import { fetchGroups, Group } from "../../api/group";
 import AddGroup from "./AddGroup";
 import { useNavigate } from "react-router-dom";
@@ -35,7 +29,7 @@ const Groups = () => {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [page, setPage] = useState<number>(1);
     const [totalPages, setTotalPages] = useState<number>(1);
-    const pageSize = 5;
+    const pageSize = 10;
     const navigate = useNavigate();
 
     const loadGroups = async (page: number, query: string) => {

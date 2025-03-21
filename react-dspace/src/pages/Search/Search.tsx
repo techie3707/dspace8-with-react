@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { searchObjects, fetchAuthors, fetchItemTypes, fetchDates, fetchHasFile } from '../../api/searchApi';
-import './search.css';
+import './Search.css';
 import PaginationComponent from '../../components/Pagination/PaginationComponent';
 
 

@@ -23,7 +23,6 @@ interface FacetResult {
   };
 }
 
-// const siteConfig = 'http://localhost:8080/server';
 
 export const searchObjects = async (
   query: string,

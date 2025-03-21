@@ -5,8 +5,10 @@ export interface NavigationLink {
     title: string;
     image?: string;
     path: string;
+    collectionId?: string;
     submenu?: NavigationLink[];
 }
+
 
 
 export const siteConfig = {
@@ -18,18 +20,39 @@ export const siteConfig = {
 
 
 
-export const generateNavigationLinks = (collectionNames: string[]): NavigationLink[] => {
-    return collectionNames.map((collection, index) => ({
-        id: index + 7,
-        title: collection.charAt(0).toUpperCase() + collection.slice(1),
-        image: iconsImgs.bills,
-        path: `/collections/${collection.toLowerCase()}`,
-        submenu: [
-            { id: (index + 1) * 10 + 1, title: "Metadata Search", path: `/collections/${collection.toLowerCase()}/metadata-search` },
-            { id: (index + 1) * 10 + 2, title: "Advanced Search", path: `/collections/${collection.toLowerCase()}/advanced-search` }
-        ]
+export const generateNavigationLinks = (
+    collections: { id: string; name: string }[]
+  ): NavigationLink[] => {
+    return collections.map((collection, index) => ({
+      id: index + 7,
+      title: collection.name.charAt(0).toUpperCase() + collection.name.slice(1),
+      image: iconsImgs.bills,
+      path: `/collections/${collection.name.toLowerCase()}`,
+      submenu: [
+        {
+          id: (index + 1) * 10 + 1,
+          title: "Metadata Search",
+          path: `/collections/${collection.name.toLowerCase()}/metadata-search`,
+          collectionId: collection.id, 
+        },
+        {
+          id: (index + 1) * 10 + 2,
+          title: "Advanced Search",
+          path: `/collections/${collection.name.toLowerCase()}/advanced-search`,
+          collectionId: collection.id, 
+        },
+        {
+          id: (index + 1) * 10 + 3,
+          title: "Create Item",
+          path: "/workspace/edit",
+          collectionId: collection.id, 
+        },
+      ],
     }));
-};
+  };
+  
+
+
 
 
 export const navigationLinks: NavigationLink[] = [
@@ -37,8 +60,8 @@ export const navigationLinks: NavigationLink[] = [
     { id: 2, title: "User Management", image: iconsImgs.gears, path: "/UserManagement" },
     { id: 3, title: "Metadata Schemas", image: iconsImgs.gears, path: "/metadataSchemas" },
     { id: 4, title: "Groups", image: iconsImgs.gears, path: "/groups" },
-    { id: 5,title: "Batch Import", image: iconsImgs.gears, path: "/batchImport" },
-    { id: 6,title: "Admin Search", image: iconsImgs.gears, path: "/adminSearch" },
+    { id: 5, title: "Batch Import", image: iconsImgs.gears, path: "/batchImport" },
+    { id: 6, title: "Admin Search", image: iconsImgs.gears, path: "/adminSearch" },
 ];
 
 

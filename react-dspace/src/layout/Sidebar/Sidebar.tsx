@@ -51,17 +51,17 @@ const Sidebar: React.FC = () => {
     const loadCollections = async () => {
       try {
         const collections = await fetchCollections();
-        const collectionNames = collections.map((col) => col.name);
-        const dynamicLinks = generateNavigationLinks(collectionNames);
-
+        const dynamicLinks = generateNavigationLinks(collections);
+  
         setNavigationLinks([...staticNavigationLinks, ...dynamicLinks]);
       } catch (error) {
         console.error("Failed to load collections:", error);
       }
     };
-
+  
     loadCollections();
   }, []);
+  
 
   return (
     <div className={`sidebar ${isSidebarOpen ? "" : "sidebar-change"}`} ref={sidebarRef}>

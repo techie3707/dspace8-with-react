@@ -86,7 +86,7 @@ const Bitstream: React.FC = () => {
     return (
         <div style={{ padding: "20px" }}>
             <Box component={Paper} sx={{ padding: 2, marginBottom: 3 }}>
-                <Typography variant="h6">Create metadata field</Typography>
+                <Typography sx={{ paddingBottom: 2 }} variant="h6">Create metadata field</Typography>
                 <Box display="flex" gap={2}>
                     <TextField
                         label="Element *"
@@ -141,7 +141,10 @@ const Bitstream: React.FC = () => {
                                     const id = field.id || "";
 
                                     return (
-                                        <TableRow key={field.id}>
+                                        <TableRow key={field.id}  sx={{
+                                            "&:hover": { backgroundColor: "#f0f0f0" }, 
+                                            cursor: "pointer", 
+                                          }}>
                                             <TableCell>
                                                 <Checkbox
                                                     checked={selected.includes(field.id)}
@@ -157,15 +160,17 @@ const Bitstream: React.FC = () => {
                             </TableBody>
                         </Table>
                     </TableContainer>
+                    <Box sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center", mt: 2 }}>
+                        <Button variant="contained" color="error" onClick={handleDeleteSelected} disabled={selected.length === 0}>
+                            Delete Selected
+                        </Button>
+                    </Box>
                     <Pagination
                         count={5}
                         page={page}
                         onChange={handleChangePage}
                         sx={{ display: "flex", justifyContent: "center", mt: 2 }}
                     />
-                    <Button variant="contained" color="error" onClick={handleDeleteSelected} disabled={selected.length === 0}>
-                        Delete Selected
-                    </Button>
                 </>
             )}
         </div>
