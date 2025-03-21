@@ -44,7 +44,7 @@ export const generateNavigationLinks = (
         {
           id: (index + 1) * 10 + 3,
           title: "Create Item",
-          path: "/workspace/edit",
+          path: `/collections/${collection.id}/create-item`, 
           collectionId: collection.id, 
         },
       ],

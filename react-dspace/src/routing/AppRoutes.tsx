@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useParams } from "react-router-dom";
 import Home from "../pages/Home/Home";
 import About from "../pages/About/About";
 import Contact from "../pages/Contact/Contact";
@@ -17,6 +17,7 @@ import Forgot from "../pages/forgot/forgot";
 import Register from "../pages/Register/Register";
 import Search from "../pages/Search/Search";
 import { ToastProvider } from "../contexts/ToastProvider";
+import CreateItem from "../pages/Item/createItem";
 
 
 const ProtectedRoute = ({ element }: { element: React.ReactElement }) => {
@@ -29,6 +30,10 @@ const ProtectedRoute = ({ element }: { element: React.ReactElement }) => {
   return isAuthenticated ? element : <Navigate to="/login" replace />;
 };
 
+const CreateItemWrapper = () => {
+  const { collectionId } = useParams<{ collectionId: string }>();
+  return collectionId ? <CreateItem collectionId={collectionId} /> : <div>Invalid Collection</div>;
+};
 
 const AppRoutes = () => {
   return (
@@ -50,6 +55,7 @@ const AppRoutes = () => {
         <Route path="/groups" element={<ProtectedRoute element={<Groups />} />} />
         <Route path="/edit-group" element={<ProtectedRoute element={<EditGroup />} />} />
         <Route path="/batchImport" element={<ProtectedRoute element={<BatchImport />} />} />
+        <Route path="/collections/:collectionId/create-item" element={<ProtectedRoute element={<CreateItemWrapper />} />}  />
       </Routes>
     </>
   );
