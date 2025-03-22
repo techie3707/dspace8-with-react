@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { searchObjects, fetchSubjects, fetchAuthors, fetchItemTypes, fetchDates, fetchHasFile } from '../../api/searchApi';
-import './search.css';
+import './Search.css';
 import PaginationComponent from '../../components/Pagination/PaginationComponent';
 
 
@@ -88,7 +88,6 @@ const Search: React.FC = () => {
         facetParam.append('f.has_content_in_original_bundle', `${filters.hasFile},equals`);
       }
 
-      console.log('Fetching facets with params:', facetParam.toString());
 
       const authorsResponse = await fetchAuthors(inputValue, (facetParam.toString() ? `&${facetParam.toString()}` : ''), 0, 5);
       const itemTypesResponse = await fetchItemTypes(inputValue, (facetParam.toString() ? `&${facetParam.toString()}` : ''), 0, 5);
@@ -146,7 +145,6 @@ const Search: React.FC = () => {
         queryParams.append('f.has_content_in_original_bundle', `${filters.hasFile},equals`);
       }
 
-      // Reset page if resetPage is true
       const pageToFetch = resetPage ? 1 : currentPage;
 
       const data = await searchObjects(inputValue, queryParams.toString(), pageToFetch - 1, itemsPerPage);
@@ -170,7 +168,7 @@ const Search: React.FC = () => {
   const handleAuthorFilterChange = (authorName: string, isChecked: boolean) => {
     setAuthorFilter((prev) => {
       const newFilters = isChecked ? [...prev, authorName] : prev.filter((name) => name !== authorName);
-      handleSearch({ author: newFilters, itemType: itemTypeFilter, date: dateFilter, hasFile: hasFileFilter }, 1, size, true); // Reset page
+      handleSearch({ author: newFilters, itemType: itemTypeFilter, date: dateFilter, hasFile: hasFileFilter }, 1, size, true); 
       fetchFacets({ author: newFilters, itemType: itemTypeFilter, date: dateFilter, hasFile: hasFileFilter });
       return newFilters;
     });
@@ -179,7 +177,7 @@ const Search: React.FC = () => {
   const handleItemTypeFilterChange = (itemType: string, isChecked: boolean) => {
     setItemTypeFilter((prev) => {
       const newFilters = isChecked ? [...prev, itemType] : prev.filter((type) => type !== itemType);
-      handleSearch({ author: authorFilter, itemType: newFilters, date: dateFilter, hasFile: hasFileFilter }, 1, size, true); // Reset page
+      handleSearch({ author: authorFilter, itemType: newFilters, date: dateFilter, hasFile: hasFileFilter }, 1, size, true); 
       fetchFacets({ author: authorFilter, itemType: newFilters, date: dateFilter, hasFile: hasFileFilter });
       return newFilters;
     });
@@ -189,7 +187,7 @@ const Search: React.FC = () => {
   const handleDateFilterChange = (dateRange: string, isChecked: boolean) => {
     setDateFilter((prev) => {
       const newFilters = isChecked ? [...prev, dateRange] : prev.filter((range) => range !== dateRange);
-      handleSearch({ author: authorFilter, itemType: itemTypeFilter, date: newFilters, hasFile: hasFileFilter }, 1, size, true); // Reset page
+      handleSearch({ author: authorFilter, itemType: itemTypeFilter, date: newFilters, hasFile: hasFileFilter }, 1, size, true); 
       fetchFacets({ author: authorFilter, itemType: itemTypeFilter, date: newFilters, hasFile: hasFileFilter });
       return newFilters;
     });
@@ -206,7 +204,7 @@ const Search: React.FC = () => {
 
   const handleHasFileFilterChange = (hasFile: boolean | null) => {
     setHasFileFilter(hasFile);
-    handleSearch({ author: authorFilter, itemType: itemTypeFilter, date: dateFilter, hasFile }, 1, size, true); // Reset page
+    handleSearch({ author: authorFilter, itemType: itemTypeFilter, date: dateFilter, hasFile }, 1, size, true); 
     fetchFacets({ author: authorFilter, itemType: itemTypeFilter, date: dateFilter, hasFile });
   };
   const getMetadataValue = (metadata: any, field: string): string | null => {
@@ -434,7 +432,7 @@ const Search: React.FC = () => {
             <button
               className="search-button"
               onClick={() => {
-                handleSearch({ author: authorFilter, itemType: itemTypeFilter, date: dateFilter, hasFile: hasFileFilter })
+                handleSearch({ author: authorFilter, itemType: itemTypeFilter, date: dateFilter, hasFile: hasFileFilter }, 1, size, true)
                 fetchFacets({ author: authorFilter, itemType: itemTypeFilter, date: dateFilter, hasFile: hasFileFilter })
               }
               }

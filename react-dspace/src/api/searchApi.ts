@@ -24,7 +24,6 @@ interface FacetResult {
 }
 
 
-// https://demo.dspace.org/server/api/discover/search/objects?sort=score,DESC&page=0&size=10&query=books&embed=thumbnail&embed=item%2Fthumbnail&embed=accessStatus
 
 export const searchObjects = async (
   query: string,
