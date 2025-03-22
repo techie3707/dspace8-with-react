@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { searchObjects, fetchAuthors, fetchItemTypes, fetchDates, fetchHasFile } from '../../api/searchApi';
-import './Search.css';
+import { searchObjects, fetchSubjects, fetchAuthors, fetchItemTypes, fetchDates, fetchHasFile } from '../../api/searchApi';
+import './search.css';
 import PaginationComponent from '../../components/Pagination/PaginationComponent';
 
 
@@ -20,16 +20,25 @@ interface DateRange {
   count: number;
 }
 
+interface Subject {
+  name: string,
+  count: number
+}
+
+
+
 const Search: React.FC = () => {
   const [inputValue, setInputValue] = useState<string>('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [authorFilter, setAuthorFilter] = useState<string[]>([]);
   const [itemTypeFilter, setItemTypeFilter] = useState<string[]>([]);
   const [dateFilter, setDateFilter] = useState<string[]>([]);
+  const [subjectFilter, setSubjectFilter] = useState<string[]>([]);
   const [hasFileFilter, setHasFileFilter] = useState<boolean | null>(null);
   const [expandedSections, setExpandedSections] = useState({
     author: true,
     itemType: false,
+    subject: false,
     date: false,
     hasFiles: false,
   });
@@ -38,6 +47,7 @@ const Search: React.FC = () => {
   const [size] = useState<number>(10);
   const [totalData, setTotalData] = useState<number>(0);
   const [authors, setAuthors] = useState<Author[]>([]);
+  const [subjects, setSubjects] = useState<Subject[]>([]);
   const [itemTypes, setItemTypes] = useState<ItemType[]>([]);
   const [dateRanges, setDateRanges] = useState<DateRange[]>([]);
   const [hasFileCounts, setHasFileCounts] = useState<{ hasFileCount: number; noFileCount: number }>({
@@ -45,43 +55,51 @@ const Search: React.FC = () => {
     noFileCount: 0,
   });
 
- 
 
-  const fetchFacets = async (filters?: { author?: string[], itemType?: string[], date?: string[], hasFile?: boolean | null }) => {
+
+  const fetchFacets = async (filters?: { author?: string[], itemType?: string[], subject?: string[], date?: string[], hasFile?: boolean | null }) => {
     try {
       const facetParam = new URLSearchParams();
-  
+
       if (filters?.author?.length) {
         filters.author.forEach((author) => {
           facetParam.append('f.author', `${author},equals`);
         });
       }
-  
+
       if (filters?.itemType?.length) {
         filters.itemType.forEach((itemType) => {
           facetParam.append('f.entityType', `${itemType},equals`);
         });
       }
-  
+
+      if (filters?.subject?.length) {
+        filters.subject.forEach((subject) => {
+          facetParam.append('f.subject', `${subject},equals`);
+        });
+      }
+
       if (filters?.date?.length) {
         const dateRange = `[${filters.date[0].split(' - ')[0]} TO ${filters.date[0].split(' - ')[1]}]`;
         facetParam.append('f.dateIssued', `${dateRange},equals`);
       }
-  
+
       if (filters?.hasFile !== null && filters?.hasFile !== undefined) {
         facetParam.append('f.has_content_in_original_bundle', `${filters.hasFile},equals`);
       }
-  
+
       console.log('Fetching facets with params:', facetParam.toString());
-  
-      const authorsResponse = await fetchAuthors((facetParam.toString() ? `&${facetParam.toString()}` : ''), 0, 5);
-      const itemTypesResponse = await fetchItemTypes((facetParam.toString() ? `&${facetParam.toString()}` : ''), 0, 5);
-      const datesResponse = await fetchDates((facetParam.toString() ? `&${facetParam.toString()}` : ''), 0, 5);
-      const hasFileResponse = await fetchHasFile((facetParam.toString() ? `&${facetParam.toString()}` : ''), 0, 5);
-  
+
+      const authorsResponse = await fetchAuthors(inputValue, (facetParam.toString() ? `&${facetParam.toString()}` : ''), 0, 5);
+      const itemTypesResponse = await fetchItemTypes(inputValue, (facetParam.toString() ? `&${facetParam.toString()}` : ''), 0, 5);
+      const datesResponse = await fetchDates(inputValue, (facetParam.toString() ? `&${facetParam.toString()}` : ''), 0, 5);
+      const hasFileResponse = await fetchHasFile(inputValue, (facetParam.toString() ? `&${facetParam.toString()}` : ''), 0, 5);
+      const subjectsResponse = await fetchSubjects(inputValue, (facetParam.toString() ? `&${facetParam.toString()}` : ''), 0, 5);
+
       setAuthors(authorsResponse._embedded.values.map((value: any) => ({ name: value.label, count: value.count })));
       setItemTypes(itemTypesResponse._embedded.values.map((value: any) => ({ type: value.label, count: value.count })));
       setDateRanges(datesResponse._embedded.values.map((value: any) => ({ range: value.label, count: value.count })));
+      setSubjects(subjectsResponse._embedded.values.map((value: any) => ({ name: value.label, count: value.count })));
       setHasFileCounts({
         hasFileCount: hasFileResponse._embedded.values.find((value: any) => value.label === 'true')?.count || 0,
         noFileCount: hasFileResponse._embedded.values.find((value: any) => value.label === 'false')?.count || 0,
@@ -90,51 +108,52 @@ const Search: React.FC = () => {
       console.error('Error fetching facets:', error);
     }
   };
-  
+
   const handleSearch = async (
     filters: { author?: string[]; subject?: string[]; date?: string[]; itemType?: string[]; hasFile?: boolean | null } = {},
     currentPage: number = page,
     itemsPerPage: number = size,
-    resetPage: boolean = false 
+    resetPage: boolean = false
   ) => {
     try {
       const queryParams = new URLSearchParams();
-      queryParams.append('sort', 'score');
       queryParams.append('configuration', 'default');
-  
+
       if (filters.author && filters.author.length > 0) {
         filters.author.forEach((author) => {
           queryParams.append('f.author', `${author},equals`);
         });
       }
-  
+
       if (filters.subject && filters.subject.length > 0) {
         filters.subject.forEach((subject) => {
           queryParams.append('f.subject', `${subject},equals`);
         });
       }
-  
+
       if (filters.date && filters.date.length > 0) {
         const dateRange = `[${filters.date[0].split(' - ')[0]} TO ${filters.date[0].split(' - ')[1]}]`;
         queryParams.append('f.dateIssued', `${dateRange},equals`);
       }
-  
+
       if (filters.itemType && filters.itemType.length > 0) {
         filters.itemType.forEach((itemType) => {
           queryParams.append('f.entityType', `${itemType},equals`);
         });
       }
-  
+
       if (filters.hasFile !== null && filters.hasFile !== undefined) {
         queryParams.append('f.has_content_in_original_bundle', `${filters.hasFile},equals`);
       }
-  
+
+      // Reset page if resetPage is true
       const pageToFetch = resetPage ? 1 : currentPage;
-  
+
       const data = await searchObjects(inputValue, queryParams.toString(), pageToFetch - 1, itemsPerPage);
       setSearchResults(data.results);
       setTotalData(data.totalElements);
-  
+
+      // Update the page state if resetPage is true
       if (resetPage) {
         setPage(1);
       }
@@ -146,60 +165,70 @@ const Search: React.FC = () => {
   useEffect(() => {
     handleSearch();
     fetchFacets();
-    console.log(authorFilter);
-    
   }, []);
 
   const handleAuthorFilterChange = (authorName: string, isChecked: boolean) => {
     setAuthorFilter((prev) => {
       const newFilters = isChecked ? [...prev, authorName] : prev.filter((name) => name !== authorName);
-      handleSearch({ author: newFilters, itemType: itemTypeFilter, date: dateFilter, hasFile: hasFileFilter }, 1, size, true); 
-      fetchFacets({author:newFilters, itemType: itemTypeFilter, date: dateFilter, hasFile: hasFileFilter}); 
+      handleSearch({ author: newFilters, itemType: itemTypeFilter, date: dateFilter, hasFile: hasFileFilter }, 1, size, true); // Reset page
+      fetchFacets({ author: newFilters, itemType: itemTypeFilter, date: dateFilter, hasFile: hasFileFilter });
       return newFilters;
     });
   };
-  
+
   const handleItemTypeFilterChange = (itemType: string, isChecked: boolean) => {
     setItemTypeFilter((prev) => {
       const newFilters = isChecked ? [...prev, itemType] : prev.filter((type) => type !== itemType);
-      handleSearch({ author: authorFilter, itemType: newFilters, date: dateFilter, hasFile: hasFileFilter }, 1, size, true); 
-      fetchFacets({ author: authorFilter, itemType: newFilters, date: dateFilter, hasFile: hasFileFilter }); 
+      handleSearch({ author: authorFilter, itemType: newFilters, date: dateFilter, hasFile: hasFileFilter }, 1, size, true); // Reset page
+      fetchFacets({ author: authorFilter, itemType: newFilters, date: dateFilter, hasFile: hasFileFilter });
       return newFilters;
     });
   };
-  
+
+
   const handleDateFilterChange = (dateRange: string, isChecked: boolean) => {
     setDateFilter((prev) => {
       const newFilters = isChecked ? [...prev, dateRange] : prev.filter((range) => range !== dateRange);
-      handleSearch({ author: authorFilter, itemType: itemTypeFilter, date: newFilters, hasFile: hasFileFilter }, 1, size, true); 
+      handleSearch({ author: authorFilter, itemType: itemTypeFilter, date: newFilters, hasFile: hasFileFilter }, 1, size, true); // Reset page
+      fetchFacets({ author: authorFilter, itemType: itemTypeFilter, date: newFilters, hasFile: hasFileFilter });
       return newFilters;
     });
   };
-  
+
+  const handleSubjectFilterChange = (subjectName: string, isChecked: boolean) => {
+    setSubjectFilter((prev) => {
+      const newFilters = isChecked ? [...prev, subjectName] : prev.filter((name) => name !== subjectName);
+      handleSearch({ author: authorFilter, itemType: itemTypeFilter, date: dateFilter, subject: newFilters, hasFile: hasFileFilter }, 1, size, true); // Reset page
+      fetchFacets({ author: authorFilter, itemType: itemTypeFilter, date: dateFilter, subject: newFilters, hasFile: hasFileFilter });
+      return newFilters;
+    });
+  };
+
   const handleHasFileFilterChange = (hasFile: boolean | null) => {
     setHasFileFilter(hasFile);
-    handleSearch({ author: authorFilter, itemType: itemTypeFilter, date: dateFilter, hasFile }, 1, size, true); 
-    fetchFacets({ author: authorFilter, itemType: itemTypeFilter, date: dateFilter, hasFile }); 
+    handleSearch({ author: authorFilter, itemType: itemTypeFilter, date: dateFilter, hasFile }, 1, size, true); // Reset page
+    fetchFacets({ author: authorFilter, itemType: itemTypeFilter, date: dateFilter, hasFile });
   };
   const getMetadataValue = (metadata: any, field: string): string | null => {
     if (metadata && metadata[field] && metadata[field].length > 0) {
-        return metadata[field][0].value;
+      return metadata[field][0].value;
     }
     return null;
-};
+  };
 
   const handlePageChange = (page: number) => {
     setPage(page);
     handleSearch({ author: authorFilter, date: dateFilter, itemType: itemTypeFilter, hasFile: hasFileFilter }, page);
-};
+  };
 
-  
+  // Reset filters
   const resetFilters = () => {
     setAuthorFilter([]);
     setItemTypeFilter([]);
+    setSubjectFilter([]);
     setDateFilter([]);
     setHasFileFilter(null);
-    handleSearch({}, 1, size, true); 
+    handleSearch({}, 1, size, true);
     fetchFacets(); 
   };
 
@@ -243,10 +272,46 @@ const Search: React.FC = () => {
                   Show more
                 </button>
               </div>
-            )} 
+            )}
           </div>
 
-          {/* Item Type Filter */}
+          {/* subject  */}
+          <div style={{ marginBottom: '20px', border: '1px solid #ddd', borderRadius: '4px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', borderBottom: '1px solid #ddd' }}>
+              <h3>Subject</h3>
+              <button onClick={() => setExpandedSections((prev) => ({ ...prev, subject: !prev.subject }))}>
+                {expandedSections.subject ? '-' : '+'}
+              </button>
+            </div>
+            {expandedSections.subject && (
+              <div style={{ padding: '10px' }}>
+                <ul style={{ listStyle: 'none', padding: '0' }}>
+                  {subjects.map((subject, index) => (
+                    <li key={index} style={{ marginBottom: '10px' }}>
+                      <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                          <input
+                            type="checkbox"
+                            checked={subjectFilter.includes(subject.name)}
+                            onChange={(e) => handleSubjectFilterChange(subject.name, e.target.checked)}
+                          />
+                          <span style={{ marginLeft: '10px' }}>{subject.name}</span>
+                        </div>
+                        <span style={{ backgroundColor: '#eee', padding: '2px 5px', borderRadius: '33px' }}>
+                          {subject.count}
+                        </span>
+                      </label>
+                    </li>
+                  ))}
+                </ul>
+                <button style={{ width: '100%', padding: '10px', backgroundColor: '#f0f0f0', border: 'none', borderRadius: '4px' }}>
+                  Show more
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Item Type  */}
           <div style={{ marginBottom: '20px', border: '1px solid #ddd', borderRadius: '4px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', borderBottom: '1px solid #ddd' }}>
               <h3>Item Type</h3>
@@ -282,7 +347,7 @@ const Search: React.FC = () => {
             )}
           </div>
 
-          {/* Date Filter */}
+          {/* Date  */}
           <div style={{ marginBottom: '20px', border: '1px solid #ddd', borderRadius: '4px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', borderBottom: '1px solid #ddd' }}>
               <h3>Date</h3>
@@ -318,7 +383,7 @@ const Search: React.FC = () => {
             )}
           </div>
 
-          {/* Has File Filter */}
+          {/* Has File  */}
           <div style={{ marginBottom: '20px', border: '1px solid #ddd', borderRadius: '4px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', borderBottom: '1px solid #ddd' }}>
               <h3>Has File</h3>
@@ -330,13 +395,18 @@ const Search: React.FC = () => {
               <div style={{ padding: '10px' }}>
                 <ul style={{ listStyle: 'none', padding: '0' }}>
                   <li style={{ marginBottom: '10px' }}>
-                    <label style={{ display: 'flex', alignItems: 'center' }}>
-                      <input
-                        type="checkbox"
-                        checked={hasFileFilter === true}
-                        onChange={(e) => handleHasFileFilterChange(e.target.checked ? true : null)}
-                      />
-                      <span style={{ marginLeft: '10px' }}>Yes</span>
+                    <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <input
+                          type="checkbox"
+                          checked={hasFileFilter === true}
+                          onChange={(e) => handleHasFileFilterChange(e.target.checked ? true : null)}
+                        />
+                        <span style={{ marginLeft: '10px' }}>Yes</span>
+                      </div>
+                      <span style={{ backgroundColor: '#eee', padding: '2px 5px', borderRadius: '33px' }}>
+                        {hasFileCounts.hasFileCount}
+                      </span>
                     </label>
                   </li>
                 </ul>
@@ -344,7 +414,7 @@ const Search: React.FC = () => {
             )}
           </div>
 
-          {/* Reset Filters Button */}
+        
           <button style={{ width: '100%', padding: '10px', backgroundColor: '#007bff', color: '#fff', border: 'none', borderRadius: '4px' }} onClick={resetFilters}>
             Reset filters
           </button>
@@ -361,9 +431,13 @@ const Search: React.FC = () => {
               onChange={(e) => setInputValue(e.target.value)}
               placeholder="Search the repository ..."
             />
-           <button
+            <button
               className="search-button"
-              onClick={() => handleSearch({ author: authorFilter, itemType: itemTypeFilter, date: dateFilter, hasFile: hasFileFilter })}
+              onClick={() => {
+                handleSearch({ author: authorFilter, itemType: itemTypeFilter, date: dateFilter, hasFile: hasFileFilter })
+                fetchFacets({ author: authorFilter, itemType: itemTypeFilter, date: dateFilter, hasFile: hasFileFilter })
+              }
+              }
             >
               Search
             </button>
@@ -388,7 +462,6 @@ const Search: React.FC = () => {
             </div>
           </div>
 
-          {/* Search Results List/Grid */}
           {viewMode === 'list' ? (
             <ul className="results-list" style={{ width: '100vh' }}>
               {searchResults.map((result, index) => {

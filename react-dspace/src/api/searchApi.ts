@@ -24,16 +24,18 @@ interface FacetResult {
 }
 
 
+// https://demo.dspace.org/server/api/discover/search/objects?sort=score,DESC&page=0&size=10&query=books&embed=thumbnail&embed=item%2Fthumbnail&embed=accessStatus
+
 export const searchObjects = async (
   query: string,
   queryParams: string,
   page: number = 0,
   size: number = 10
 ): Promise<{ results: any[]; totalElements: number }> => {
-  let apiUrl = `${siteConfig.apiEndpoint}/api/discover/search/objects?sort=score,DESC&page=${page}&size=${size}&embed=item&${queryParams}`;
+  let apiUrl = `${siteConfig.apiEndpoint}/api/discover/search/objects?sort=score,DESC&page=${page}&size=${size}&${queryParams}`;
 
   if (query.trim()) {
-    apiUrl += `&configuration=default&embed=item&configuration=default&query=${encodeURIComponent(query)}`;
+    apiUrl += `&query=${encodeURIComponent(query)}&embed=thumbnail&embed=item`;
   }
 
   try {
@@ -48,22 +50,47 @@ export const searchObjects = async (
   }
 };
 
-export const fetchAuthors = async (facetParam: string, page: number, size: number): Promise<FacetResult> => {
-  const response = await axios.get<FacetResult>(`${siteConfig.apiEndpoint}/api/discover/facets/author?&page=${page}&size=${size}${facetParam}`);
+export const fetchAuthors = async (query: string,facetParam: string, page: number, size: number): Promise<FacetResult> => {
+  let f_url = `${siteConfig.apiEndpoint}/api/discover/facets/author?&page=${page}&size=${size}${facetParam}`;
+  if(query){
+    f_url += `&query=${encodeURIComponent(query)}`
+  }
+  const response = await axios.get<FacetResult>(f_url);
   return response.data;
 };
 
-export const fetchItemTypes = async (facetParam: string, page: number, size: number): Promise<FacetResult> => {
-  const response = await axios.get<FacetResult>(`${siteConfig.apiEndpoint}/api/discover/facets/entityType?&page=${page}&size=${size}${facetParam}`);
+export const fetchSubjects = async (query: string, facetParam: string, page: number, size: number): Promise<FacetResult> => {
+  let f_url = `${siteConfig.apiEndpoint}/api/discover/facets/subject?&page=${page}&size=${size}${facetParam}`;
+  if (query) {
+    f_url += `&query=${encodeURIComponent(query)}`;
+  }
+  const response = await axios.get<FacetResult>(f_url);
   return response.data;
 };
 
-export const fetchDates = async ( facetParam: string,page: number, size: number): Promise<FacetResult> => {
-  const response = await axios.get<FacetResult>(`${siteConfig.apiEndpoint}/api/discover/facets/dateIssued?&page=${page}&size=${size}${facetParam}`);
+export const fetchItemTypes = async (query: string,facetParam: string, page: number, size: number): Promise<FacetResult> => {
+  let f_url = `${siteConfig.apiEndpoint}/api/discover/facets/entityType?&page=${page}&size=${size}${facetParam}`;
+  if(query){
+    f_url += `&query=${encodeURIComponent(query)}`
+  }
+  const response = await axios.get<FacetResult>(f_url);
   return response.data;
 };
 
-export const fetchHasFile = async ( facetParam: string,page: number, size: number): Promise<FacetResult> => {
-  const response = await axios.get<FacetResult>(`${siteConfig.apiEndpoint}/api/discover/facets/has_content_in_original_bundle?&page=${page}&size=${size}${facetParam}`);
+export const fetchDates = async (query: string, facetParam: string,page: number, size: number): Promise<FacetResult> => {
+  let f_url = `${siteConfig.apiEndpoint}/api/discover/facets/dateIssued?&page=${page}&size=${size}${facetParam}`;
+  if(query){
+    f_url += `&query=${encodeURIComponent(query)}`
+  }
+  const response = await axios.get<FacetResult>(f_url);
+  return response.data;
+};
+
+export const fetchHasFile = async ( query: string,facetParam: string,page: number, size: number): Promise<FacetResult> => {
+  let f_url = `${siteConfig.apiEndpoint}/api/discover/facets/has_content_in_original_bundle?&page=${page}&size=${size}${facetParam}`;
+  if(query){
+    f_url += `&query=${encodeURIComponent(query)}`
+  }
+  const response = await axios.get<FacetResult>(f_url);
   return response.data;
 };
