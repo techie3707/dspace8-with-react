@@ -2,29 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { searchObjects, fetchSubjects, fetchAuthors, fetchItemTypes, fetchDates, fetchHasFile } from '../../api/searchApi';
 import './Search.css';
 import PaginationComponent from '../../components/Pagination/PaginationComponent';
-
-
-
-interface Author {
-  name: string;
-  count: number;
-}
-
-interface ItemType {
-  type: string;
-  count: number;
-}
-
-interface DateRange {
-  range: string;
-  count: number;
-}
-
-interface Subject {
-  name: string,
-  count: number
-}
-
+import { Author, Subject, ItemType, DateRange } from '../../data/searchData';
 
 
 const Search: React.FC = () => {
@@ -151,7 +129,6 @@ const Search: React.FC = () => {
       setSearchResults(data.results);
       setTotalData(data.totalElements);
 
-      // Update the page state if resetPage is true
       if (resetPage) {
         setPage(1);
       }
@@ -196,7 +173,7 @@ const Search: React.FC = () => {
   const handleSubjectFilterChange = (subjectName: string, isChecked: boolean) => {
     setSubjectFilter((prev) => {
       const newFilters = isChecked ? [...prev, subjectName] : prev.filter((name) => name !== subjectName);
-      handleSearch({ author: authorFilter, itemType: itemTypeFilter, date: dateFilter, subject: newFilters, hasFile: hasFileFilter }, 1, size, true); // Reset page
+      handleSearch({ author: authorFilter, itemType: itemTypeFilter, date: dateFilter, subject: newFilters, hasFile: hasFileFilter }, 1, size, true); 
       fetchFacets({ author: authorFilter, itemType: itemTypeFilter, date: dateFilter, subject: newFilters, hasFile: hasFileFilter });
       return newFilters;
     });

@@ -9,7 +9,11 @@
   transition: var(--transition-default);
   border-right: 1px solid white;
   z-index: 1000;
-  box-shadow: rgba(0, 0, 0, 0.2) 0px 5px 15px; 
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 5px 15px;
+  
+  /* Enable scrolling */
+  display: flex;
+  flex-direction: column;
 }
 .sidebar-change {
   transform: translateX(-260px);
@@ -39,13 +43,20 @@
 
 .navigation {
   margin-top: 28px;
-  height: 600px;
+  flex-grow: 1;
+  overflow-y: auto;
+  max-height: calc(100vh - 120px);
+  padding-right: 8px;
+  scrollbar-width: none; 
+  -ms-overflow-style: none; 
 }
 .nav-item {
   margin-bottom: 10px;
   margin-right: 4px;
 }
-
+.navigation::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
 
 .nav-link {
   display: flex;
