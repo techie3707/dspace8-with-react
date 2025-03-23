@@ -44,7 +44,7 @@ const Search: React.FC = () => {
   });
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   const [page, setPage] = useState<number>(1);
-  const [size] = useState<number>(10);
+  const [size, setSize] = useState<number>(10);
   const [totalData, setTotalData] = useState<number>(0);
   const [authors, setAuthors] = useState<Author[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
@@ -55,7 +55,18 @@ const Search: React.FC = () => {
     noFileCount: 0,
   });
 
+  const [sortOption, setSortOption] = useState("relevant");
+  const [resultPerPage, setResultPerPage] = useState<number>(10);
 
+
+  type SortOptionKeys = 'relevant' | 'title-asc' | 'date-desc' | 'accessioned-desc';
+
+  const sortOptionsMap: Record<SortOptionKeys, string> = {
+    relevant: 'score,DESC', 
+    'title-asc': 'dc.title,ASC', 
+    'date-desc': 'dc.date.issued,DESC', 
+    'accessioned-desc': 'dc.date.accessioned,DESC', 
+  };
 
   const fetchFacets = async (filters?: { author?: string[], itemType?: string[], subject?: string[], date?: string[], hasFile?: boolean | null }) => {
     try {
@@ -112,7 +123,8 @@ const Search: React.FC = () => {
     filters: { author?: string[]; subject?: string[]; date?: string[]; itemType?: string[]; hasFile?: boolean | null } = {},
     currentPage: number = page,
     itemsPerPage: number = size,
-    resetPage: boolean = false
+    resetPage: boolean = false,
+    sort: string = 'score,DESC' 
   ) => {
     try {
       const queryParams = new URLSearchParams();
@@ -147,11 +159,11 @@ const Search: React.FC = () => {
 
       const pageToFetch = resetPage ? 1 : currentPage;
 
-      const data = await searchObjects(inputValue, queryParams.toString(), pageToFetch - 1, itemsPerPage);
+      // Pass the sort parameter to searchObjects
+      const data = await searchObjects(inputValue, queryParams.toString(), pageToFetch - 1, itemsPerPage, sort);
       setSearchResults(data.results);
       setTotalData(data.totalElements);
 
-      // Update the page state if resetPage is true
       if (resetPage) {
         setPage(1);
       }
@@ -168,43 +180,47 @@ const Search: React.FC = () => {
   const handleAuthorFilterChange = (authorName: string, isChecked: boolean) => {
     setAuthorFilter((prev) => {
       const newFilters = isChecked ? [...prev, authorName] : prev.filter((name) => name !== authorName);
-      handleSearch({ author: newFilters, itemType: itemTypeFilter, date: dateFilter, hasFile: hasFileFilter }, 1, size, true); 
+      const sortParam = sortOptionsMap[sortOption as SortOptionKeys] || 'score,DESC';
+      handleSearch({ author: newFilters, itemType: itemTypeFilter, date: dateFilter, hasFile: hasFileFilter }, 1, size, true, sortParam);
       fetchFacets({ author: newFilters, itemType: itemTypeFilter, date: dateFilter, hasFile: hasFileFilter });
       return newFilters;
     });
   };
-
+  
   const handleItemTypeFilterChange = (itemType: string, isChecked: boolean) => {
     setItemTypeFilter((prev) => {
       const newFilters = isChecked ? [...prev, itemType] : prev.filter((type) => type !== itemType);
-      handleSearch({ author: authorFilter, itemType: newFilters, date: dateFilter, hasFile: hasFileFilter }, 1, size, true); 
+      const sortParam = sortOptionsMap[sortOption as SortOptionKeys] || 'score,DESC';
+      handleSearch({ author: authorFilter, itemType: newFilters, date: dateFilter, hasFile: hasFileFilter }, 1, size, true, sortParam);
       fetchFacets({ author: authorFilter, itemType: newFilters, date: dateFilter, hasFile: hasFileFilter });
       return newFilters;
     });
   };
-
-
+  
   const handleDateFilterChange = (dateRange: string, isChecked: boolean) => {
     setDateFilter((prev) => {
       const newFilters = isChecked ? [...prev, dateRange] : prev.filter((range) => range !== dateRange);
-      handleSearch({ author: authorFilter, itemType: itemTypeFilter, date: newFilters, hasFile: hasFileFilter }, 1, size, true); 
+      const sortParam = sortOptionsMap[sortOption as SortOptionKeys] || 'score,DESC';
+      handleSearch({ author: authorFilter, itemType: itemTypeFilter, date: newFilters, hasFile: hasFileFilter }, 1, size, true, sortParam);
       fetchFacets({ author: authorFilter, itemType: itemTypeFilter, date: newFilters, hasFile: hasFileFilter });
       return newFilters;
     });
   };
-
+  
   const handleSubjectFilterChange = (subjectName: string, isChecked: boolean) => {
     setSubjectFilter((prev) => {
       const newFilters = isChecked ? [...prev, subjectName] : prev.filter((name) => name !== subjectName);
-      handleSearch({ author: authorFilter, itemType: itemTypeFilter, date: dateFilter, subject: newFilters, hasFile: hasFileFilter }, 1, size, true); // Reset page
+      const sortParam = sortOptionsMap[sortOption as SortOptionKeys] || 'score,DESC';
+      handleSearch({ author: authorFilter, itemType: itemTypeFilter, date: dateFilter, subject: newFilters, hasFile: hasFileFilter }, 1, size, true, sortParam);
       fetchFacets({ author: authorFilter, itemType: itemTypeFilter, date: dateFilter, subject: newFilters, hasFile: hasFileFilter });
       return newFilters;
     });
   };
-
+  
   const handleHasFileFilterChange = (hasFile: boolean | null) => {
     setHasFileFilter(hasFile);
-    handleSearch({ author: authorFilter, itemType: itemTypeFilter, date: dateFilter, hasFile }, 1, size, true); 
+    const sortParam = sortOptionsMap[sortOption as SortOptionKeys] || 'score,DESC';
+    handleSearch({ author: authorFilter, itemType: itemTypeFilter, date: dateFilter, hasFile }, 1, size, true, sortParam);
     fetchFacets({ author: authorFilter, itemType: itemTypeFilter, date: dateFilter, hasFile });
   };
   const getMetadataValue = (metadata: any, field: string): string | null => {
@@ -216,7 +232,14 @@ const Search: React.FC = () => {
 
   const handlePageChange = (page: number) => {
     setPage(page);
-    handleSearch({ author: authorFilter, date: dateFilter, itemType: itemTypeFilter, hasFile: hasFileFilter }, page);
+    const sortParam = sortOptionsMap[sortOption as SortOptionKeys] || 'score,DESC';
+    handleSearch(
+      { author: authorFilter, date: dateFilter, itemType: itemTypeFilter, hasFile: hasFileFilter },
+      page,
+      size,
+      false,
+      sortParam
+    );
   };
 
   // Reset filters
@@ -227,7 +250,33 @@ const Search: React.FC = () => {
     setDateFilter([]);
     setHasFileFilter(null);
     handleSearch({}, 1, size, true);
-    fetchFacets(); 
+    fetchFacets();
+  };
+
+  const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedSort = event.target.value;
+    setSortOption(selectedSort);
+
+    const sortParam = sortOptionsMap[selectedSort as SortOptionKeys] || 'score,DESC'; 
+
+    handleSearch(
+      { author: authorFilter, itemType: itemTypeFilter, date: dateFilter, hasFile: hasFileFilter },
+      page,
+      size,
+      false,
+      sortParam
+    );
+  };
+
+  const handleResultPerPageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const newSize = parseInt(event.target.value, 10); 
+    setResultPerPage(newSize); 
+    setSize(newSize); 
+    handleSearch(
+      { author: authorFilter, itemType: itemTypeFilter, date: dateFilter, hasFile: hasFileFilter },
+      1, newSize, true, 
+      sortOptionsMap[sortOption as SortOptionKeys] || 'score,DESC' 
+    );
   };
 
   return (
@@ -235,188 +284,213 @@ const Search: React.FC = () => {
       {/* Filters and Results */}
       <div className="filters-and-results">
         {/* Filters Sidebar */}
-        <div className="filters">
-          <h2>Filters</h2>
-          {/* Author Filter */}
-          <div style={{ marginBottom: '20px', border: '1px solid #ddd', borderRadius: '4px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', borderBottom: '1px solid #ddd' }}>
-              <h3>Author</h3>
-              <button onClick={() => setExpandedSections((prev) => ({ ...prev, author: !prev.author }))}>
-                {expandedSections.author ? '-' : '+'}
-              </button>
+        <div className='filters-and-setting'>
+          <div className="filters">
+            <h2>Filters</h2>
+            {/* Author Filter */}
+            <div style={{ marginBottom: '20px', border: '1px solid #ddd', borderRadius: '4px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', borderBottom: '1px solid #ddd' }}>
+                <h3>Author</h3>
+                <button onClick={() => setExpandedSections((prev) => ({ ...prev, author: !prev.author }))}>
+                  {expandedSections.author ? '-' : '+'}
+                </button>
+              </div>
+              {expandedSections.author && (
+                <div style={{ padding: '10px' }}>
+                  <ul style={{ listStyle: 'none', padding: '0' }}>
+                    {authors.map((author, index) => (
+                      <li key={index} style={{ marginBottom: '10px' }}>
+                        <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <input
+                              type="checkbox"
+                              checked={authorFilter.includes(author.name)}
+                              onChange={(e) => handleAuthorFilterChange(author.name, e.target.checked)}
+                            />
+                            <span style={{ marginLeft: '10px' }}>{author.name}</span>
+                          </div>
+                          <span style={{ backgroundColor: '#eee', padding: '2px 5px', borderRadius: '33px' }}>
+                            {author.count}
+                          </span>
+                        </label>
+                      </li>
+                    ))}
+                  </ul>
+                  <button style={{ width: '100%', padding: '10px', backgroundColor: '#f0f0f0', border: 'none', borderRadius: '4px' }}>
+                    Show more
+                  </button>
+                </div>
+              )}
             </div>
-            {expandedSections.author && (
-              <div style={{ padding: '10px' }}>
-                <ul style={{ listStyle: 'none', padding: '0' }}>
-                  {authors.map((author, index) => (
-                    <li key={index} style={{ marginBottom: '10px' }}>
+
+            {/* subject  */}
+            <div style={{ marginBottom: '20px', border: '1px solid #ddd', borderRadius: '4px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', borderBottom: '1px solid #ddd' }}>
+                <h3>Subject</h3>
+                <button onClick={() => setExpandedSections((prev) => ({ ...prev, subject: !prev.subject }))}>
+                  {expandedSections.subject ? '-' : '+'}
+                </button>
+              </div>
+              {expandedSections.subject && (
+                <div style={{ padding: '10px' }}>
+                  <ul style={{ listStyle: 'none', padding: '0' }}>
+                    {subjects.map((subject, index) => (
+                      <li key={index} style={{ marginBottom: '10px' }}>
+                        <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <input
+                              type="checkbox"
+                              checked={subjectFilter.includes(subject.name)}
+                              onChange={(e) => handleSubjectFilterChange(subject.name, e.target.checked)}
+                            />
+                            <span style={{ marginLeft: '10px' }}>{subject.name}</span>
+                          </div>
+                          <span style={{ backgroundColor: '#eee', padding: '2px 5px', borderRadius: '33px' }}>
+                            {subject.count}
+                          </span>
+                        </label>
+                      </li>
+                    ))}
+                  </ul>
+                  <button style={{ width: '100%', padding: '10px', backgroundColor: '#f0f0f0', border: 'none', borderRadius: '4px' }}>
+                    Show more
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Item Type  */}
+            <div style={{ marginBottom: '20px', border: '1px solid #ddd', borderRadius: '4px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', borderBottom: '1px solid #ddd' }}>
+                <h3>Item Type</h3>
+                <button onClick={() => setExpandedSections((prev) => ({ ...prev, itemType: !prev.itemType }))}>
+                  {expandedSections.itemType ? '-' : '+'}
+                </button>
+              </div>
+              {expandedSections.itemType && (
+                <div style={{ padding: '10px' }}>
+                  <ul style={{ listStyle: 'none', padding: '0' }}>
+                    {itemTypes.map((itemType, index) => (
+                      <li key={index} style={{ marginBottom: '10px' }}>
+                        <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <input
+                              type="checkbox"
+                              checked={itemTypeFilter.includes(itemType.type)}
+                              onChange={(e) => handleItemTypeFilterChange(itemType.type, e.target.checked)}
+                            />
+                            <span style={{ marginLeft: '10px' }}>{itemType.type}</span>
+                          </div>
+                          <span style={{ backgroundColor: '#eee', padding: '2px 5px', borderRadius: '33px' }}>
+                            {itemType.count}
+                          </span>
+                        </label>
+                      </li>
+                    ))}
+                  </ul>
+                  <button style={{ width: '100%', padding: '10px', backgroundColor: '#f0f0f0', border: 'none', borderRadius: '4px' }}>
+                    Show more
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Date  */}
+            <div style={{ marginBottom: '20px', border: '1px solid #ddd', borderRadius: '4px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', borderBottom: '1px solid #ddd' }}>
+                <h3>Date</h3>
+                <button onClick={() => setExpandedSections((prev) => ({ ...prev, date: !prev.date }))}>
+                  {expandedSections.date ? '-' : '+'}
+                </button>
+              </div>
+              {expandedSections.date && (
+                <div style={{ padding: '10px' }}>
+                  <ul style={{ listStyle: 'none', padding: '0' }}>
+                    {dateRanges.map((dateRange, index) => (
+                      <li key={index} style={{ marginBottom: '10px' }}>
+                        <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <input
+                              type="checkbox"
+                              checked={dateFilter.includes(dateRange.range)}
+                              onChange={(e) => handleDateFilterChange(dateRange.range, e.target.checked)}
+                            />
+                            <span style={{ marginLeft: '10px' }}>{dateRange.range}</span>
+                          </div>
+                          <span style={{ backgroundColor: '#eee', padding: '2px 5px', borderRadius: '3px' }}>
+                            {dateRange.count}
+                          </span>
+                        </label>
+                      </li>
+                    ))}
+                  </ul>
+                  <button style={{ width: '100%', padding: '10px', backgroundColor: '#f0f0f0', border: 'none', borderRadius: '4px' }}>
+                    Show more
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Has File  */}
+            <div style={{ marginBottom: '20px', border: '1px solid #ddd', borderRadius: '4px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', borderBottom: '1px solid #ddd' }}>
+                <h3>Has File</h3>
+                <button onClick={() => setExpandedSections((prev) => ({ ...prev, hasFiles: !prev.hasFiles }))}>
+                  {expandedSections.hasFiles ? '-' : '+'}
+                </button>
+              </div>
+              {expandedSections.hasFiles && (
+                <div style={{ padding: '10px' }}>
+                  <ul style={{ listStyle: 'none', padding: '0' }}>
+                    <li style={{ marginBottom: '10px' }}>
                       <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <div style={{ display: 'flex', alignItems: 'center' }}>
                           <input
                             type="checkbox"
-                            checked={authorFilter.includes(author.name)}
-                            onChange={(e) => handleAuthorFilterChange(author.name, e.target.checked)}
+                            checked={hasFileFilter === true}
+                            onChange={(e) => handleHasFileFilterChange(e.target.checked ? true : null)}
                           />
-                          <span style={{ marginLeft: '10px' }}>{author.name}</span>
+                          <span style={{ marginLeft: '10px' }}>Yes</span>
                         </div>
                         <span style={{ backgroundColor: '#eee', padding: '2px 5px', borderRadius: '33px' }}>
-                          {author.count}
+                          {hasFileCounts.hasFileCount}
                         </span>
                       </label>
                     </li>
-                  ))}
-                </ul>
-                <button style={{ width: '100%', padding: '10px', backgroundColor: '#f0f0f0', border: 'none', borderRadius: '4px' }}>
-                  Show more
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* subject  */}
-          <div style={{ marginBottom: '20px', border: '1px solid #ddd', borderRadius: '4px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', borderBottom: '1px solid #ddd' }}>
-              <h3>Subject</h3>
-              <button onClick={() => setExpandedSections((prev) => ({ ...prev, subject: !prev.subject }))}>
-                {expandedSections.subject ? '-' : '+'}
-              </button>
+                  </ul>
+                </div>
+              )}
             </div>
-            {expandedSections.subject && (
-              <div style={{ padding: '10px' }}>
-                <ul style={{ listStyle: 'none', padding: '0' }}>
-                  {subjects.map((subject, index) => (
-                    <li key={index} style={{ marginBottom: '10px' }}>
-                      <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                          <input
-                            type="checkbox"
-                            checked={subjectFilter.includes(subject.name)}
-                            onChange={(e) => handleSubjectFilterChange(subject.name, e.target.checked)}
-                          />
-                          <span style={{ marginLeft: '10px' }}>{subject.name}</span>
-                        </div>
-                        <span style={{ backgroundColor: '#eee', padding: '2px 5px', borderRadius: '33px' }}>
-                          {subject.count}
-                        </span>
-                      </label>
-                    </li>
-                  ))}
-                </ul>
-                <button style={{ width: '100%', padding: '10px', backgroundColor: '#f0f0f0', border: 'none', borderRadius: '4px' }}>
-                  Show more
-                </button>
-              </div>
-            )}
+
+
+            <button style={{ width: '100%', padding: '10px', backgroundColor: '#007bff', color: '#fff', border: 'none', borderRadius: '4px' }} onClick={resetFilters}>
+              Reset filters
+            </button>
           </div>
 
-          {/* Item Type  */}
-          <div style={{ marginBottom: '20px', border: '1px solid #ddd', borderRadius: '4px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', borderBottom: '1px solid #ddd' }}>
-              <h3>Item Type</h3>
-              <button onClick={() => setExpandedSections((prev) => ({ ...prev, itemType: !prev.itemType }))}>
-                {expandedSections.itemType ? '-' : '+'}
-              </button>
+          <div className="dropdown-container">
+            <h1>Setting</h1>
+            <div>
+              <label htmlFor="sort">Sort By</label>
+              <select id="sort" value={sortOption} onChange={handleSortChange}>
+                <option value="relevant">Most Relevant</option>
+                <option value="title-asc">Title Ascending</option>
+                <option value="date-desc">Date Issued Descending</option>
+                <option value="accessioned-desc">Accessioned Date Descending</option>
+              </select>
             </div>
-            {expandedSections.itemType && (
-              <div style={{ padding: '10px' }}>
-                <ul style={{ listStyle: 'none', padding: '0' }}>
-                  {itemTypes.map((itemType, index) => (
-                    <li key={index} style={{ marginBottom: '10px' }}>
-                      <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                          <input
-                            type="checkbox"
-                            checked={itemTypeFilter.includes(itemType.type)}
-                            onChange={(e) => handleItemTypeFilterChange(itemType.type, e.target.checked)}
-                          />
-                          <span style={{ marginLeft: '10px' }}>{itemType.type}</span>
-                        </div>
-                        <span style={{ backgroundColor: '#eee', padding: '2px 5px', borderRadius: '33px' }}>
-                          {itemType.count}
-                        </span>
-                      </label>
-                    </li>
-                  ))}
-                </ul>
-                <button style={{ width: '100%', padding: '10px', backgroundColor: '#f0f0f0', border: 'none', borderRadius: '4px' }}>
-                  Show more
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Date  */}
-          <div style={{ marginBottom: '20px', border: '1px solid #ddd', borderRadius: '4px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', borderBottom: '1px solid #ddd' }}>
-              <h3>Date</h3>
-              <button onClick={() => setExpandedSections((prev) => ({ ...prev, date: !prev.date }))}>
-                {expandedSections.date ? '-' : '+'}
-              </button>
+            <div>
+              <label htmlFor="results-per-page">Results per page</label>
+              <select id="results-per-page" value={resultPerPage} onChange={handleResultPerPageChange}>
+                <option value="1">1</option>
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="20">20</option>
+              </select>
             </div>
-            {expandedSections.date && (
-              <div style={{ padding: '10px' }}>
-                <ul style={{ listStyle: 'none', padding: '0' }}>
-                  {dateRanges.map((dateRange, index) => (
-                    <li key={index} style={{ marginBottom: '10px' }}>
-                      <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                          <input
-                            type="checkbox"
-                            checked={dateFilter.includes(dateRange.range)}
-                            onChange={(e) => handleDateFilterChange(dateRange.range, e.target.checked)}
-                          />
-                          <span style={{ marginLeft: '10px' }}>{dateRange.range}</span>
-                        </div>
-                        <span style={{ backgroundColor: '#eee', padding: '2px 5px', borderRadius: '3px' }}>
-                          {dateRange.count}
-                        </span>
-                      </label>
-                    </li>
-                  ))}
-                </ul>
-                <button style={{ width: '100%', padding: '10px', backgroundColor: '#f0f0f0', border: 'none', borderRadius: '4px' }}>
-                  Show more
-                </button>
-              </div>
-            )}
           </div>
-
-          {/* Has File  */}
-          <div style={{ marginBottom: '20px', border: '1px solid #ddd', borderRadius: '4px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', borderBottom: '1px solid #ddd' }}>
-              <h3>Has File</h3>
-              <button onClick={() => setExpandedSections((prev) => ({ ...prev, hasFiles: !prev.hasFiles }))}>
-                {expandedSections.hasFiles ? '-' : '+'}
-              </button>
-            </div>
-            {expandedSections.hasFiles && (
-              <div style={{ padding: '10px' }}>
-                <ul style={{ listStyle: 'none', padding: '0' }}>
-                  <li style={{ marginBottom: '10px' }}>
-                    <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <input
-                          type="checkbox"
-                          checked={hasFileFilter === true}
-                          onChange={(e) => handleHasFileFilterChange(e.target.checked ? true : null)}
-                        />
-                        <span style={{ marginLeft: '10px' }}>Yes</span>
-                      </div>
-                      <span style={{ backgroundColor: '#eee', padding: '2px 5px', borderRadius: '33px' }}>
-                        {hasFileCounts.hasFileCount}
-                      </span>
-                    </label>
-                  </li>
-                </ul>
-              </div>
-            )}
-          </div>
-
-        
-          <button style={{ width: '100%', padding: '10px', backgroundColor: '#007bff', color: '#fff', border: 'none', borderRadius: '4px' }} onClick={resetFilters}>
-            Reset filters
-          </button>
         </div>
+
 
         {/* Search Results */}
         <div className="search-results">
@@ -432,10 +506,15 @@ const Search: React.FC = () => {
             <button
               className="search-button"
               onClick={() => {
-                handleSearch({ author: authorFilter, itemType: itemTypeFilter, date: dateFilter, hasFile: hasFileFilter }, 1, size, true)
-                fetchFacets({ author: authorFilter, itemType: itemTypeFilter, date: dateFilter, hasFile: hasFileFilter })
-              }
-              }
+
+                const sortParam = sortOptionsMap[sortOption as SortOptionKeys] || 'score,DESC'; 
+
+                handleSearch(
+                  { author: authorFilter, itemType: itemTypeFilter, date: dateFilter, hasFile: hasFileFilter },
+                  1, size, true, sortParam
+                );
+                fetchFacets({ author: authorFilter, itemType: itemTypeFilter, date: dateFilter, hasFile: hasFileFilter });
+              }}
             >
               Search
             </button>

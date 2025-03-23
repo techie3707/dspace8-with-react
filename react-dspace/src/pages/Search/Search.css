@@ -1,20 +1,59 @@
-Search.css .search-container {
+Search.css 
+.search-container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
 }
+.filters-and-setting {
+  display: flex;
+  flex-direction: column;
+  gap: 60px;
+}
+
+.dropdown-container {
+    /* width: 100%;  */
+    margin-right: 20px;
+    margin-top: 20px; 
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+  }
+
+  .dropdown-container h1 {
+    margin-bottom: 10px;
+    font-size: 1.5em;
+  }
+  
+  .dropdown-container label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+  
+  .dropdown-container select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #fff;
+    margin-bottom: 20px;
+  }
 
 .filters-and-results {
     display: flex;
+    flex-direction: row;
     gap: 20px;
 }
 
 .filters {
     width: 25%;
+    min-width: 200px;
 }
 
 .search-results {
     width: 75%;
+    min-width: 300px;
 }
 
 .search-input-container {
