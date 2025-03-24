@@ -2,29 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { searchObjects, fetchSubjects, fetchAuthors, fetchItemTypes, fetchDates, fetchHasFile } from '../../api/searchApi';
 import './Search.css';
 import PaginationComponent from '../../components/Pagination/PaginationComponent';
-
-
-
-interface Author {
-  name: string;
-  count: number;
-}
-
-interface ItemType {
-  type: string;
-  count: number;
-}
-
-interface DateRange {
-  range: string;
-  count: number;
-}
-
-interface Subject {
-  name: string,
-  count: number
-}
-
+import { Author, Subject, ItemType, DateRange } from '../../data/searchData';
 
 
 const Search: React.FC = () => {

@@ -40,7 +40,7 @@ const CreateItem: React.FC<CreateItemProps> = ({ collectionId }) => {
             return newDateParts;
         });
     };
-    
+
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
             setSelectedFile(e.target.files[0]);
@@ -67,13 +67,13 @@ const CreateItem: React.FC<CreateItemProps> = ({ collectionId }) => {
     };
 
     return (
-        <Box sx={{ maxWidth: 500, margin: "auto", p: 3 }}>
-            <Typography variant="h5" gutterBottom>
+        <Box className="create-item-container">
+            <Typography variant="h5" gutterBottom className="create-item-title">
                 Create Item
             </Typography>
             <form onSubmit={handleSubmit}>
                 {formFields.map((field: FormField) => (
-                    <Box key={field.id} sx={{ mb: 2 }}>
+                    <Box key={field.id}>
                         {field.type === "textarea" ? (
                             <TextField
                                 fullWidth
@@ -84,17 +84,19 @@ const CreateItem: React.FC<CreateItemProps> = ({ collectionId }) => {
                                 required={field.required}
                                 onChange={handleChange}
                                 variant="outlined"
+                                InputLabelProps={{ className: "custom-label" }}
                             />
                         ) : field.type === "date" ? (
-                            <Box display="flex" alignItems="center" justifyContent="center" gap={2}>
+                            <Box className="create-item-date-container">
                                 {(["year", "month", "day"] as const).map((type) => (
-                                    <Box key={type} display="flex" flexDirection="column" alignItems="center">
-                                        <IconButton onClick={() => handleDateChange(type, dateParts[type] + 1)}>
-                                            <ArrowDropUp />
+                                    <Box key={type} className="create-item-date-box">
+                                        <IconButton onClick={() => handleDateChange(type, dateParts[type] + 1)} size="small">
+                                            <ArrowDropUp fontSize="large" />
                                         </IconButton>
                                         <Select
                                             value={dateParts[type]}
                                             onChange={(e) => handleDateChange(type, Number(e.target.value))}
+                                            className="create-item-select"
                                         >
                                             {Array.from(
                                                 { length: type === "year" ? 200 : type === "month" ? 12 : 31 },
@@ -105,11 +107,24 @@ const CreateItem: React.FC<CreateItemProps> = ({ collectionId }) => {
                                                 </MenuItem>
                                             ))}
                                         </Select>
-                                        <IconButton onClick={() => handleDateChange(type, dateParts[type] - 1)}>
-                                            <ArrowDropDown />
+                                        <IconButton onClick={() => handleDateChange(type, dateParts[type] - 1)} size="small">
+                                            <ArrowDropDown fontSize="large" />
                                         </IconButton>
                                     </Box>
                                 ))}
+
+                                <Box>
+                                    <TextField
+                                        fullWidth
+                                        label="Item Type"
+                                        name="dc.type"
+                                        required
+                                        onChange={handleChange}
+                                        variant="outlined"
+                                        className="item_input-field type_field"
+                                        InputLabelProps={{ className: "custom-label" }}
+                                    />
+                                </Box>
                             </Box>
                         ) : (
                             <TextField
@@ -119,38 +134,40 @@ const CreateItem: React.FC<CreateItemProps> = ({ collectionId }) => {
                                 required={field.required}
                                 onChange={handleChange}
                                 variant="outlined"
+                                className="item_input-field"
+                                InputLabelProps={{ className: "custom-label" }}
                             />
                         )}
                     </Box>
                 ))}
-                <Box sx={{ mb: 2 }}>
-                    <TextField
-                        fullWidth
-                        label="Item Type"
-                        name="dc.type"
-                        required
-                        onChange={handleChange}
-                        variant="outlined"
-                    />
+
+
+                <Box className="upload-container" onClick={() => document.getElementById('fileInput')?.click()}>
+                    <input type="file" id="fileInput" hidden onChange={handleFileChange} />
+                    <Typography variant="body2" className="upload-text">
+                        <span className="upload-icon">☁️</span> Upload a File
+                    </Typography>
+                    <Typography variant="caption" color="gray">
+                        Drag and drop files here
+                    </Typography>
                 </Box>
 
-                <Box sx={{ mb: 2 }}>
-                    <Button variant="contained" component="label" fullWidth>
-                        Upload File
-                        <input type="file" hidden onChange={handleFileChange} />
-                    </Button>
+                <Box className="item-submit_main">
                     {selectedFile && (
-                        <Typography variant="body2" sx={{ mt: 1 }}>
+                        <Typography variant="body2" sx={{ mt: 1, color: "gray" }}>
                             Selected File: {selectedFile.name}
                         </Typography>
                     )}
+
+                    <Button type="submit" variant="contained" color="primary" className="create-item-submit">
+                        Submit
+                    </Button>
                 </Box>
 
-                <Button type="submit" variant="contained" color="primary">
-                    Submit
-                </Button>
             </form>
         </Box>
+
+
     );
 };
 
