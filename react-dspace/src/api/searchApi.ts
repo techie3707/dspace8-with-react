@@ -29,9 +29,10 @@ export const searchObjects = async (
   query: string,
   queryParams: string,
   page: number = 0,
-  size: number = 10
+  size: number = 10,
+  sort: string = 'score,DESC' // Default sort parameter
 ): Promise<{ results: any[]; totalElements: number }> => {
-  let apiUrl = `${siteConfig.apiEndpoint}/api/discover/search/objects?sort=score,DESC&page=${page}&size=${size}&${queryParams}`;
+  let apiUrl = `${siteConfig.apiEndpoint}/api/discover/search/objects?sort=${sort}&page=${page}&size=${size}&${queryParams}`;
 
   if (query.trim()) {
     apiUrl += `&query=${encodeURIComponent(query)}&embed=thumbnail&embed=item`;
