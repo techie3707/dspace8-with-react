@@ -175,6 +175,11 @@ button {
   border-radius: 5px 0px 0px 5px !important;
 }
 
+.search-field_item .MuiInputBase-root {
+  height: 40px !important;
+  border-radius: 5px 0px 0px 5px !important;
+}
+
 .search-field .MuiOutlinedInput-notchedOutline {
   border-color: #ccc !important;
 }
@@ -186,6 +191,7 @@ button {
 .search-field_double .MuiInputLabel-root {
   color: gray !important;
 }
+
 .button_search {
   height: 40px !important;
   background-color: var(--clr-primary) !important;
@@ -392,26 +398,29 @@ button {
   cursor: pointer;
 }
 
-.group_form{
-    overflow-y: hidden !important;
-     padding: 0px !important;
-     padding-top: 8px !important;
+.group_form {
+  overflow-y: hidden !important;
+  padding: 0px !important;
+  padding-top: 8px !important;
 }
-.css-1dc80h3-MuiTableCell-root{
+
+.css-1dc80h3-MuiTableCell-root {
   text-align: left;
   align-items: flex-start;
 
 }
-.css-1orzuox-MuiTableCell-root{
+
+.css-1orzuox-MuiTableCell-root {
   text-align: left;
 }
-.group_btn{
+
+.group_btn {
   gap: 5px;
 }
 
 
 /* bitstream ralated css  */
-.search-field_double{
+.search-field_double {
   height: 22px !important;
   border-radius: 5px !important;
   position: relative;
@@ -426,4 +435,150 @@ button {
   border-radius: 0px 5px 5px 0px !important;
   position: relative;
   right: 11px;
+}
+
+/* single item creation start */
+
+.create-item-container {
+  width: 700px;
+  margin: auto;
+  padding: 24px;
+  background-color: white;
+  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.create-item-title {
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+.create-item-input {
+  width: 100%;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+
+.create-item-date-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.create-item-select {
+  width: 80px;
+  text-align: center;
+}
+
+.create-item-file {
+  width: 100%;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+.item-submit_main {
+  display: flex;
+  justify-content: center;
+}
+
+.create-item-submit {
+  width: 50%;
+
+}
+
+/* single item creation end  */
+
+.item_input-field {
+  width: 100%;
+}
+
+.item_input-field .MuiInputBase-root {
+  height: 40px !important;
+  border-radius: 5px !important;
+}
+
+.item_input-field .MuiOutlinedInput-notchedOutline {
+  border-color: #ccc !important;
+}
+
+.item_input-field .MuiInputLabel-root {
+  color: gray !important;
+}
+
+.create-item-container {
+  max-width: 600px;
+  margin: auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.create-item-title {
+  text-align: center;
+  font-weight: bold;
+}
+
+.create-item-date-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2px;
+
+}
+
+.create-item-date-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  bottom: 8px;
+}
+
+.create-item-select {
+  width: 100px;
+}
+
+.upload-container {
+  border: 2px dashed #ccc;
+  padding: 20px;
+  text-align: center;
+  border-radius: 8px;
+  background: #f9f9f9;
+  cursor: pointer;
+  transition: 0.3s;
+  margin-top: 15px;
+}
+
+.upload-container:hover {
+  border-color: #007bff;
+  background: #f1f1f1;
+}
+
+.upload-container input {
+  display: none;
+}
+
+.upload-icon {
+  font-size: 40px;
+  color: #007bff;
+}
+
+.upload-text {
+  font-weight: bold;
+  color: #555;
+}
+
+.item-submit_main {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.css-w76bbz-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input {
+  padding: 9px !important;
+}
+.type_field{
+  width: 250px !important;
+  margin-left: 2px !important;
 }
