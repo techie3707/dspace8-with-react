@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { searchObjects, fetchSubjects, fetchAuthors, fetchItemTypes, fetchDates, fetchHasFile } from '../../api/searchApi';
 import './Search.css';
 import PaginationComponent from '../../components/Pagination/PaginationComponent';
+import YearRangeSlider from './YearRangeSlider'; 
+
 import { Author, Subject, ItemType, DateRange } from '../../data/searchData';
 
 
@@ -40,10 +42,10 @@ const Search: React.FC = () => {
   type SortOptionKeys = 'relevant' | 'title-asc' | 'date-desc' | 'accessioned-desc';
 
   const sortOptionsMap: Record<SortOptionKeys, string> = {
-    relevant: 'score,DESC', 
-    'title-asc': 'dc.title,ASC', 
-    'date-desc': 'dc.date.issued,DESC', 
-    'accessioned-desc': 'dc.date.accessioned,DESC', 
+    relevant: 'score,DESC',
+    'title-asc': 'dc.title,ASC',
+    'date-desc': 'dc.date.issued,DESC',
+    'accessioned-desc': 'dc.date.accessioned,DESC',
   };
 
   const fetchFacets = async (filters?: { author?: string[], itemType?: string[], subject?: string[], date?: string[], hasFile?: boolean | null }) => {
@@ -102,7 +104,7 @@ const Search: React.FC = () => {
     currentPage: number = page,
     itemsPerPage: number = size,
     resetPage: boolean = false,
-    sort: string = 'score,DESC' 
+    sort: string = 'score,DESC'
   ) => {
     try {
       const queryParams = new URLSearchParams();
@@ -137,7 +139,6 @@ const Search: React.FC = () => {
 
       const pageToFetch = resetPage ? 1 : currentPage;
 
-      // Pass the sort parameter to searchObjects
       const data = await searchObjects(inputValue, queryParams.toString(), pageToFetch - 1, itemsPerPage, sort);
       setSearchResults(data.results);
       setTotalData(data.totalElements);
@@ -164,7 +165,7 @@ const Search: React.FC = () => {
       return newFilters;
     });
   };
-  
+
   const handleItemTypeFilterChange = (itemType: string, isChecked: boolean) => {
     setItemTypeFilter((prev) => {
       const newFilters = isChecked ? [...prev, itemType] : prev.filter((type) => type !== itemType);
@@ -174,17 +175,17 @@ const Search: React.FC = () => {
       return newFilters;
     });
   };
-  
+
   const handleDateFilterChange = (dateRange: string, isChecked: boolean) => {
     setDateFilter((prev) => {
-      const newFilters = isChecked ? [...prev, dateRange] : prev.filter((range) => range !== dateRange);
+      const newFilters = isChecked ? [dateRange] : [];
       const sortParam = sortOptionsMap[sortOption as SortOptionKeys] || 'score,DESC';
       handleSearch({ author: authorFilter, itemType: itemTypeFilter, date: newFilters, hasFile: hasFileFilter }, 1, size, true, sortParam);
       fetchFacets({ author: authorFilter, itemType: itemTypeFilter, date: newFilters, hasFile: hasFileFilter });
       return newFilters;
     });
   };
-  
+
   const handleSubjectFilterChange = (subjectName: string, isChecked: boolean) => {
     setSubjectFilter((prev) => {
       const newFilters = isChecked ? [...prev, subjectName] : prev.filter((name) => name !== subjectName);
@@ -194,7 +195,7 @@ const Search: React.FC = () => {
       return newFilters;
     });
   };
-  
+
   const handleHasFileFilterChange = (hasFile: boolean | null) => {
     setHasFileFilter(hasFile);
     const sortParam = sortOptionsMap[sortOption as SortOptionKeys] || 'score,DESC';
@@ -220,7 +221,7 @@ const Search: React.FC = () => {
     );
   };
 
-  // Reset filters
+ 
   const resetFilters = () => {
     setAuthorFilter([]);
     setItemTypeFilter([]);
@@ -235,25 +236,22 @@ const Search: React.FC = () => {
     const selectedSort = event.target.value;
     setSortOption(selectedSort);
 
-    const sortParam = sortOptionsMap[selectedSort as SortOptionKeys] || 'score,DESC'; 
+    const sortParam = sortOptionsMap[selectedSort as SortOptionKeys] || 'score,DESC';
 
     handleSearch(
       { author: authorFilter, itemType: itemTypeFilter, date: dateFilter, hasFile: hasFileFilter },
-      page,
-      size,
-      false,
-      sortParam
+      page, size, false,sortParam
     );
   };
 
   const handleResultPerPageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const newSize = parseInt(event.target.value, 10); 
-    setResultPerPage(newSize); 
-    setSize(newSize); 
+    const newSize = parseInt(event.target.value, 10);
+    setResultPerPage(newSize);
+    setSize(newSize);
     handleSearch(
       { author: authorFilter, itemType: itemTypeFilter, date: dateFilter, hasFile: hasFileFilter },
-      1, newSize, true, 
-      sortOptionsMap[sortOption as SortOptionKeys] || 'score,DESC' 
+      1, newSize, true,
+      sortOptionsMap[sortOption as SortOptionKeys] || 'score,DESC'
     );
   };
 
@@ -383,28 +381,12 @@ const Search: React.FC = () => {
               </div>
               {expandedSections.date && (
                 <div style={{ padding: '10px' }}>
-                  <ul style={{ listStyle: 'none', padding: '0' }}>
-                    {dateRanges.map((dateRange, index) => (
-                      <li key={index} style={{ marginBottom: '10px' }}>
-                        <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                          <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <input
-                              type="checkbox"
-                              checked={dateFilter.includes(dateRange.range)}
-                              onChange={(e) => handleDateFilterChange(dateRange.range, e.target.checked)}
-                            />
-                            <span style={{ marginLeft: '10px' }}>{dateRange.range}</span>
-                          </div>
-                          <span style={{ backgroundColor: '#eee', padding: '2px 5px', borderRadius: '3px' }}>
-                            {dateRange.count}
-                          </span>
-                        </label>
-                      </li>
-                    ))}
-                  </ul>
-                  <button style={{ width: '100%', padding: '10px', backgroundColor: '#f0f0f0', border: 'none', borderRadius: '4px' }}>
-                    Show more
-                  </button>
+                  <YearRangeSlider
+                    onApply={(startYear, endYear) => {
+                      const dateRange = `${startYear} - ${endYear}`;
+                      handleDateFilterChange(dateRange, true);
+                    }}
+                  />
                 </div>
               )}
             </div>
@@ -485,7 +467,7 @@ const Search: React.FC = () => {
               className="search-button"
               onClick={() => {
 
-                const sortParam = sortOptionsMap[sortOption as SortOptionKeys] || 'score,DESC'; 
+                const sortParam = sortOptionsMap[sortOption as SortOptionKeys] || 'score,DESC';
 
                 handleSearch(
                   { author: authorFilter, itemType: itemTypeFilter, date: dateFilter, hasFile: hasFileFilter },
