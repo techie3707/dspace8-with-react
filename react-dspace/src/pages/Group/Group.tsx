@@ -80,7 +80,7 @@ const Groups = () => {
             </Grid>
 
             <Grid container alignItems="center" className="search-container">
-                <Grid item xs={11}>
+                <Grid item xs={8.5} sm={10.5}  lg={11} >
                     <TextField
                         label="Search Groups..."
                         variant="outlined"

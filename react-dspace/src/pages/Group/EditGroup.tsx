@@ -198,7 +198,7 @@ const EditGroup = () => {
             {/* Non-Members Table */}
             <Typography variant="h6" sx={{ marginTop: 3 }}>Non-Members</Typography>
             <Grid container alignItems="center" className="search-container">
-                <Grid item xs={11}>
+                <Grid item xs={9} sm={10.5} lg={11} >
                     <TextField
                         label="Search people..."
                         variant="outlined"
@@ -206,11 +206,11 @@ const EditGroup = () => {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="search-field"
-						InputLabelProps={{ className: "custom-label" }}
+                        InputLabelProps={{ className: "custom-label" }}
                     />
                 </Grid>
                 <Grid item>
-                    <Button variant="contained"className="button_search" color="primary" onClick={handleSearch}>
+                    <Button variant="contained" className="button_search" color="primary" onClick={handleSearch}>
                         Search
                     </Button>
                 </Grid>
@@ -253,7 +253,7 @@ const EditGroup = () => {
                 count={nonMemberTotalPages}
                 page={nonMemberPage}
                 onChange={(_event, value) => setNonMemberPage(value)}
-                sx={{ display: "flex", justifyContent: "center", mt: 2, mb:2}}
+                sx={{ display: "flex", justifyContent: "center", mt: 2, mb: 2 }}
             />
         </Container>
     );

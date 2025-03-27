@@ -73,6 +73,8 @@ button {
   transition: var(--transition-default);
   color: var(--clr-white);
   font-size: 1.6rem;
+  position: relative;
+  top: 6px;
 }
 
 .theme-toggle-btn:hover {
@@ -284,21 +286,34 @@ button {
   font-size: 14px;
 }
 
-/* add user edit and group modal css  */
-
-
 .modal-paper {
   position: absolute !important;
   top: 50% !important;
   left: 50% !important;
   transform: translate(-50%, -50%) !important;
-  width: 650px !important;
+  width: 90% !important; 
+  max-width: 650px !important; 
   border-radius: 8px !important;
   box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2) !important;
   padding: 24px 12px 0px 12px !important;
   background-color: #fff !important;
   font-family: 'IBM Plex Sans' !important;
 }
+
+/* Adjust for tablets */
+@media (min-width: 768px) {
+  .modal-paper {
+    width: 80% !important;
+  }
+}
+
+/* Adjust for desktops */
+@media (min-width: 1024px) {
+  .modal-paper {
+    width: 650px !important;
+  }
+}
+
 
 .modal-header {
   font-size: 1.25rem !important;
@@ -581,4 +596,8 @@ button {
 .type_field{
   width: 250px !important;
   margin-left: 2px !important;
+}
+
+.css-16htz67-MuiPaper-root-MuiDialog-paper{
+  margin: 0 !important;
 }

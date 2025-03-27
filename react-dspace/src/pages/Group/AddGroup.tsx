@@ -34,7 +34,7 @@ const AddGroup = ({ open, onClose, onGroupAdded }: AddGroupProps) => {
       onClose={onClose}
       fullWidth
       maxWidth="sm"
-      PaperProps={{ className: "modal-paper" }} // Apply custom styles
+      PaperProps={{ className: "modal-paper" }} 
     >
       <div className="modal-header-container">
         <DialogTitle className="modal-header">Create Group</DialogTitle>

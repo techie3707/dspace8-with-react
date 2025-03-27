@@ -61,21 +61,22 @@
 .nav-link {
   display: flex;
   align-items: center;
-  
   height: 44px;
   border-radius: 8px;
-  padding: 6px 14px;
+  padding: 3px 1px;
   column-gap: 12px;
   text-decoration: none;
   color: white;
   transition: var(--transition-default);
 }
-
-
+.nav-link:hover{
+  color: chocolate !important;
+}
 
 .nav-link.active {
-  background-color: var(--clr-pumpkin);
+  background-color: var(--clr-pumpkin) !important;
   box-shadow: rgba(0, 0, 0, 0.1) 0px 20px 25px -5px, rgba(0, 0, 0, 0.04) 0px 10px 10px -5px;
+  color: burlywood;
 }
 
 .nav-link-icon {

@@ -27,6 +27,7 @@ import AddUser from "./addUser/addUser";
 import EditUser from "./editUser/editUser";
 import "./userManagement.css";
 import { iconsImgs } from "../../utils/images";
+import AccessManagement from "./accessManagement/accessManagement";
 
 const UserManagement = () => {
   const [users, setUsers] = useState<EPerson[]>([]);
@@ -34,6 +35,7 @@ const UserManagement = () => {
   const [addUserModalOpen, setAddUserModalOpen] = useState<boolean>(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [editUserModalOpen, setEditUserModalOpen] = useState<boolean>(false);
+  const [accessModalOpen, setAccessModalOpen] = useState<boolean>(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
   const [selectedUser, setSelectedUser] = useState<EPerson | null>(null);
   const [page, setPage] = useState<number>(1);
@@ -68,6 +70,11 @@ const UserManagement = () => {
     setEditUserModalOpen(true);
   };
 
+  const handleAcessClick = (userId: string) => {
+    setSelectedUserId(userId);
+    setAccessModalOpen(true);
+  };
+
   const handleConfirmDelete = async () => {
     if (selectedUser) {
       const success = await removeUser(selectedUser.id);
@@ -95,7 +102,7 @@ const UserManagement = () => {
 
 
       <Grid container alignItems="center" className="search-container">
-        <Grid item xs={11}>
+      <Grid item xs={9.5} sm={10.5}  lg={11} >
           <TextField
             label="Search people..."
             variant="outlined"
@@ -155,7 +162,7 @@ const UserManagement = () => {
             <IconButton className="btn_table_dlt" color="error" onClick={() => handleDeleteClick(user)} title="Delete">
               <img className="table_icon" src={iconsImgs.remove} alt="Remove" />
             </IconButton>
-            <IconButton className="btn_table" color="secondary" title="Give Access">
+            <IconButton className="btn_table" color="secondary" onClick={() => handleAcessClick(user.id)} title="Give Access">
               <img className="table_icon" src={iconsImgs.access} alt="Access" />
             </IconButton>
           </TableCell>
@@ -205,6 +212,11 @@ const UserManagement = () => {
         onClose={() => setEditUserModalOpen(false)}
         userId={selectedUserId || ""}
         fetchUsers={() => fetchUsers(page, size, searchQuery)}
+      />
+      <AccessManagement
+        open={accessModalOpen}
+        onClose={() => setAccessModalOpen(false)}
+        userId={selectedUserId || ""}
       />
 
     </Container>

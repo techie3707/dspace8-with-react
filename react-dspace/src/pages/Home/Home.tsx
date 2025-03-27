@@ -1,7 +1,7 @@
-import React from "react";
 import { Container, Grid, Button, Typography, Box, Card, CardContent } from "@mui/material";
 import "./Home.css";
 import { personsImgs } from '../../utils/images';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const Home = () => {
   return (
@@ -20,12 +20,13 @@ const Home = () => {
             <Button variant="outlined" color="primary">Overview Video!</Button>
           </Box>
           <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>KEY FEATURES:</Typography>
-          <Grid container spacing={2} className="key-features">
-            <Grid item xs={6}>✅ Central Source of Truth</Grid>
-            <Grid item xs={6}>✅ Automate Reliably</Grid>
-            <Grid item xs={6}>✅ Manage Access</Grid>
-            <Grid item xs={6}>✅ Find Easily</Grid>
+          <Grid container spacing={2} className="key-features" sx={{ display: "flex", flexWrap: "nowrap", overflowX: "auto" }}>
+            <Grid item sx={{ whiteSpace: "nowrap", paddingRight: 2 }}>✅ Central Source of Truth</Grid>
+            <Grid item sx={{ whiteSpace: "nowrap", paddingRight: 2 }}>✅ Automate Reliably</Grid>
+            <Grid item sx={{ whiteSpace: "nowrap", paddingRight: 2 }}>✅ Manage Access</Grid>
+            <Grid item sx={{ whiteSpace: "nowrap", paddingRight: 2 }}>✅ Find Easily</Grid>
           </Grid>
+
         </Box>
         <Box sx={{ flex: 1, display: "flex", justifyContent: "center" }}>
           <img className="" src={personsImgs.home_main} alt="profile" />
@@ -34,39 +35,47 @@ const Home = () => {
 
       {/* New Cards Section */}
       <Typography
-  variant="h5"
-  fontWeight="bold"
-  sx={{
-    textAlign: 'center',
-    textDecoration: 'underline',
-    mb: 3
-  }}
->
-  Latest Collections 
-</Typography>
+        variant="h5"
+        fontWeight="bold"
+        sx={{
+          textAlign: 'center',
+          textDecoration: 'underline',
+          mb: 3
+        }}
+      >
 
-{/* Cards Section */}
-<Grid container spacing={1} className="cards-section">
-  {[
-    { title: "Academics", description: "Combine PDFs in the order you want with the easiest PDF merger available." },
-    { title: "Accounts", description: "Separate one page or a whole set for easy conversion into independent PDF files." },
-    { title: "General Administrative", description: "Reduce file size while optimizing for maximal PDF quality." },
-    { title: "Publication", description: "Add text, images, shapes or freehand annotations to a PDF document." },
-    { title: "Finance", description: "Add text, images, shapes or freehand annotations to a PDF document." },
-    { title: "R&D Development", description: "Add text, images, shapes or freehand annotations to a PDF document." }
-  ].map((card, index) => (
-    <Grid item xs={12} sm={6} md={2} key={index}>
-      <Card className="feature-card">
-        <CardContent>
-          <Typography variant="h6" fontWeight="bold">{card.title}</Typography>
-          <Typography variant="body2" color="textSecondary">
-            {card.description}
-          </Typography>
-        </CardContent>
-      </Card>
-    </Grid>
-  ))}
-</Grid>
+      </Typography>
+
+      {/* Cards Section */}
+      <div className="collection_mains">
+        <div className="header-section">
+          <h1 className="header-title">Latest Collections</h1>
+          <div className="header-underline">
+            <span className="arrow-down">&#9660;</span>
+          </div>
+        </div>
+        <div className="row g-4">
+          {[
+            { "title": "Cosmic Chronicles", "description": "Exploring the latest advancements and discoveries in space science and astronomy.", "link": "/", "class": "card_d" },
+            { "title": "Fashion Forward", "description": "A deep dive into the world of fashion, style trends, and iconic designs shaping the industry.", "link": "/", "class": "card_d" },
+            { "title": "Tech Innovations", "description": "Bringing you the latest breakthroughs in technology, gadgets, and digital transformation.", "link": "/", "class": "card_h" },
+            { "title": "Travel Escapes", "description": "Discover breathtaking destinations, travel tips, and cultural experiences from around the world.", "link": "/", "class": "card_c" },
+            { "title": "Culinary Delights", "description": "A gastronomic journey through exquisite recipes, food trends, and expert cooking insights.", "link": "/", "class": "card_k" }
+          ].map((dept, index) => (
+            <div className="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" key={index}>
+              <a href={dept.link} className={`card ${dept.class}`}>
+                <div className="card-content">
+                  <div className="card-title">{dept.title}</div>
+                  <div className="card-description">{dept.description}</div>
+                  <div className="card-date">28/2/2024</div>
+                </div>
+              </a>
+            </div>
+          ))}
+        </div>
+      </div>
+
+
     </Container>
   );
 };
