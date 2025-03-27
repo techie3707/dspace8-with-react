@@ -136,7 +136,7 @@ const Search: React.FC = () => {
 
   useEffect(() => {
     handleSearch();
-  });
+  },[]);
 
   const updateFilter = (filterType: keyof SearchFilters, value: any, isChecked: boolean) => {
     setFilters(prev => {
