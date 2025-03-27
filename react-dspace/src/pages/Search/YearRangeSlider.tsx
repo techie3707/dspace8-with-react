@@ -3,7 +3,6 @@ import { styled, alpha, Box } from '@mui/system';
 import { Slider as BaseSlider, sliderClasses } from '@mui/base/Slider';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
 
 
 
@@ -33,8 +32,12 @@ interface YearRangeSliderProps {
             variant="outlined"
             size="small"
             InputProps={{
-              style: { width: '120px' }
+              style: { width:  '100%', }
             }}
+            sx={{
+                flex: '1 1 120px', 
+                maxWidth: '200px', 
+              }}
           />
           <TextField
             value={value[1]}
@@ -42,8 +45,12 @@ interface YearRangeSliderProps {
             variant="outlined"
             size="small"
             InputProps={{
-              style: { width: '120px' }
+              style: { width:  '100%' }
             }}
+            sx={{
+                flex: '1 1 120px', 
+                maxWidth: '200px', 
+              }}
           />
         </Box>
         
@@ -73,29 +80,9 @@ function valuetext(value: number) {
   return `${value}`;
 }
 
-const blue = {
-  100: '#DAECFF',
-  200: '#99CCF3',
-  300: '#66B2FF',
-  400: '#3399FF',
-  500: '#007FFF',
-  600: '#0072E5',
-  700: '#0059B3',
-  900: '#003A75',
-};
 
-const grey = {
-  50: '#F3F6F9',
-  100: '#E5EAF2',
-  200: '#DAE2ED',
-  300: '#C7D0DD',
-  400: '#B0B8C4',
-  500: '#9DA8B7',
-  600: '#6B7A90',
-  700: '#434D5B',
-  800: '#303740',
-  900: '#1C2025',
-};
+
+
 
 // Custom styled slider to match the blue color in the image
 const Slider = styled(BaseSlider)(
@@ -114,7 +101,7 @@ const Slider = styled(BaseSlider)(
   &.${sliderClasses.disabled} {
     pointer-events: none;
     cursor: default;
-    color: ${theme.palette.mode === 'light' ? grey[300] : grey[600]};
+    color: ${theme.palette.mode === 'light' ? '#C7D0DD' : '#6B7A90'};
     opacity: 0.4;
   }
 
