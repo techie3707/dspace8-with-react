@@ -1,7 +1,8 @@
 import axios from "axios";
 import { siteConfig } from "../data/data";
-import { FacetResult, ObjectSearchResult, SearchParams } from "../data/searchData";
-
+import { FacetResult, ObjectSearchResult, SearchParams, filterSections, FilterOption, SearchFilters } from "../data/searchData";
+import { Bitstream, BitstreamsResponse, BookDetailsData, Bundle, BundlesResponse } from "../data/bookDetail";
+// import { BookDetailsData } from "../search/bookDetailsData";
 
 
 const buildApiQueryParams = (params: SearchParams): string => {
@@ -16,34 +17,23 @@ const buildApiQueryParams = (params: SearchParams): string => {
   queryParams.append('size', (params.size || 10).toString());
 
   if (params.filters) {
-    const { filters } = params;
-    
-    if (filters.author?.length) {
-      filters.author.forEach(author => {
-        queryParams.append('f.author', `${author},equals`);
-      });
-    }
+    Object.entries(params.filters).forEach(([key, value]) => {
+      if (!value) return;
 
-    if (filters.subject?.length) {
-      filters.subject.forEach(subject => {
-        queryParams.append('f.subject', `${subject},equals`);
-      });
-    }
-
-    if (filters.date?.length) {
-      const dateRange = `[${filters.date[0].split(' - ')[0]} TO ${filters.date[0].split(' - ')[1]}]`;
-      queryParams.append('f.dateIssued', `${dateRange},equals`);
-    }
-
-    if (filters.itemType?.length) {
-      filters.itemType.forEach(itemType => {
-        queryParams.append('f.entityType', `${itemType},equals`);
-      });
-    }
-
-    if (filters.hasFile !== null && filters.hasFile !== undefined) {
-      queryParams.append('f.has_content_in_original_bundle', `${filters.hasFile},equals`);
-    }
+      if (Array.isArray(value)) {
+        value.forEach(val => {
+          if (key === 'date' && val.includes(' - ')) {
+            const dateRange = `[${val.split(' - ')[0]} TO ${val.split(' - ')[1]}]`;
+            queryParams.append('f.dateIssued', `${dateRange},equals`);
+          } else {
+            const fieldName = filterSections.find(s => s.id === key)?.fieldName || key;
+            queryParams.append(`f.${fieldName}`, `${val},equals`);
+          }
+        });
+      } else if (typeof value === 'boolean') {
+        queryParams.append(`f.has_content_in_original_bundle`, `${value},equals`);
+      }
+    });
   }
 
   return queryParams.toString();
@@ -55,19 +45,27 @@ export const parseSearchParamsFromUrl = (): SearchParams => {
   }
 
   const params = new URLSearchParams(window.location.search);
+  const filters: SearchFilters = {};
+
+  filterSections.forEach(section => {
+    if (section.filterType === 'checkbox') {
+      const values = params.getAll(section.id);
+      if (values.length) filters[section.id] = values;
+    } else if (section.filterType === 'boolean') {
+      const value = params.get(section.id);
+      if (value) filters[section.id] = value === 'true';
+    } else if (section.filterType === 'range') {
+      const values = params.getAll(section.id).filter(Boolean);
+      if (values.length) filters[section.id] = values;
+    }
+  });
+
   return {
     page: parseInt(params.get('page') || '0'),
     size: parseInt(params.get('size') || '10'),
     query: params.get('query') || undefined,
     sort: params.get('sort') || undefined,
-    filters: {
-      author: params.getAll('author'),
-      subject: params.getAll('subject'),
-      date: params.getAll('date').filter(Boolean),
-      itemType: params.getAll('itemType'),
-      hasFile: params.get('hasFile') === 'true' ? true : 
-               params.get('hasFile') === 'false' ? false : undefined
-    }
+    filters: Object.keys(filters).length ? filters : undefined
   };
 };
 
@@ -75,28 +73,30 @@ export const updateUrlWithSearchParams = (params: SearchParams) => {
   if (typeof window === 'undefined') return;
 
   const urlParams = new URLSearchParams();
-  
+
   urlParams.set('page', (params.page || 0).toString());
   urlParams.set('size', (params.size || 10).toString());
-  
+
   if (params.query) {
     urlParams.set('query', params.query);
   }
-  
+
   if (params.sort) {
     urlParams.set('sort', params.sort);
   }
-  
+
   if (params.filters) {
-    params.filters.author?.forEach(a => urlParams.append('author', a));
-    params.filters.subject?.forEach(s => urlParams.append('subject', s));
-    params.filters.date?.forEach(d => urlParams.append('date', d));
-    params.filters.itemType?.forEach(i => urlParams.append('itemType', i));
-    if (params.filters?.hasFile !== null && params.filters?.hasFile !== undefined) {
-      urlParams.set('hasFile', params.filters.hasFile.toString());
-    }
+    Object.entries(params.filters).forEach(([key, value]) => {
+      if (!value) return;
+
+      if (Array.isArray(value)) {
+        value.forEach(val => urlParams.append(key, val));
+      } else if (typeof value === 'boolean') {
+        urlParams.set(key, value.toString());
+      }
+    });
   }
-  
+
   // Update URL without reloading
   const newUrl = `${window.location.pathname}?${urlParams.toString()}`;
   window.history.pushState({ path: newUrl }, '', newUrl);
@@ -108,9 +108,9 @@ export const searchObjects = async (
   let apiUrl = `${siteConfig.apiEndpoint}/api/discover/search/objects?${buildApiQueryParams(params)}`;
 
   if (params.query?.trim()) {
-    apiUrl += `&query=${encodeURIComponent(params.query)}&embed=thumbnail&embed=item`;
+    apiUrl += `&query=${encodeURIComponent(params.query)}`;
   }
-
+  apiUrl += '&embed=thumbnail&embed=item/thumbnail'
   try {
     const response = await axios.get<ObjectSearchResult>(apiUrl);
     return {
@@ -123,37 +123,62 @@ export const searchObjects = async (
   }
 };
 
-const fetchFacetData = async (
+export const fetchFacet = async (
   facetName: string,
   params: SearchParams
-): Promise<FacetResult> => {
+): Promise<FilterOption[]> => {
   let f_url = `${siteConfig.apiEndpoint}/api/discover/facets/${facetName}?${buildApiQueryParams(params)}`;
-  
+
   if (params.query) {
     f_url += `&query=${encodeURIComponent(params.query)}`;
   }
 
   const response = await axios.get<FacetResult>(f_url);
+  return response.data._embedded?.values?.map((value: any) => ({
+    id: value.label,
+    label: value.label,
+    count: value.count
+  })) || [];
+};
+
+export const fetchFacets = async (params: SearchParams) => {
+  const facetPromises = filterSections.map(section => {
+    if (section.filterType === 'checkbox' || section.filterType === 'boolean') {
+      return fetchFacet(section.fieldName, params);
+    }
+    return Promise.resolve([]);
+  });
+
+  const results = await Promise.all(facetPromises);
+
+  return filterSections.reduce((acc, section, index) => {
+    if (section.filterType === 'checkbox' || section.filterType === 'boolean') {
+      acc[section.id] = results[index];
+    }
+    return acc;
+  }, {} as Record<string, FilterOption[]>);
+};
+
+export const fetchHasFileCounts = async (params: SearchParams) => {
+  const options = await fetchFacet('has_content_in_original_bundle', params);
+  return {
+    hasFileCount: options.find(o => o.id === 'true')?.count || 0,
+    noFileCount: options.find(o => o.id === 'false')?.count || 0
+  };
+};
+
+
+export const fetchItemDetails = async (id: string): Promise<BookDetailsData> => {
+  const response = await axios.get<BookDetailsData>(`${siteConfig.apiEndpoint}/api/core/items/${id}?embed=thumbnail&embed=accessStatus`);
   return response.data;
 };
 
-export const fetchAuthors = async (params: SearchParams): Promise<FacetResult> => {
-  return fetchFacetData('author', params);
+export const fetchItemBundles = async (id: string): Promise<Bundle[]> => {
+  const response = await axios.get<BundlesResponse>(`${siteConfig.apiEndpoint}/api/core/items/${id}/bundles?size=9999`);
+  return response.data._embedded.bundles;
 };
 
-export const fetchSubjects = async (params: SearchParams): Promise<FacetResult> => {
-  return fetchFacetData('subject', params);
+export const fetchBitstreams = async (bundleId: string): Promise<Bitstream[]> => {
+  const response = await axios.get<BitstreamsResponse>(`${siteConfig.apiEndpoint}/api/core/bundles/${bundleId}/bitstreams?page=0&size=5`);
+  return response.data._embedded.bitstreams;
 };
-
-export const fetchItemTypes = async (params: SearchParams): Promise<FacetResult> => {
-  return fetchFacetData('entityType', params);
-};
-
-export const fetchDates = async (params: SearchParams): Promise<FacetResult> => {
-  return fetchFacetData('dateIssued', params);
-};
-
-export const fetchHasFile = async (params: SearchParams): Promise<FacetResult> => {
-  return fetchFacetData('has_content_in_original_bundle', params);
-};
-

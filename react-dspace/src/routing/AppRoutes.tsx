@@ -18,6 +18,8 @@ import Register from "../pages/Register/Register";
 import Search from "../pages/Search/Search";
 import { ToastProvider } from "../contexts/ToastProvider";
 import CreateItem from "../pages/Item/createItem";
+import BookDetails from "../pages/book-detail/bookDetails";
+
 
 
 const ProtectedRoute = ({ element }: { element: React.ReactElement }) => {
@@ -49,6 +51,7 @@ const AppRoutes = () => {
         <Route path="/register/:token" element={<Register />} />
         <Route path="/signUp" element={<SignUp />} />
         <Route path="/adminSearch" element={<Search />} />
+        <Route path="/items/:id" element={<BookDetails />} />
         <Route path="/usermanagement" element={<ProtectedRoute element={<UserManagement />} />} />
         <Route path="/metadataSchemas" element={<ProtectedRoute element={<MetadataSchemas />} />} />
         <Route path="/bitstream/:schemaId/:schemaName" element={<ProtectedRoute element={<Bitstream />} />} />

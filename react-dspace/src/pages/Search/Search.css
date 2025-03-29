@@ -72,6 +72,11 @@ Search.css
 .results-list {
     list-style: none;
     padding: 0;
+    transition: all 0.3s ease; /* Smooth transition for all properties */
+}
+.results-list h3:hover {
+    color: black;
+    transition: color 0.3s ease; /* Smooth transition for hover effect */
 }
 
 .results-list li {
@@ -79,18 +84,27 @@ Search.css
     border: 1px solid #ddd;
     border-radius: 4px;
     padding: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for transform and shadow */
 }
-
+.results-list li:hover {
+    transform: scale(1.02); /* Slight zoom effect on hover */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add shadow on hover */
+}
 .results-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 20px;
+    transition: all 0.3s ease; 
 }
-
 .results-grid div {
     border: 1px solid #ddd;
     border-radius: 4px;
     padding: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease; 
+}
+.results-grid li:hover {
+    transform: scale(1.02);
+     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
 }
 .dropdown-container {
     /* width: 100%;  */
