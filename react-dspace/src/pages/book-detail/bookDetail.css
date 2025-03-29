@@ -1,0 +1,89 @@
+.full-section {
+    width: 100%;
+    padding: 20px;
+}
+
+.full-section button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+.full-section button:hover {
+    background-color: #0056b3;
+}
+.left-section{
+width: 30%;
+}
+.right-section{
+width: 70%;
+}
+
+.left-section,
+.right-section {
+    flex: 1;
+    padding: 10px;
+}
+
+.left-section img {
+    width: 100%;
+    max-width: 200px;
+    height: auto;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    margin-bottom: 10px;
+}
+
+.left-section h4,
+.right-section h3 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.full-section>.flex-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+    .full-section>.container {
+        flex-direction: column;
+    }
+
+    .left-section img {
+        width: 100%;
+        height: auto;
+    }
+
+    .left-section,
+    .right-section {
+        padding: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .full-section {
+        padding: 10px;
+    }
+
+    .full-section button {
+        width: 100%;
+        padding: 10px;
+    }
+
+    .left-section img {
+        width: 100%;
+        height: auto;
+    }
+
+    .left-section h4,
+    .right-section h3 {
+        font-size: 1.2rem;
+    }
+}

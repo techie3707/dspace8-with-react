@@ -5,17 +5,26 @@ export interface SearchParams {
   sort?: string;
   filters?: SearchFilters;
 }
-export interface SortOption {
-  value: string;
+
+export interface FilterOption {
+  id: string;
   label: string;
-  apiValue: string;
+  count: number;
 }
+
 export interface SearchFilters {
+  [key: string]: string[] | boolean | null | undefined;
   author?: string[];
   subject?: string[];
   date?: string[];
   itemType?: string[];
   hasFile?: boolean | null;
+}
+
+export interface SortOption {
+  value: string;
+  label: string;
+  apiValue: string;
 }
 
 export interface ResultsPerPageOption {
@@ -27,16 +36,18 @@ export interface FilterSection {
   id: string;
   label: string;
   defaultExpanded: boolean;
+  fieldName: string; 
+  filterType: 'checkbox' | 'range' | 'boolean';
 }
 
-export interface MetadataFields {
-  title: string;
-  abstract: string;
-  date: string;
-  author: string;
-  entityType: string;
-  publisher: string;
-}
+export const metadataFields = {
+  title: 'dc.title',
+  abstract: 'dc.description.abstract',
+  date: 'dc.date.issued',
+  author: 'dc.contributor.author',
+  entityType: 'dspace.entity.type',
+  publisher: 'dc.publisher'
+} as const;
 
 export const sortOptions: SortOption[] = [
   { value: 'relevant', label: 'Most Relevant', apiValue: 'score,DESC' },
@@ -54,37 +65,50 @@ export const resultsPerPageOptions: ResultsPerPageOption[] = [
 ];
 
 export const filterSections: FilterSection[] = [
-  { id: 'author', label: 'Author', defaultExpanded: true },
-  { id: 'subject', label: 'Subject', defaultExpanded: false },
-  { id: 'itemType', label: 'Item Type', defaultExpanded: false },
-  { id: 'date', label: 'Date', defaultExpanded: false },
-  { id: 'hasFiles', label: 'Has File', defaultExpanded: false }
+  { 
+    id: 'author', 
+    label: 'Author', 
+    defaultExpanded: true, 
+    fieldName: 'author',
+    filterType: 'checkbox'
+  },
+  // { 
+  //     id: 'public', 
+  //     label: 'public', 
+  //     defaultExpanded: true, 
+  //     fieldName: 'public',
+  //     filterType: 'checkbox'
+  //   },
+  { 
+    id: 'subject', 
+    label: 'Subject', 
+    defaultExpanded: false, 
+    fieldName: 'subject',
+    filterType: 'checkbox'
+  },
+  { 
+    id: 'itemType', 
+    label: 'Item Type', 
+    defaultExpanded: false, 
+    fieldName: 'entityType',
+    filterType: 'checkbox'
+  },
+  { 
+    id: 'date', 
+    label: 'Date', 
+    defaultExpanded: false, 
+    fieldName: 'dateIssued',
+    filterType: 'range'
+  },
+  { 
+    id: 'hasFiles', 
+    label: 'Has File', 
+    defaultExpanded: false, 
+    fieldName: 'has_content_in_original_bundle',
+    filterType: 'boolean'
+  }
 ];
 
-export const metadataFields: MetadataFields = {
-  title: 'dc.title',
-  abstract: 'dc.description.abstract',
-  date: 'dc.date.issued',
-  author: 'dc.contributor.author',
-  entityType: 'dspace.entity.type',
-  publisher: 'dc.publisher'
-};
-
-
-export interface Author {
-  name: string;
-  count: number;
-}
-
-export interface ItemType {
-  type: string;
-  count: number;
-}
-
-export interface Subject {
-  name: string,
-  count: number
-}
 export interface ObjectSearchResult {
   _embedded: {
     searchResult: {
@@ -100,6 +124,7 @@ export interface ObjectSearchResult {
     };
   };
 }
+
 export interface FacetResult {
   _embedded: {
     values: Array<{ label: string; count: number }>;
