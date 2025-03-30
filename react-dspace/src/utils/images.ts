@@ -20,8 +20,11 @@ import edit from "../assets/icons/edit.png";
 import remove from "../assets/icons/delete.png";
 import access from "../assets/icons/access-control.png";
 import person_one from "../assets/images/person_one.jpg";
-import brand_one from "../assets/images/Final LogoESD.png"
-import home_main from "../assets/images/homepage.svg"
+import brand_one from "../assets/images/Final LogoESD.png";
+import home_main from "../assets/images/homepage.svg";
+import grid from "../assets/icons/grid.png";
+import list from "../assets/icons/list.png";
+
 
 interface IconsImages {
     alert: string;
@@ -45,6 +48,8 @@ interface IconsImages {
     edit: string;
     remove: string;
     access: string;
+    list:   string;
+    grid:   string;
 }
 
 
@@ -56,7 +61,7 @@ interface PersonsImages {
 
 // Export typed objects
 export const iconsImgs: IconsImages = {
-    alert, bell, bills, budget, card, check, empty_check, gears, home, menu, plane, plus, report, search, user, wallet, wealth, login, edit, remove, access
+    alert, bell, bills, budget, card, check, empty_check, gears, home, menu, plane, plus, report, search, user, wallet, wealth, login, edit, remove, access, list, grid
 };
 
 export const personsImgs: PersonsImages = {

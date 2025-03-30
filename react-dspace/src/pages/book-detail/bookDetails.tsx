@@ -1,12 +1,9 @@
-import React, { useEffect, useState } from 'react'
-import { fetchBitstreams, fetchItemBundles, fetchItemDetails } from '../../api/searchApi'
+import React, { useEffect, useState } from 'react';
+import { fetchBitstreams, fetchItemBundles, fetchItemDetails } from '../../api/searchApi';
 import { useNavigate, useParams } from 'react-router-dom';
-import './bookDetail.css'
+import './bookDetail.css';
 import { Bitstream, BookDetailsData } from '../../data/bookDetail';
 import { siteConfig } from '../../data/data';
-
-
-
 
 const BookDetails: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -32,7 +29,6 @@ const BookDetails: React.FC = () => {
                         const thumbnailbitstreamsData = await fetchBitstreams(thumbnailBundle.uuid);
                         setOriginalBitstreams(originalbitstreamsData);
                         setThumbnailBitstreams(thumbnailbitstreamsData);
-
                     }
                 }
             } catch (error) {
@@ -43,25 +39,21 @@ const BookDetails: React.FC = () => {
             }
         };
         fetchData();
-    }, []);
+    }, [id]);
 
     const getMetadataValue = (field: string): string | null => {
         if (!item || !item.metadata) return null;
         const metadataField = item.metadata[field as keyof typeof item.metadata];
-        if (metadataField && metadataField.length > 0) {
-            return metadataField[0].value;
-        }
-        return null;
+        return metadataField && metadataField.length > 0 ? metadataField[0].value : null;
     };
 
     const title = getMetadataValue('dc.title');
     const author = getMetadataValue('dc.contributor.author');
     const description = getMetadataValue('dc.description');
-    const abstract = getMetadataValue('dc.description.abstract') ;
-    const dateIssued = getMetadataValue('dc.date.issued') ;
+    const abstract = getMetadataValue('dc.description.abstract');
+    const dateIssued = getMetadataValue('dc.date.issued');
     const uri = getMetadataValue('dc.identifier.uri');
     const publisher = getMetadataValue('dc.publisher');
-
 
     if (isLoading) return <div>Loading...</div>;
     if (error) return <h3>{error}</h3>;
@@ -71,23 +63,29 @@ const BookDetails: React.FC = () => {
         <div className='full-section'>
             <button onClick={() => navigate(-1)}> ← Back to result</button>
             <h1>{title}</h1>
-           <div className='container' style={{ display: 'flex', justifyContent: "center" }}>
-                <div className='left-section '>
-                    {thumbnailBitstreams.map(bitstream => <img style={{ width: "200px", height: "300px" }} src={`${siteConfig.apiEndpoint}/api/core/bitstreams/${bitstream.uuid}/content`} alt="no thumbnail" />
-                    )}
+            <div className='container' style={{ display: 'flex', justifyContent: "center" }}>
+                <div className='left-section'>
+                    {thumbnailBitstreams.map(bitstream => (
+                        <img 
+                            key={bitstream.uuid}
+                            style={{ width: "200px", height: "300px" }} 
+                            src={`${siteConfig.apiEndpoint}/api/core/bitstreams/${bitstream.uuid}/content`} 
+                            alt="No thumbnail" 
+                        />
+                    ))}
+
                     {originalBitstreams.length > 0 && (
                         <div>
                             <h4>Files</h4>
                             <ul>
                                 {originalBitstreams.map(bitstream => (
                                     <li key={bitstream.uuid}>
-                                        <a
-                                            href={`${siteConfig.apiEndpoint}/api/core/bitstreams/${bitstream.uuid}/content`}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
+                                        <p>{bitstream.metadata['dc.title']?.[0]?.value || bitstream.name}</p>
+                                        <button 
+                                            onClick={() => window.open(`${siteConfig.apiEndpoint}/api/core/bitstreams/${bitstream.uuid}/content`, '_blank')}
                                         >
-                                            {bitstream.metadata['dc.title']?.[0]?.value || bitstream.name}
-                                        </a>
+                                            View PDF
+                                        </button>
                                     </li>
                                 ))}
                             </ul>
@@ -140,7 +138,7 @@ const BookDetails: React.FC = () => {
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default BookDetails;

@@ -154,6 +154,11 @@ button {
   width: 0.5em;
   height: 0.5em;
 }
+.sresult_icon{
+  width: 1em;
+  height: 1em;
+}
+
 
 .btn_table {
   border: 1px solid black !important;

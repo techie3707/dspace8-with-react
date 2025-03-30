@@ -1,5 +1,3 @@
-// Search.tsx
-
 import React, { useEffect, useState } from 'react';
 import {
     searchObjects,
@@ -21,6 +19,8 @@ import {
     FilterOption
 } from '../../data/searchData';
 import { useNavigate } from 'react-router-dom';
+import { Button, Grid, TextField } from '@mui/material';
+import { iconsImgs } from '../../utils/images';
 
 const Search: React.FC = () => {
     const initialParams = parseSearchParamsFromUrl();
@@ -41,7 +41,7 @@ const Search: React.FC = () => {
         }, {} as Record<string, boolean>)
     );
 
-    const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
+    const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [page, setPage] = useState<number>((initialParams.page ?? 0) + 1 || 1);
     const [size, setSize] = useState<number>(initialParams.size || resultsPerPageOptions[3].value);
     const [totalData, setTotalData] = useState<number>(0);
@@ -130,7 +130,6 @@ const Search: React.FC = () => {
             } else if (section.filterType === 'range') {
                 newValue = isChecked ? [value] : [];
             } else {
-                // Fix: Ensure we treat the value as a whole string, not individual characters
                 newValue = isChecked
                     ? Array.from(new Map([...(prev[filterType] || []), value].map(item => [item, item])).keys())
                     : (prev[filterType] || []).filter((item: string) => item !== value);
@@ -233,15 +232,15 @@ const Search: React.FC = () => {
     };
 
     return (
-        <div className="search-container">
+        <div className="search-container row">
             <div className="filters-and-results">
-                <div className='filters-and-setting'>
+                <div className='filters-and-setting col-3'>
                     <div className="filters">
                         <h2>Filters</h2>
 
                         {filterSections.map(section => (
-                            <div key={section.id} style={{ marginBottom: '20px', border: '1px solid #ddd', borderRadius: '4px' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', borderBottom: '1px solid #ddd' }}>
+                            <div key={section.id}>
+                                <div>
                                     <h5>{section.label}</h5>
                                     <button onClick={() => toggleSection(section.id)}>
                                         {expandedSections[section.id] ? '-' : '+'}
@@ -303,45 +302,55 @@ const Search: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="search-results">
-                    <div className="search-input-container">
-                        <input
-                            type="text"
-                            className="search-input"
-                            value={inputValue}
-                            onChange={(e) => setInputValue(e.target.value)}
-                            placeholder="Search the repository ..."
-                            onKeyPress={(e) => {
-                                if (e.key === 'Enter') {
-                                    handleSearch(filters, 1, size, true, getSortParam());
-                                }
-                            }}
-                        />
-                        <button
-                            className="search-button"
-                            onClick={() => {
-                                handleSearch(filters, 1, size, true, getSortParam());
-                            }}
-                            disabled={isLoading}
-                        >
-                            {isLoading ? 'Searching...' : 'Search'}
-                        </button>
-                    </div>
+                <div className="search-results col-10">
+                    <div className='col-12'>
+                    <Grid container alignItems="center" className="search-container">
+                        <Grid item xs={8.5} sm={8.5} lg={10}>
+                            <TextField
+                                label="Search the repository..."
+                                variant="outlined"
+                                fullWidth
+                                value={inputValue}
+                                onChange={(e) => setInputValue(e.target.value)}
+                                className="search-field"
+                                InputLabelProps={{ className: "custom-label" }}
+                                onKeyPress={(e) => {
+                                    if (e.key === 'Enter') {
+                                        handleSearch(filters, 1, size, true, getSortParam());
+                                    }
+                                }}
+                            />
+                        </Grid>
 
-                    <div className="results-header">
+                        <Grid item>
+                            <Button
+                                className="button_search"
+                                variant="contained"
+                                onClick={() => handleSearch(filters, 1, size, true, getSortParam())}
+                                disabled={isLoading}
+                            >
+                                {isLoading ? 'Searching...' : 'Search'}
+                            </Button>
+                        </Grid>
+                    </Grid>
+                    </div>
+                    
+
+
+                    <div className="results-header col-11">
                         <h2>Search Results</h2>
                         <div>
+                        <button
+                                className={`view-mode-button ${viewMode === 'grid' ? 'active' : ''}`}
+                                onClick={() => setViewMode('grid')}
+                            >
+                                <img className="sresult_icon" src={iconsImgs.grid} alt="Grid" />
+                            </button>
                             <button
                                 className={`view-mode-button ${viewMode === 'list' ? 'active' : ''}`}
                                 onClick={() => setViewMode('list')}
                             >
-                                List
-                            </button>
-                            <button
-                                className={`view-mode-button ${viewMode === 'grid' ? 'active' : ''}`}
-                                onClick={() => setViewMode('grid')}
-                            >
-                                Grid
+                                <img className="sresult_icon" src={iconsImgs.list} alt="List" />
                             </button>
                         </div>
                     </div>
@@ -351,7 +360,7 @@ const Search: React.FC = () => {
                     ) : (
                         <>
                             {viewMode === 'list' ? (
-                                <ul className="results-list" style={{ width: '100vh' }}>
+                                <ul className="results-list" style={{ width: '145vh' }}>
                                     {searchResults.map((result, index) => {
                                         const metadata = result._embedded?.indexableObject?.metadata;
                                         const type = result._embedded?.indexableObject?.type;
@@ -417,7 +426,7 @@ const Search: React.FC = () => {
                                     })}
                                 </ul>
                             ) : (
-                                <ul className="results-grid">
+                                <ul className="results-grid" style={{ width: '145vh' }}>
                                     {searchResults.map((result, index) => {
                                         const metadata = result._embedded?.indexableObject?.metadata;
                                         const type = result._embedded?.indexableObject?.type;
@@ -430,13 +439,13 @@ const Search: React.FC = () => {
                                         const publisher = getMetadataValue(metadata, metadataFields.publisher);
                                         const displayType = entity || type;
                                         const handleTitleClick = () => {
-                                          if (uuid) {
-                                              navigate(`/items/${uuid}`);
-                                          }
-                                      };
+                                            if (uuid) {
+                                                navigate(`/items/${uuid}`);
+                                            }
+                                        };
 
                                         return (
-                                            <li key={index}>
+                                            <li key={index} className='grid_main'>
                                                 <div style={{ display: 'flex', alignItems: 'center' }}>
                                                     <img
                                                         src="#"
@@ -454,9 +463,9 @@ const Search: React.FC = () => {
                                                             </span>
                                                         </div>
                                                         <h3
-                                                                style={{ margin: '0', cursor: 'pointer' }}
-                                                                onClick={handleTitleClick}
-                                                            >{title}</h3>
+                                                            style={{ margin: '0', cursor: 'pointer' }}
+                                                            onClick={handleTitleClick}
+                                                        >{title}</h3>
                                                         {date && (
                                                             <p style={{ margin: '10px 0', color: '#666' }}>
                                                                 {`(${publisher},${date}) ${author}`}

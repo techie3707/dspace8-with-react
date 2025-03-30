@@ -41,7 +41,6 @@ export const fetchCollections = async (communityId: string): Promise<Collection[
 
         return response.data._embedded?.collections || [];
     } catch (error) {
-        console.error(`Error fetching collections for community ${communityId}:`, error);
         showToast(`Failed to fetch collections for community ${communityId}`, "error");
         return [];
     }
@@ -64,7 +63,28 @@ export const fetchGroupsList = async () => {
             totalPages: response.data.page?.totalPages || 1,
         };
     } catch (error) {
-        console.error("Error fetching groups:", error);
         return { groups: [], totalPages: 1 };
     }
 };
+
+export const fetchUserGroupsList = async (userId: string) => {
+    try {
+        const apiUrl = `${siteConfig.apiEndpoint}/api/eperson/epersons/${userId}/groups`;
+
+        const response = await axios.get<ApiResponse>(apiUrl, {
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: authToken,
+            },
+            withCredentials: true,
+        });
+
+        return {
+            groups: response.data._embedded?.groups || [],
+            totalPages: response.data.page?.totalPages || 1,
+        };
+    } catch (error) {
+        return { groups: [], totalPages: 1 };
+    }
+};
+
