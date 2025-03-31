@@ -1,84 +1,175 @@
 import React, { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
-import { pdfjs, Document, Page } from "react-pdf";
-import { Box, Button, CircularProgress, Container, Typography } from "@mui/material";
+import axios from "axios";
+import { Viewer } from "@react-pdf-viewer/core";
+import { toolbarPlugin, ToolbarSlot } from "@react-pdf-viewer/toolbar";
+import { RenderGoToPageProps } from "@react-pdf-viewer/page-navigation";
+import { RenderCurrentScaleProps, RenderZoomInProps, RenderZoomOutProps } from "@react-pdf-viewer/zoom";
 
-// Load PDF.js worker
-pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+import "@react-pdf-viewer/core/lib/styles/index.css";
+import "@react-pdf-viewer/toolbar/lib/styles/index.css";
+import { useSearchParams } from "react-router-dom";
+
 
 const PDFViewer: React.FC = () => {
+    const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [searchParams] = useSearchParams();
     const uuid = searchParams.get("uuid");
-    const [fileUrl, setFileUrl] = useState<string | null>(null);
-    const [numPages, setNumPages] = useState<number>(0);
-    const [pageNumber, setPageNumber] = useState<number>(1);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
 
-    // Fetch PDF URL based on UUID
+    const toolbarPluginInstance = toolbarPlugin();
+    const { Toolbar } = toolbarPluginInstance;
+
     useEffect(() => {
-        if (uuid) {
-            const pdfUrl = `http://localhost:8080/server/api/core/bitstreams/${uuid}/content`;
-            setFileUrl(pdfUrl);
-        }
+        const fetchPDF = async () => {
+            try {
+                const response = await axios.get(
+                    `http://localhost:8080/server/api/core/bitstreams/${uuid}/content`,
+                    { responseType: "blob" }
+                );
+                const pdfBlobUrl = URL.createObjectURL(response.data as Blob);
+                setPdfUrl(pdfBlobUrl);
+                setLoading(false);
+            } catch (error) {
+                setError("Failed to load PDF");
+                setLoading(false);
+            }
+        };
+
+        fetchPDF();
     }, [uuid]);
 
-    // Handle document load success
-    const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
-        setNumPages(numPages);
-        setPageNumber(1);
-        setLoading(false);
-    };
-
-    const onError = (err: any) => {
-        setError("Failed to load PDF.");
-        console.error("PDF Load Error:", err);
-        setLoading(false);
-    };
-
-    const goToPreviousPage = () => setPageNumber((prev) => Math.max(prev - 1, 1));
-    const goToNextPage = () => setPageNumber((prev) => Math.min(prev + 1, numPages));
+    if (loading) return <p>Loading PDF...</p>;
+    if (error) return <p style={{ color: "red" }}>{error}</p>;
 
     return (
-        <Container sx={{ textAlign: "center", p: 2, maxWidth: "800px", margin: "auto" }}>
-            {loading && <CircularProgress sx={{ marginBottom: 2 }} />}
-            
-            {error ? (
-                <Typography color="error">{error}</Typography>
-            ) : fileUrl ? (
-                <>
-                    <Box sx={{
-                        boxShadow: 3,
-                        borderRadius: 2,
-                        overflow: "hidden",
-                        p: 2,
-                        backgroundColor: "#fff",
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                    }}>
-                        <Document file={fileUrl} onLoadSuccess={onDocumentLoadSuccess} onLoadError={onError}>
-                            <Page pageNumber={pageNumber} width={600} />
-                        </Document>
-
-                        <Typography variant="body1" sx={{ mt: 2 }}>
-                            Page {pageNumber} of {numPages}
-                        </Typography>
-
-                        <Box sx={{ mt: 2, display: "flex", gap: 2 }}>
-                            <Button variant="contained" onClick={goToPreviousPage} disabled={pageNumber === 1 || loading}>
-                                Previous
-                            </Button>
-                            <Button variant="contained" onClick={goToNextPage} disabled={pageNumber === numPages || loading}>
-                                Next
-                            </Button>
-                        </Box>
-                    </Box>
-                </>
-            ) : (
-                <CircularProgress />
-            )}
-        </Container>
+        <div
+            style={{
+                border: "1px solid rgba(0, 0, 0, 0.3)",
+                display: "flex",
+                flexDirection: "column",
+                height: "100%",
+            }}
+        >
+            <div
+                style={{
+                    alignItems: "center",
+                    backgroundColor: "#eeeeee",
+                    borderBottom: "1px solid rgba(0, 0, 0, 0.1)",
+                    display: "flex",
+                    padding: "4px",
+                }}
+            >
+                <Toolbar>
+                    {(props: ToolbarSlot) => {
+                        const { CurrentPageInput, CurrentScale, GoToNextPage, GoToPreviousPage, NumberOfPages, ZoomIn, ZoomOut } = props;
+                        return (
+                            <>
+                                <div style={{ padding: "0px 2px" }}>
+                                    <ZoomOut>
+                                        {(props: RenderZoomOutProps) => (
+                                            <button
+                                                style={{
+                                                    backgroundColor: "#357edd",
+                                                    border: "none",
+                                                    borderRadius: "4px",
+                                                    color: "#ffffff",
+                                                    cursor: "pointer",
+                                                    padding: "8px",
+                                                }}
+                                                onClick={props.onClick}
+                                            >
+                                                Zoom out
+                                            </button>
+                                        )}
+                                    </ZoomOut>
+                                </div>
+                                <div style={{ padding: "0px 2px" }}>
+                                    <CurrentScale>
+                                        {(props: RenderCurrentScaleProps) => (
+                                            <span>{`${Math.round(props.scale * 100)}%`}</span>
+                                        )}
+                                    </CurrentScale>
+                                </div>
+                                <div style={{ padding: "0px 2px" }}>
+                                    <ZoomIn>
+                                        {(props: RenderZoomInProps) => (
+                                            <button
+                                                style={{
+                                                    backgroundColor: "#357edd",
+                                                    border: "none",
+                                                    borderRadius: "4px",
+                                                    color: "#ffffff",
+                                                    cursor: "pointer",
+                                                    padding: "8px",
+                                                }}
+                                                onClick={props.onClick}
+                                            >
+                                                Zoom in
+                                            </button>
+                                        )}
+                                    </ZoomIn>
+                                </div>
+                                <div style={{ padding: "0px 2px", marginLeft: "auto" }}>
+                                    <GoToPreviousPage>
+                                        {(props: RenderGoToPageProps) => (
+                                            <button
+                                                style={{
+                                                    backgroundColor: props.isDisabled ? "#96ccff" : "#357edd",
+                                                    border: "none",
+                                                    borderRadius: "4px",
+                                                    color: "#ffffff",
+                                                    cursor: props.isDisabled ? "not-allowed" : "pointer",
+                                                    padding: "8px",
+                                                }}
+                                                disabled={props.isDisabled}
+                                                onClick={props.onClick}
+                                            >
+                                                Previous page
+                                            </button>
+                                        )}
+                                    </GoToPreviousPage>
+                                </div>
+                                <div style={{ padding: "0px 2px", width: "4rem" }}>
+                                    <CurrentPageInput />
+                                </div>
+                                <div style={{ padding: "0px 2px" }}>
+                                    / <NumberOfPages />
+                                </div>
+                                <div style={{ padding: "0px 2px" }}>
+                                    <GoToNextPage>
+                                        {(props: RenderGoToPageProps) => (
+                                            <button
+                                                style={{
+                                                    backgroundColor: props.isDisabled ? "#96ccff" : "#357edd",
+                                                    border: "none",
+                                                    borderRadius: "4px",
+                                                    color: "#ffffff",
+                                                    cursor: props.isDisabled ? "not-allowed" : "pointer",
+                                                    padding: "8px",
+                                                }}
+                                                disabled={props.isDisabled}
+                                                onClick={props.onClick}
+                                            >
+                                                Next page
+                                            </button>
+                                        )}
+                                    </GoToNextPage>
+                                </div>
+                            </>
+                        );
+                    }}
+                </Toolbar>
+            </div>
+            <div
+                style={{
+                    flex: 1,
+                    overflow: "hidden",
+                }}
+            >
+                {pdfUrl && <Viewer fileUrl={pdfUrl} plugins={[toolbarPluginInstance]} />}
+            </div>
+        </div>
     );
 };
 

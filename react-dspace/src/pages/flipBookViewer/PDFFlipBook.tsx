@@ -4,6 +4,7 @@ import HTMLFlipBook from "react-pageflip";
 import * as pdfjsLib from "pdfjs-dist";
 import "pdfjs-dist/build/pdf.worker.entry";
 import { Box, CircularProgress, Container } from "@mui/material";
+import { getPDFUrl } from "../../api/bitstream";
 
 const PDFFlipBook: React.FC = () => {
     const [searchParams] = useSearchParams();
@@ -17,10 +18,10 @@ const PDFFlipBook: React.FC = () => {
 
     const pageBatchSize = 10;
 
+    
     useEffect(() => {
         if (uuid) {
-            const pdfUrl = `http://localhost:8080/server/api/core/bitstreams/${uuid}/content`;
-            setFileUrl(pdfUrl);
+            setFileUrl(getPDFUrl(uuid));
         }
     }, [uuid]);
 

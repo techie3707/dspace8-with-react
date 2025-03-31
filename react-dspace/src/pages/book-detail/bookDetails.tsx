@@ -4,6 +4,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import './bookDetail.css';
 import { Bitstream, BookDetailsData } from '../../data/bookDetail';
 import { siteConfig } from '../../data/data';
+import { downloadPDF } from '../../api/bitstream';
+import { useAuth } from '../../contexts/AuthContext';
 
 
 
@@ -16,7 +18,7 @@ const BookDetails: React.FC = () => {
     const [originalBitstreams, setOriginalBitstreams] = useState<Bitstream[]>([]);
     const [thumbnailBitstreams, setThumbnailBitstreams] = useState<Bitstream[]>([]);
     const navigate = useNavigate();
-
+    const { isAuthenticated } = useAuth();
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -92,12 +94,18 @@ const BookDetails: React.FC = () => {
                                             >
                                                 View PDF
                                             </button>
-                                            
+
                                             <button
                                                 onClick={() => window.open(`/flip-book-viewer?uuid=${bitstream.uuid}`, '_blank')}
                                             >
                                                 View In Flip PDF
                                             </button>
+
+                                            {isAuthenticated && (
+                                                <button onClick={() => downloadPDF(bitstream.uuid, bitstream.name)}>
+                                                    Download PDF
+                                                </button>
+                                            )}
                                         </li>
                                     ))}
                             </ul>
