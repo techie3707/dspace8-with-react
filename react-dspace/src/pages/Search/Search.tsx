@@ -234,34 +234,35 @@ const Search: React.FC = () => {
     return (
         <div className="search-container row">
             <div className="filters-and-results">
-                <div className='filters-and-setting col-3'>
-                    <div className="filters">
-                        <h2>Filters</h2>
-
-                        {filterSections.map(section => (
+                <div className='filters-and-setting'>
+                    <div className="filters col-3">
+                        <div className="Zns0ac"><span className="I75YIf">Filter by</span></div>
+                          {filterSections.map(section => (
                             <div key={section.id}>
-                                <div>
-                                    <h5>{section.label}</h5>
-                                    <button onClick={() => toggleSection(section.id)}>
-                                        {expandedSections[section.id] ? '-' : '+'}
-                                    </button>
-                                </div>
+                                <div className={`filter_name ${expandedSections[section.id] ? '' : 'border-bottom'}`}>
+                                   <h2 className='ZF0dQe'>{section.label}</h2>
+                                      <button
+                                        className={`toggle-button ${expandedSections[section.id] ? 'up' : 'down'}`}
+                                         onClick={() => toggleSection(section.id)}
+                                    ></button>
+                               </div>
                                 {expandedSections[section.id] && (
-                                    <div style={{ padding: '10px' }}>
+                                    <div className='li_filter'>
                                         {renderFilterSection(section)}
                                     </div>
                                 )}
                             </div>
                         ))}
-
-                        <button
-                            style={{ width: '100%', padding: '10px', backgroundColor: '#007bff', color: '#fff', border: 'none', borderRadius: '4px' }}
+                        
+                    </div>
+                    <div className='filter_reset'>
+                        <button className='filter_reset_btn'
+                            style={{ width: '50%', padding: '10px', border: 'none', borderRadius: '4px' }}
                             onClick={resetFilters}
                         >
                             Reset filters
                         </button>
-                    </div>
-
+                        </div>
                     <div className="dropdown-container">
                         <h1>Setting</h1>
                         <div>
@@ -304,43 +305,43 @@ const Search: React.FC = () => {
 
                 <div className="search-results col-10">
                     <div className='col-12'>
-                    <Grid container alignItems="center" className="search-container">
-                        <Grid item xs={8.5} sm={8.5} lg={10}>
-                            <TextField
-                                label="Search the repository..."
-                                variant="outlined"
-                                fullWidth
-                                value={inputValue}
-                                onChange={(e) => setInputValue(e.target.value)}
-                                className="search-field"
-                                InputLabelProps={{ className: "custom-label" }}
-                                onKeyPress={(e) => {
-                                    if (e.key === 'Enter') {
-                                        handleSearch(filters, 1, size, true, getSortParam());
-                                    }
-                                }}
-                            />
-                        </Grid>
+                        <Grid container alignItems="center" className="search-container">
+                            <Grid item xs={8.5} sm={8.5} lg={10}>
+                                <TextField
+                                    label="Search the repository..."
+                                    variant="outlined"
+                                    fullWidth
+                                    value={inputValue}
+                                    onChange={(e) => setInputValue(e.target.value)}
+                                    className="search-field"
+                                    InputLabelProps={{ className: "custom-label" }}
+                                    onKeyPress={(e) => {
+                                        if (e.key === 'Enter') {
+                                            handleSearch(filters, 1, size, true, getSortParam());
+                                        }
+                                    }}
+                                />
+                            </Grid>
 
-                        <Grid item>
-                            <Button
-                                className="button_search"
-                                variant="contained"
-                                onClick={() => handleSearch(filters, 1, size, true, getSortParam())}
-                                disabled={isLoading}
-                            >
-                                {isLoading ? 'Searching...' : 'Search'}
-                            </Button>
+                            <Grid item>
+                                <Button
+                                    className="button_search"
+                                    variant="contained"
+                                    onClick={() => handleSearch(filters, 1, size, true, getSortParam())}
+                                    disabled={isLoading}
+                                >
+                                    {isLoading ? 'Searching...' : 'Search'}
+                                </Button>
+                            </Grid>
                         </Grid>
-                    </Grid>
                     </div>
-                    
+
 
 
                     <div className="results-header col-11">
                         <h2>Search Results</h2>
                         <div>
-                        <button
+                            <button
                                 className={`view-mode-button ${viewMode === 'grid' ? 'active' : ''}`}
                                 onClick={() => setViewMode('grid')}
                             >

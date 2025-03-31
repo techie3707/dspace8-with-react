@@ -17,10 +17,53 @@
  }
 
  .filters {
-     width: 25%;
-     min-width: 200px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 1px 3px 1px rgba(0, 0, 0, .15);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    max-height: 100%;
+     width: 93%;
+     padding-bottom: 10px;
  }
-
+ .Zns0ac {
+    padding: 17px 24px 16px !important;
+    border-bottom: 1px solid rgb(218, 220, 224) !important;
+}
+.I75YIf {
+    -moz-osx-font-smoothing: grayscale !important;
+    -webkit-font-smoothing: antialiased !important;
+    text-rendering: optimizeLegibility !important;
+    font-family: Google Sans Text, Roboto, Arial, sans-serif !important;
+    font-size: 18px !important;
+    font-weight: 500 !important;
+    letter-spacing: .5px !important;
+    line-height: 24px !important;
+    text-transform: uppercase !important;
+    color: rgb(95, 99, 104) !important;
+}
+.li_filter li{
+    padding: 17px 24px 16px !important;
+    font-size: 17px;
+}
+.li_filter input[type="checkbox"] {
+    width: 19px;
+    height: 19px;
+    border: 1px solid black;
+}
+.li_filter input[type="text"] {
+    width: 57px;
+    height: 19px;
+   
+}
+.css-quhxjy-MuiInputBase-root-MuiOutlinedInput-root{
+    width: 90% !important;
+} 
+.css-1ssd6a6{
+    background: #fff !important;
+}
+.li_filter li:hover{
+    background-color: #ddd;
+}
  .search-results {
      width: 75%;
      min-width: 300px;
@@ -88,23 +131,62 @@
      border-radius: 4px;
      padding: 10px;
      transition: transform 0.3s ease, box-shadow 0.3s ease;
-     /* Smooth transition for transform and shadow */
  }
+ .toggle-button {
+    width: 16px;
+    height: 16px;
+    background-size: cover;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+}
+
+.toggle-button.up {
+    background-image: url('../../assets/icons/down-arrow.png'); 
+}
+
+.toggle-button.down {
+    background-image: url('../../assets/icons/arrow-up.png'); 
+}
+
 
  .results-list li:hover {
      transform: scale(1.02);
-     /* Slight zoom effect on hover */
      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-     /* Add shadow on hover */
  }
-
+.filter_name{
+    display: flex;
+    justify-content: space-between;
+    padding: 17px 24px 16px !important;
+}
+.filter_name:hover {
+    background-color: #ddd;
+}
+.ZF0dQe {
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    font-family: Google Sans, Roboto, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: normal;
+    line-height: 24px;
+}
  .results-grid {
      display: grid;
      grid-template-columns: repeat(4, 1fr);
      gap: 4px;
      transition: all 0.3s ease;
  }
-
+ .filter_reset{
+    position: relative;
+    bottom: 43px;
+ }
+.filter_reset_btn{
+    background-color: #43515f;
+    color: #fff;
+    font-weight: 500;
+}
  .results-grid div {
      padding: 5px;
      transition: transform 0.3s ease, box-shadow 0.3s ease;

@@ -14,8 +14,7 @@ export const uploadBatchImport = async (
     const properties = [
       { name: "--add" },
       { name: "--zip", value: selectedFile.name },
-      { name: "--collection", value: selectedCollection },
-      { name: "-v", value: true }
+      { name: "--collection", value: selectedCollection }
     ];
     formData.append("properties", JSON.stringify(properties));
 

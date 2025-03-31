@@ -19,6 +19,8 @@ import Search from "../pages/Search/Search";
 import { ToastProvider } from "../contexts/ToastProvider";
 import CreateItem from "../pages/Item/createItem";
 import BookDetails from "../pages/book-detail/bookDetails";
+import PDFViewer from "../pages/PDFViewer/PDFViewer";
+import PDFFlipBook from "../pages/flipBookViewer/PDFFlipBook";
 
 
 
@@ -52,6 +54,8 @@ const AppRoutes = () => {
         <Route path="/signUp" element={<SignUp />} />
         <Route path="/adminSearch" element={<Search />} />
         <Route path="/items/:id" element={<BookDetails />} />
+        <Route path="/pdf-viewer" element={<PDFViewer />} />
+        <Route path="/flip-book-viewer" element={<PDFFlipBook />} />
         <Route path="/usermanagement" element={<ProtectedRoute element={<UserManagement />} />} />
         <Route path="/metadataSchemas" element={<ProtectedRoute element={<MetadataSchemas />} />} />
         <Route path="/bitstream/:schemaId/:schemaName" element={<ProtectedRoute element={<Bitstream />} />} />

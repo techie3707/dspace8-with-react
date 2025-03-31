@@ -5,6 +5,9 @@ import './bookDetail.css';
 import { Bitstream, BookDetailsData } from '../../data/bookDetail';
 import { siteConfig } from '../../data/data';
 
+
+
+
 const BookDetails: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const [item, setItem] = useState<BookDetailsData | null>(null);
@@ -65,32 +68,42 @@ const BookDetails: React.FC = () => {
             <h1>{title}</h1>
             <div className='container' style={{ display: 'flex', justifyContent: "center" }}>
                 <div className='left-section'>
-                    {thumbnailBitstreams.map(bitstream => (
-                        <img 
-                            key={bitstream.uuid}
-                            style={{ width: "200px", height: "300px" }} 
-                            src={`${siteConfig.apiEndpoint}/api/core/bitstreams/${bitstream.uuid}/content`} 
-                            alt="No thumbnail" 
-                        />
-                    ))}
+                    {thumbnailBitstreams
+                        .filter(bitstream => /\.jpe?g|\.png$/i.test(bitstream.name))
+                        .map(bitstream => (
+                            <img
+                                key={bitstream.uuid}
+                                style={{ width: "200px", height: "300px" }}
+                                src={`${siteConfig.apiEndpoint}/api/core/bitstreams/${bitstream.uuid}/content`}
+                            />
+                        ))}
 
                     {originalBitstreams.length > 0 && (
                         <div>
                             <h4>Files</h4>
                             <ul>
-                                {originalBitstreams.map(bitstream => (
-                                    <li key={bitstream.uuid}>
-                                        <p>{bitstream.metadata['dc.title']?.[0]?.value || bitstream.name}</p>
-                                        <button 
-                                            onClick={() => window.open(`${siteConfig.apiEndpoint}/api/core/bitstreams/${bitstream.uuid}/content`, '_blank')}
-                                        >
-                                            View PDF
-                                        </button>
-                                    </li>
-                                ))}
+                                {originalBitstreams
+                                    .filter(bitstream => /.pdf$/i.test(bitstream.name))
+                                    .map(bitstream => (
+                                        <li key={bitstream.uuid}>
+                                            <p>{bitstream.metadata['dc.title']?.[0]?.value || bitstream.name}</p>
+                                            <button
+                                                onClick={() => window.open(`/pdf-viewer?uuid=${bitstream.uuid}`, '_blank')}
+                                            >
+                                                View PDF
+                                            </button>
+                                            
+                                            <button
+                                                onClick={() => window.open(`/flip-book-viewer?uuid=${bitstream.uuid}`, '_blank')}
+                                            >
+                                                View In Flip PDF
+                                            </button>
+                                        </li>
+                                    ))}
                             </ul>
                         </div>
                     )}
+
 
                     <div>
                         <h4>Date</h4>
