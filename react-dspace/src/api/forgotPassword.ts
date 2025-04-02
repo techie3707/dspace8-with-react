@@ -1,23 +1,41 @@
 import axios from "axios";
 import { siteConfig } from "../data/data";
+import { showToast } from "../contexts/ToastProvider";
 
 interface RegistrationResponse {
     email: string;
-    user: string; 
+    user: string;
     type: string;
 }
 const csrfToken = localStorage.getItem("csrfToken") || "";
 export const fetchUserByEmail = async (token: string) => {
     try {
         const response = await axios.get<RegistrationResponse>(
-            `http://localhost:8080/server/api/eperson/registrations/search/findByToken?token=${token}`
+            `${siteConfig.apiEndpoint}/api/eperson/registrations/search/findByToken?token=${token}`
         );
 
         return {
             email: response.data.email,
             epersonId: response.data.user
         };
-    } catch (error) {
+        if(response.status === 200) {
+            showToast("User fetched successfully!", "success");
+        }
+    } catch (error: any) {
+        const errorStatus = error.response?.status || 500;
+        if (errorStatus === 400) {
+            window.location.href = `/error-400`;
+        } else if (errorStatus === 401) {
+            window.location.href = `/error-401`;
+        } else if (errorStatus === 403) {
+            window.location.href = `/error-403`;
+        } else if (errorStatus === 422) {
+            window.location.href = `/error-422`;
+        } else if (errorStatus === 500) {
+            window.location.href = `/error-500`;
+        } else {
+            window.location.href = `/error-404`;
+        }
         throw new Error("Invalid token or expired link.");
     }
 };
@@ -38,9 +56,25 @@ export const resetPassword = async (epersonId: string, newPassword: string, toke
                 withCredentials: true,
             }
         );
+        if (response.status === 201) {
+            showToast(`An email has been sent to your email containing a special URL and further instructions.`, "success");
+        }
         return response.data;
-    } catch (error) {
-        console.error("Error resetting password:", error);
+    } catch (error: any) {
+        const errorStatus = error.response?.status || 500;
+        if (errorStatus === 400) {
+            window.location.href = `/error-400`;
+        } else if (errorStatus === 401) {
+            window.location.href = `/error-401`;
+        } else if (errorStatus === 403) {
+            window.location.href = `/error-403`;
+        } else if (errorStatus === 422) {
+            window.location.href = `/error-422`;
+        } else if (errorStatus === 500) {
+            window.location.href = `/error-500`;
+        } else {
+            window.location.href = `/error-404`;
+        }
         throw error;
     }
 };
@@ -77,9 +111,25 @@ export const userRegister = async (
                 withCredentials: true,
             }
         );
+        if (response.status === 201) {
+            showToast("A confirmation mail send on your registered email.", "success");
+        }
         return response.data;
-    } catch (error) {
-        console.error("Error registering user:", error);
-        throw error;
+    } catch (error: any) {
+        const errorStatus = error.response?.status || 500;
+        if (errorStatus === 400) {
+            window.location.href = `/error-400`;
+        } else if (errorStatus === 401) {
+            window.location.href = `/error-401`;
+        } else if (errorStatus === 403) {
+            window.location.href = `/error-403`;
+        } else if (errorStatus === 422) {
+            window.location.href = `/error-422`;
+        } else if (errorStatus === 500) {
+            window.location.href = `/error-500`;
+        } else {
+            window.location.href = `/error-404`;
+        }
+
     }
 };

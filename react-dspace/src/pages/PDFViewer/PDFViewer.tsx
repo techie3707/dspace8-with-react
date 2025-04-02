@@ -8,6 +8,7 @@ import { RenderCurrentScaleProps, RenderZoomInProps, RenderZoomOutProps } from "
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import "@react-pdf-viewer/toolbar/lib/styles/index.css";
 import { useSearchParams } from "react-router-dom";
+import { siteConfig } from "../../data/data";
 
 
 const PDFViewer: React.FC = () => {
@@ -24,7 +25,7 @@ const PDFViewer: React.FC = () => {
         const fetchPDF = async () => {
             try {
                 const response = await axios.get(
-                    `http://localhost:8080/server/api/core/bitstreams/${uuid}/content`,
+                    `${siteConfig.apiEndpoint}/api/core/bitstreams/${uuid}/content`,
                     { responseType: "blob" }
                 );
                 const pdfBlobUrl = URL.createObjectURL(response.data as Blob);

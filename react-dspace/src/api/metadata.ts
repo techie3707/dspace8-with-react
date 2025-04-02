@@ -1,5 +1,6 @@
 import axios from "axios";
 import { siteConfig } from "../data/data";
+import { showToast } from "../contexts/ToastProvider";
 
 
 export interface MetadataSchema {
@@ -39,10 +40,25 @@ export const fetchMetadataFields = async (
                 withCredentials: true,
             }
         );
-
+        if (response.status === 200) {
+            showToast('Metadata fields fetched successfully!', 'success');
+        }
         return response.data._embedded?.metadatafields || [];
-    } catch (error) {
-        console.error("Failed to fetch metadata fields:", error);
+    } catch (error: any) {
+        const errorStatus = error.response?.status || 500;
+        if (errorStatus === 400) {
+            window.location.href = `/error-400`;
+        } else if (errorStatus === 401) {
+            window.location.href = `/error-401`;
+        } else if (errorStatus === 403) {
+            window.location.href = `/error-403`;
+        } else if (errorStatus === 422) {
+            window.location.href = `/error-422`;
+        } else if (errorStatus === 500) {
+            window.location.href = `/error-500`;
+        } else {
+            window.location.href = `/error-404`;
+        }
         throw new Error("Failed to fetch metadata fields.");
     }
 };
@@ -72,9 +88,25 @@ export const addMetadataField = async (
                 withCredentials: true,
             }
         );
+        if (response.status === 201) {
+            showToast('Metadata field added successfully!', 'success');
+        }
         return response.data;
-    } catch (error) {
-        console.error("Failed to add metadata field:", error);
+    } catch (error: any) {
+        const errorStatus = error.response?.status || 500;
+        if (errorStatus === 400) {
+            window.location.href = `/error-400`;
+        } else if (errorStatus === 401) {
+            window.location.href = `/error-401`;
+        } else if (errorStatus === 403) {
+            window.location.href = `/error-403`;
+        } else if (errorStatus === 422) {
+            window.location.href = `/error-422`;
+        } else if (errorStatus === 500) {
+            window.location.href = `/error-500`;
+        } else {
+            window.location.href = `/error-404`;
+        }
         throw new Error("Failed to add metadata field.");
     }
 };
@@ -90,9 +122,12 @@ export const deleteBitstream = async (id: number) => {
             },
             withCredentials: true,
         });
+        
+            showToast("Metadata field deleted successfully!", "success");
+        
     } catch (error) {
-        console.error(`Error deleting metadata schema with ID ${id}:`, error);
-        throw error; 
+        showToast("Failed to delete metadata field.", "error");
+        throw error;
     }
 };
 

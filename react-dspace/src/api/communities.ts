@@ -1,5 +1,6 @@
 import axios from "axios";
 import { siteConfig } from "../data/data";
+import { showToast } from "../contexts/ToastProvider";
 
 const csrfToken = localStorage.getItem("csrfToken") || "";
 
@@ -16,11 +17,12 @@ export const fetchCommunities = async (authToken: string) => {
                 withCredentials: true,
             }
         );
-
-        console.log("Communities API response:", response.data);
+        if (response.status === 200) {
+            showToast('Communities fetched successfully!', 'success');
+        }
         return response.data;
     } catch (error) {
-        console.error("Error fetching communities:", error);
+        showToast("Failed to fetch communities", "error");
         throw error;
     }
 };

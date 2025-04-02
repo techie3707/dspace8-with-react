@@ -1,5 +1,6 @@
 import axios from "axios";
 import { siteConfig } from "../data/data";
+import { showToast } from "../contexts/ToastProvider";
 
 let csrfToken: string | null = localStorage.getItem("csrfToken") || null;
 
@@ -15,7 +16,7 @@ export const fetchCsrfToken = async (): Promise<string | null> => {
     }
     return token;
   } catch (error) {
-    console.error("Failed to fetch CSRF token:", error);
+    showToast("Failed to fetch CSRF token", "error");
     return null;
   }
 };

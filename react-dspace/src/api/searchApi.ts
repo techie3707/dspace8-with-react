@@ -2,10 +2,11 @@ import axios from "axios";
 import { siteConfig } from "../data/data";
 import { FacetResult, ObjectSearchResult, SearchParams, filterSections, FilterOption, SearchFilters } from "../data/searchData";
 import { Bitstream, BitstreamsResponse, BookDetailsData, Bundle, BundlesResponse } from "../data/bookDetail";
+import { showToast } from "../contexts/ToastProvider";
 // import { BookDetailsData } from "../search/bookDetailsData";
 
 
-const buildApiQueryParams = (params: SearchParams): string => {
+ const buildApiQueryParams = (params: SearchParams): string => {
   const queryParams = new URLSearchParams();
   queryParams.append('configuration', 'default');
 
@@ -105,7 +106,7 @@ export const updateUrlWithSearchParams = (params: SearchParams) => {
 export const searchObjects = async (
   params: SearchParams
 ): Promise<{ results: any[]; totalElements: number }> => {
-  let apiUrl = `${siteConfig.apiEndpoint}/api/discover/search/objects?${buildApiQueryParams(params)}`;
+  let apiUrl = `${siteConfig.apiEndpoint}//api/discover/search/objects?${buildApiQueryParams(params)}`;
 
   if (params.query?.trim()) {
     apiUrl += `&query=${encodeURIComponent(params.query)}`;
@@ -113,13 +114,32 @@ export const searchObjects = async (
   apiUrl += '&embed=thumbnail&embed=item/thumbnail'
   try {
     const response = await axios.get<ObjectSearchResult>(apiUrl);
+    if (response.status === 200) {
+      showToast( 'Search completed successfully!','success');
+    }
     return {
       results: response.data._embedded.searchResult._embedded.objects || [],
       totalElements: response.data._embedded.searchResult.page?.totalElements || 0,
     };
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    throw error;
+  } catch (error:any) {
+    const errorStatus = error.response?.status || 500;
+    if(errorStatus === 400){
+      window.location.href = `/error-400`;
+    }else if(errorStatus === 401){
+      window.location.href = `/error-401`;
+    }else if(errorStatus === 403){
+      window.location.href = `/error-403`;
+    }else if(errorStatus === 422){
+      window.location.href = `/error-422`;
+    }else if(errorStatus === 500){
+      window.location.href = `/error-500`;
+    }else{
+      window.location.href = `/error-404`;
+    }
+    return {
+      results: [],
+      totalElements: 0,
+    };
   }
 };
 

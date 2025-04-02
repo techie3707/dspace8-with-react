@@ -15,6 +15,7 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { uploadBatchImport } from "../../api/batchImport";
 import { fetchCollections } from "../../api/collection";
 import { useNavigate } from "react-router-dom";
+import { showToast } from "../../contexts/ToastProvider";
 
 const BatchImport: React.FC = () => {
   const [collections, setCollections] = useState<{ id: string; name: string }[]>([]);
@@ -36,13 +37,12 @@ const BatchImport: React.FC = () => {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       setSelectedFile(event.target.files[0]);
-      console.log("Selected File:", event.target.files[0].name);
     }
   };
 
   const handleSubmit = async () => {
     if (!selectedCollection || !selectedFile) {
-      console.error("Please select a collection and a ZIP file.");
+      showToast("Please select a collection and a ZIP file.", "error");
       return;
     }
 
@@ -52,13 +52,13 @@ const BatchImport: React.FC = () => {
       const response = await uploadBatchImport(selectedCollection, selectedFile);
 
       if (response.status === 202) {
-        console.log("Upload successful, navigating to home...");
+        showToast("Batch import uploaded successfully!", "success");
         navigate("/");
       } else {
-        console.log("Upload completed but did not return 202:", response);
+        showToast("Upload completed but did not return 202.", "info");
       }
     } catch (error) {
-      console.error("Upload failed:", error);
+      showToast("Upload failed. Please try again.", "error");
     } finally {
       setIsLoading(false); 
     }

@@ -1,5 +1,6 @@
 import axios from "axios";
 import { siteConfig } from "../data/data";
+import { showToast } from "../contexts/ToastProvider";
 
 export interface Collection {
   id: string;
@@ -36,14 +37,16 @@ export const fetchCollections = async (): Promise<Collection[]> => {
         },
       }
     );
-
+       if(response.status === 200) {
+        showToast('Collections fetched successfully!', 'success');
+       }
     const objects = response.data._embedded?.searchResult?._embedded?.objects || [];
     return objects.map((obj) => ({
       id: obj._embedded.indexableObject.uuid,
       name: obj._embedded.indexableObject.name,
     }));
   } catch (error) {
-    console.error("Error fetching collections:", error);
+    showToast("Failed to fetch collections.", "error");
     throw error;
   }
 };

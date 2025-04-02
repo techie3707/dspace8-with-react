@@ -38,7 +38,6 @@ const BookDetails: React.FC = () => {
                 }
             } catch (error) {
                 setError("Data not found");
-                console.error(error);
             } finally {
                 setIsLoading(false);
             }

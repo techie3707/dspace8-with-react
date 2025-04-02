@@ -21,6 +21,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { Button, Grid, TextField } from '@mui/material';
 import { iconsImgs } from '../../utils/images';
+import { showToast } from '../../contexts/ToastProvider';
 
 const Search: React.FC = () => {
     const initialParams = parseSearchParamsFromUrl();
@@ -73,7 +74,7 @@ const Search: React.FC = () => {
             setFacets(facetsResponse);
             setHasFileCounts(hasFileResponse);
         } catch (error) {
-            console.error('Error fetching facets:', error);
+            showToast('Error fetching filter', 'error');
         }
     };
 
@@ -108,7 +109,7 @@ const Search: React.FC = () => {
 
             await fetchAllFacets(currentFilters);
         } catch (error) {
-            console.error('Error fetching data:', error);
+            showToast('Error fetching search data', 'error');
         } finally {
             setIsLoading(false);
         }

@@ -21,6 +21,12 @@ import CreateItem from "../pages/Item/createItem";
 import BookDetails from "../pages/book-detail/bookDetails";
 import PDFViewer from "../pages/PDFViewer/PDFViewer";
 import PDFFlipBook from "../pages/flipBookViewer/PDFFlipBook";
+import Error400 from "../pages/error/error400";
+import Error401 from "../pages/error/error401";
+import Error403 from "../pages/error/error403";
+import Error422 from "../pages/error/error422";
+import Error404 from "../pages/error/error404";
+import Error500 from "../pages/error/error500";
 
 
 
@@ -54,6 +60,12 @@ const AppRoutes = () => {
         <Route path="/signUp" element={<SignUp />} />
         <Route path="/adminSearch" element={<Search />} />
         <Route path="/items/:id" element={<BookDetails />} />
+        <Route path="/error-400" element={<Error400 />} />   
+        <Route path="/error-401" element={<Error401 />} />   
+        <Route path="/error-403" element={<Error403 />} />   
+        <Route path="/error-404" element={<Error404 />} />   
+        <Route path="/error-422" element={<Error422 />} />   
+        <Route path="/error-500" element={<Error500 />} />   
         <Route path="/pdf-viewer" element={<PDFViewer />} />
         <Route path="/flip-book-viewer" element={<PDFFlipBook />} />
         <Route path="/usermanagement" element={<ProtectedRoute element={<UserManagement />} />} />

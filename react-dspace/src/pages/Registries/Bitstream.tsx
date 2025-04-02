@@ -5,6 +5,7 @@ import {
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,
     Checkbox, CircularProgress, Typography, Pagination, TextField, Button, Box
 } from "@mui/material";
+import { showToast } from "../../contexts/ToastProvider";
 
 const Bitstream: React.FC = () => {
     const { schemaId, schemaName } = useParams<{ schemaId: string; schemaName: string }>();
@@ -79,7 +80,7 @@ const Bitstream: React.FC = () => {
             const fields = await fetchMetadataFields(schemaName ?? "", authToken, page, rowsPerPage);
             setMetadataFields(fields);
         } catch (error) {
-            console.error("Error deleting metadata schemas:", error);
+            showToast("Error deleting metadata fields", "error");
         }
     };
 

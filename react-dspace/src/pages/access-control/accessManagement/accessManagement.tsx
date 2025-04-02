@@ -21,6 +21,7 @@ import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { Collection } from "../../../data/accessAPI";
 import { addMemberToGroup, Group, removeMemberToGroup } from "../../../api/group";
+import { showToast } from "../../../contexts/ToastProvider";
 
 interface AccessManagementProps {
     open: boolean;
@@ -51,7 +52,7 @@ const AccessManagement: React.FC<AccessManagementProps> = ({ open, onClose, user
                 }
                 setCollections(allCollections);
             } catch (error) {
-                console.error("Error fetching collections:", error);
+                // console.error("Error fetching collections:", error);
             }
         };
         fetchData();
@@ -86,7 +87,7 @@ const AccessManagement: React.FC<AccessManagementProps> = ({ open, onClose, user
                 });
                 setCollectionPermissions(permissionsMap);
             } catch (error) {
-                console.error("Error fetching groups list:", error);
+                showToast("Failed to fetch groups list.", "error");
             }
         };
         fetchGroups();
@@ -117,7 +118,7 @@ const AccessManagement: React.FC<AccessManagementProps> = ({ open, onClose, user
                 });
                 setSelectedPermissions(updatedPermissions);
             } catch (error) {
-                console.error("Error fetching user groups:", error);
+                showToast("Failed to fetch user groups.", "error");
             }
         };
         fetchUserAssignedGroups();
@@ -188,7 +189,7 @@ const AccessManagement: React.FC<AccessManagementProps> = ({ open, onClose, user
     
             onClose();
         } catch (error) {
-            console.error("Error updating group memberships:", error);
+            showToast("Failed to update group memberships.", "error");
         }
     };
     

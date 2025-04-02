@@ -49,11 +49,23 @@ export const createItem = async (
         } else {
             showToast(`Error: ${response.statusText}`, "error");
         }
-        
+
         return response.data;
-        return response.data;
-    } catch (error) {
-        console.error("Error creating item:", error);
+    } catch (error: any) {
+        const errorStatus = error.response?.status || 500;
+        if (errorStatus === 400) {
+            window.location.href = `/error-400`;
+        } else if (errorStatus === 401) {
+            window.location.href = `/error-401`;
+        } else if (errorStatus === 403) {
+            window.location.href = `/error-403`;
+        } else if (errorStatus === 422) {
+            window.location.href = `/error-422`;
+        } else if (errorStatus === 500) {
+            window.location.href = `/error-500`;
+        } else {
+            window.location.href = `/error-404`;
+        }
         throw error;
     }
 };

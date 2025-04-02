@@ -28,6 +28,7 @@ import EditUser from "./editUser/editUser";
 import "./userManagement.css";
 import { iconsImgs } from "../../utils/images";
 import AccessManagement from "./accessManagement/accessManagement";
+import { showToast } from "../../contexts/ToastProvider";
 
 const UserManagement = () => {
   const [users, setUsers] = useState<EPerson[]>([]);
@@ -50,7 +51,7 @@ const UserManagement = () => {
       setUsers(data.epersons);
       setTotalPages(data.totalPages);
     } catch (error) {
-      console.error("Failed to fetch users:", error);
+      showToast("Failed to fetch users.", "error");
     } finally {
       setLoading(false);
     }

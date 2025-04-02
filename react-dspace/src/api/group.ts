@@ -1,5 +1,6 @@
 import axios from "axios";
 import { siteConfig } from "../data/data";
+import { showToast } from "../contexts/ToastProvider";
 
 
 export interface Group {
@@ -80,13 +81,16 @@ export const fetchGroups = async (
             },
             withCredentials: true,
         });
+        if (response.status === 200) {
+            showToast("Groups fetched successfully!", "success");
+        }
 
         return {
             groups: response.data._embedded?.groups || [],
             totalPages: response.data.page?.totalPages || 1,
         };
-    } catch (error) {
-        console.error("Error fetching groups:", error);
+    } catch (error: any) {
+        showToast("Failed to fetch groups.", "error");
         return { groups: [], totalPages: 1 };
     }
 };
@@ -105,10 +109,27 @@ export const addGroup = async (groupData: GroupPayload): Promise<boolean> => {
             },
             withCredentials: true,
         });
-
+        if (response.status === 201) {
+            showToast("Group created successfully!", "success");
+        } else {
+            showToast("Failed to create group.", "error");
+        }
         return response.status === 201;
-    } catch (error) {
-        console.error("Error creating group:", error);
+    } catch (error: any){
+        const errorStatus = error.response?.status || 500;
+    if(errorStatus === 400){
+      window.location.href = `/error-400`;
+    }else if(errorStatus === 401){
+      window.location.href = `/error-401`;
+    }else if(errorStatus === 403){
+      window.location.href = `/error-403`;
+    }else if(errorStatus === 422){
+      window.location.href = `/error-422`;
+    }else if(errorStatus === 500){
+      window.location.href = `/error-500`;
+    }else{
+      window.location.href = `/error-404`;
+    }
         return false;
     }
 };
@@ -126,9 +147,14 @@ export const fetchGroupMembers = async (groupId: string, page: number = 0, size:
                 },
             }
         );
+        if (response.status === 200) {
+            showToast("Group members fetched successfully!", "success");
+        } else {
+            showToast("Failed to fetch group members.", "error");
+        }
         return response.data;
-    } catch (error) {
-        console.error("Error fetching group members:", error);
+    } catch (error:any) {
+       showToast("Failed to fetch group members.", "error");
         throw error;
     }
 };
@@ -144,9 +170,14 @@ export const fetchNonMembers = async (groupId: string, page: number = 0, size: n
                 },
             }
         );
+        if (response.status === 200) {
+            showToast("Non-members fetched successfully!", "success");
+        } else {
+            showToast("Failed to fetch non-members.", "error");
+        } 
         return response.data;
     } catch (error) {
-        console.error("Error fetching non-members:", error);
+  showToast("Failed to fetch non-members.", "error");
         throw error;
     }
 };
@@ -166,9 +197,27 @@ export const addMemberToGroup = async (groupId: string, epersonId: string) => {
                 withCredentials: true,
             }
         );
+        if (response.status === 201) {
+            showToast("Member added to group successfully!", "success");
+        } else {
+            showToast("Failed to add member to group.", "error");
+        }
         return response.data;
-    } catch (error) {
-        console.error("Error adding member to group:", error);
+    } catch (error: any) {
+        const errorStatus = error.response?.status || 500;
+    if(errorStatus === 400){
+      window.location.href = `/error-400`;
+    }else if(errorStatus === 401){
+      window.location.href = `/error-401`;
+    }else if(errorStatus === 403){
+      window.location.href = `/error-403`;
+    }else if(errorStatus === 422){
+      window.location.href = `/error-422`;
+    }else if(errorStatus === 500){
+      window.location.href = `/error-500`;
+    }else{
+      window.location.href = `/error-404`;
+    }
         throw error;
     }
 };
@@ -186,9 +235,12 @@ export const removeMemberToGroup = async (groupId: string, epersonId: string) =>
                 withCredentials: true,
             }
         );
+        if (response.status === 204) {
+            showToast("Member removed from group successfully!", "success");
+        }
         return response.data;
     } catch (error) {
-        console.error("Error removing member to group:", error);
+        showToast("Failed to remove member from group.", "error");
         throw error;
     }
 };
@@ -211,9 +263,12 @@ export const editGroupDetail = async (groupId: string, groupName: string, groupD
                 withCredentials: true,
             }
         );
+        if (response.status === 200){
+            showToast("Group details updated successfully!", "success");
+        }
         return response.data;
     } catch (error) {
-        console.error("Error updating group details:", error);
+        showToast("Failed to update group details.", "error");
         throw error;
     }
 };
@@ -233,9 +288,12 @@ export const deleteGroup = async (groupId: string) => {
                 withCredentials: true,
             }
         );
+        if (response.status === 204){
+            showToast("Group deleted successfully!", "success");
+        }
         return response.data;
     } catch (error) {
-        console.error("Error deleting group :", error);
+        showToast("Failed to delete group.", "error");
         throw error;
     }
 };

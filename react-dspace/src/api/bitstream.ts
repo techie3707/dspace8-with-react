@@ -1,7 +1,9 @@
+import { showToast } from "../contexts/ToastProvider";
+import { siteConfig } from "../data/data";
 
 export const downloadPDF = async (uuid: string, name: string) => {
     try {
-        const response = await fetch(`http://localhost:8080/server/api/core/bitstreams/${uuid}/content`, {
+        const response = await fetch(`${siteConfig.apiEndpoint}/api/core/bitstreams/${uuid}/content`, {
             method: 'GET'
         });
 
@@ -18,19 +20,22 @@ export const downloadPDF = async (uuid: string, name: string) => {
         a.click();
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
+        if (response.status === 200) {
+            showToast('PDF downloaded successfully!', 'success');
+    }
     } catch (error) {
-        console.error('Error downloading PDF:', error);
+        showToast('Failed to download PDF', 'error');
     }
 };
 
 export const getPDFUrl = (uuid: string): string => {
-    return `http://localhost:8080/server/api/core/bitstreams/${uuid}/content`;
+    return `${siteConfig.apiEndpoint}/api/core/bitstreams/${uuid}/content`;
 };
 
 
 export const fetchPDFUrl = async (uuid: string): Promise<string> => {
     try {
-        const response = await fetch(`http://localhost:8080/server/api/core/bitstreams/${uuid}/content`, {
+        const response = await fetch(`${siteConfig.apiEndpoint}/api/core/bitstreams/${uuid}/content`, {
             method: "GET",
         });
 
@@ -41,7 +46,6 @@ export const fetchPDFUrl = async (uuid: string): Promise<string> => {
         const blob = await response.blob();
         return URL.createObjectURL(blob);
     } catch (error) {
-        console.error("Error fetching PDF:", error);
         throw error;
     }
 };

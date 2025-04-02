@@ -3,6 +3,7 @@ import { addMetadataSchema, deleteMetadataSchema, fetchMetadataSchemas } from ".
 import { Paper, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Checkbox, Pagination, TextField, Button, Box } from "@mui/material";
 import "../../pages/Registries/MetadataSchemas.css"
 import { useNavigate } from "react-router-dom";
+import { showToast } from "../../contexts/ToastProvider";
 
 interface MetadataSchema {
     id: number;
@@ -31,7 +32,7 @@ const MetadataSchemas = () => {
             setSchemas(metadataschemas);
             setTotalPages(totalPages);
         } catch (error) {
-            console.error("Failed to fetch metadata schemas:", error);
+            showToast("Error fetching metadata schemas", "error");
         }
     };
 
@@ -60,7 +61,7 @@ const MetadataSchemas = () => {
             setName("");
             getSchemas();
         } catch (error) {
-            console.error("Error saving metadata schema:", error);
+            showToast("Error saving metadata schema", "error");
         }
     };
 
@@ -70,7 +71,7 @@ const MetadataSchemas = () => {
             setSelected([]);
             getSchemas();
         } catch (error) {
-            console.error("Error deleting metadata schemas:", error);
+            showToast("Error deleting metadata schemas", "error");
         }
     };
     const handleView = (prefix: string, schemaId: number) => {
