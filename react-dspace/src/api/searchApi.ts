@@ -106,7 +106,7 @@ export const updateUrlWithSearchParams = (params: SearchParams) => {
 export const searchObjects = async (
   params: SearchParams
 ): Promise<{ results: any[]; totalElements: number }> => {
-  let apiUrl = `${siteConfig.apiEndpoint}//api/discover/search/objects?${buildApiQueryParams(params)}`;
+  let apiUrl = `${siteConfig.apiEndpoint}/api/discover/search/objects?${buildApiQueryParams(params)}`;
 
   if (params.query?.trim()) {
     apiUrl += `&query=${encodeURIComponent(params.query)}`;
