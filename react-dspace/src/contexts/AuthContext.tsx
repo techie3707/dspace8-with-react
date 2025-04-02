@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { login as authLogin } from "../api/authApi";
+import { showToast } from "./ToastProvider";
 
 interface AuthContextType {
     isAuthenticated: boolean;
@@ -34,7 +35,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 setIsAuthenticated(true);
             }
         } catch (error) {
-            console.error("Login failed:", error);
+            showToast("Invalid credentials. Please try again.", "error");
         }
     };
 
@@ -65,7 +66,7 @@ const parseJwt = (token: string): { exp?: number } | null => {
         const decodedPayload = JSON.parse(atob(base64));
         return decodedPayload;
     } catch (error) {
-        console.error("Error decoding JWT:", error);
+        showToast("Error decoding JWT", "error");
         return null;
     }
 };

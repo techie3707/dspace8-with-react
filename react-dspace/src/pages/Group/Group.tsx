@@ -20,6 +20,7 @@ import { fetchGroups, Group } from "../../api/group";
 import AddGroup from "./AddGroup";
 import { useNavigate } from "react-router-dom";
 import { iconsImgs } from "../../utils/images";
+import { showToast } from "../../contexts/ToastProvider";
 
 const Groups = () => {
     const authToken = localStorage.getItem("authToken") || "";
@@ -39,7 +40,7 @@ const Groups = () => {
             setGroups(data.groups);
             setTotalPages(data.totalPages);
         } catch (error) {
-            console.error("Failed to fetch groups:", error);
+            showToast("Failed to fetch groups.", "error");
         } finally {
             setLoading(false);
         }

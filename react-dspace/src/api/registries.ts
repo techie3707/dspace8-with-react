@@ -1,3 +1,4 @@
+import { showToast } from "../contexts/ToastProvider";
 import { siteConfig } from "../data/data";
 import axios from "axios";
 
@@ -36,13 +37,28 @@ export const fetchMetadataSchemas = async (authToken: string, page: number = 0, 
                 withCredentials: true,
             }
         );
-
+        if (response.status === 200) {
+            showToast('Metadata schemas fetched successfully!', 'success');
+        }
         return {
             metadataschemas: response.data._embedded?.metadataschemas || [],
             totalPages: response.data.page?.totalPages || 1,
         };
     } catch (error: any) {
-        console.error("Error fetching metadata schemas:", error?.response?.data || error.message);
+        const errorStatus = error.response?.status || 500;
+        if (errorStatus === 400) {
+            window.location.href = `/error-400`;
+        } else if (errorStatus === 401) {
+            window.location.href = `/error-401`;
+        } else if (errorStatus === 403) {
+            window.location.href = `/error-403`;
+        } else if (errorStatus === 422) {
+            window.location.href = `/error-422`;
+        } else if (errorStatus === 500) {
+            window.location.href = `/error-500`;
+        } else {
+            window.location.href = `/error-404`;
+        }
         throw error;
     }
 };
@@ -64,11 +80,25 @@ export const addMetadataSchema = async (payload: { prefix: string; namespace: st
                 withCredentials: true,
             }
         );
-
-        console.log("Metadata schema added successfully:", response.data);
+        if (response.status === 201) {
+            showToast('Metadata schema added successfully!', 'success');
+        }
         return response.data;
     } catch (error: any) {
-        console.error("Failed to create metadata schema:", error?.response?.data || error.message);
+        const errorStatus = error.response?.status || 500;
+        if (errorStatus === 400) {
+            window.location.href = `/error-400`;
+        } else if (errorStatus === 401) {
+            window.location.href = `/error-401`;
+        } else if (errorStatus === 403) {
+            window.location.href = `/error-403`;
+        } else if (errorStatus === 422) {
+            window.location.href = `/error-422`;
+        } else if (errorStatus === 500) {
+            window.location.href = `/error-500`;
+        } else {
+            window.location.href = `/error-404`;
+        }
         throw error;
     }
 };
@@ -85,8 +115,22 @@ export const deleteMetadataSchema = async (id: number) => {
             },
             withCredentials: true,
         });
-    } catch (error) {
-        console.error(`Error deleting metadata schema with ID ${id}:`, error);
-        throw error; 
+        showToast("Metadata schema deleted successfully!", "success");
+    } catch (error: any) {
+        const errorStatus = error.response?.status || 500;
+        if (errorStatus === 400) {
+            window.location.href = `/error-400`;
+        } else if (errorStatus === 401) {
+            window.location.href = `/error-401`;
+        } else if (errorStatus === 403) {
+            window.location.href = `/error-403`;
+        } else if (errorStatus === 422) {
+            window.location.href = `/error-422`;
+        } else if (errorStatus === 500) {
+            window.location.href = `/error-500`;
+        } else {
+            window.location.href = `/error-404`;
+        }
+        throw error;
     }
 };

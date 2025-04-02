@@ -1,5 +1,6 @@
 import axios from "axios";
 import { siteConfig } from "../data/data";
+import { showToast } from "../contexts/ToastProvider";
 
 export const uploadBatchImport = async (
   selectedCollection: string,
@@ -31,10 +32,25 @@ export const uploadBatchImport = async (
         withCredentials: true,
       }
     );
-
+    if (response.status === 202) {
+      showToast("BThe process was successfully created", "success");
+    }
     return response;
-  } catch (error) {
-    console.error("Error uploading batch import:", error);
+  } catch (error: any) {
+    const errorStatus = error.response?.status || 500;
+    if (errorStatus === 400) {
+      window.location.href = `/error-400`;
+    } else if (errorStatus === 401) {
+      window.location.href = `/error-401`;
+    } else if (errorStatus === 403) {
+      window.location.href = `/error-403`;
+    } else if (errorStatus === 422) {
+      window.location.href = `/error-422`;
+    } else if (errorStatus === 500) {
+      window.location.href = `/error-500`;
+    } else {
+      window.location.href = `/error-404`;
+    }
     throw error;
   }
 };

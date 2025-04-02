@@ -22,7 +22,7 @@ export const login = async (email: string, password: string) => {
 
     if (response.status === 200) {
       showToast("Login successful!", "success");
-      window.location.href = "/"; 
+      window.location.href = "/";
     }
 
     const authToken = response.headers["authorization"];
@@ -37,7 +37,7 @@ export const login = async (email: string, password: string) => {
     }
 
     await fetchCsrfToken();
-    return response; 
+    return response;
   } catch (error: any) {
     if (error.response) {
       if (error.response.status === 401) {
@@ -77,7 +77,7 @@ export const forgotPassword = async (email: string) => {
       throw new Error("Failed to send password reset request.");
     }
   } catch (error: any) {
-    console.error("Forgot password request failed:", error?.response?.data || error.message);
+    showToast("Invalid credentials. Please try again.", "error");
     throw error;
   }
 };
@@ -99,12 +99,13 @@ export const register = async (email: string) => {
     );
 
     if (response.status === 201) {
+      showToast('Password reset link sent to your email.', 'success');
       return { success: true, message: "Password reset link sent to your email." };
     } else {
       throw new Error("Failed to send password reset request.");
     }
   } catch (error: any) {
-    console.error("Forgot password request failed:", error?.response?.data || error.message);
+    showToast("Invalid credentials. Please try again.", "error");
     throw error;
   }
 };
@@ -128,7 +129,7 @@ export const logout = async () => {
       localStorage.removeItem("authToken");
     }
   } catch (error) {
-    console.error("Error logging out:", error);
+    showToast("Logout failed. Please try again.", "error");
     throw error;
   }
 };
@@ -143,7 +144,7 @@ const parseJwt = (token: string): { exp?: number } | null => {
     const decodedPayload = JSON.parse(atob(base64));
     return decodedPayload;
   } catch (error) {
-    console.error("Error decoding JWT:", error);
+    // console.error("Error decoding JWT:", error);
     return null;
   }
 };

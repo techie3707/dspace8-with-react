@@ -36,7 +36,7 @@ const EditUser: React.FC<EditUserProps> = ({ open, onClose, userId, fetchUsers }
             setUserData(userDetails);
             setOriginalData(userDetails);
         } catch (error) {
-            console.error("Failed to fetch user details:", error);
+            // console.error("Failed to fetch user details:", error);
         } finally {
             setLoading(false);
         }
@@ -61,7 +61,6 @@ const EditUser: React.FC<EditUserProps> = ({ open, onClose, userId, fetchUsers }
         }
 
         if (Object.keys(updatedFields).length === 0) {
-            console.log("No changes detected.");
             return;
         }
 
@@ -72,7 +71,7 @@ const EditUser: React.FC<EditUserProps> = ({ open, onClose, userId, fetchUsers }
             fetchUsers();
             onClose();
         } catch (error) {
-            console.error("Failed to update user:", error);
+            // console.error("Failed to update user:", error);
         } finally {
             setUpdating(false);
         }

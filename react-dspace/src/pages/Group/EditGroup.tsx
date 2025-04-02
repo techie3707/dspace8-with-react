@@ -15,6 +15,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import { addMemberToGroup, deleteGroup, editGroupDetail, EPerson, fetchGroupMembers, fetchNonMembers, removeMemberToGroup } from "../../api/group";
 import { Delete } from "@mui/icons-material";
+import { showToast } from "../../contexts/ToastProvider";
 
 const EditGroup = () => {
     const location = useLocation();
@@ -52,7 +53,7 @@ const EditGroup = () => {
             setMembers(response._embedded?.epersons || []);
             setMemberTotalPages(response.page?.totalPages || 1);
         } catch (error) {
-            console.error("Error fetching group members:", error);
+            showToast("Failed to fetch group members.", "error");
         }
     };
 
@@ -62,7 +63,7 @@ const EditGroup = () => {
             setNonMembers(response._embedded?.epersons || []);
             setNonMemberTotalPages(response.page?.totalPages || 1);
         } catch (error) {
-            console.error("Error fetching non-members:", error);
+            showToast("Failed to fetch non-members.", "error");
         }
     };
 
@@ -77,7 +78,7 @@ const EditGroup = () => {
             setNonMembers(updatedNonMembers._embedded?.epersons || []);
             setNonMemberTotalPages(updatedNonMembers.page?.totalPages || 1);
         } catch (error) {
-            console.error("Failed to add member:", error);
+            showToast("Failed to add member.", "error");
         }
     };
 
@@ -92,7 +93,7 @@ const EditGroup = () => {
             setNonMembers(updatedNonMembers._embedded?.epersons || []);
             setNonMemberTotalPages(updatedNonMembers.page?.totalPages || 1);
         } catch (error) {
-            console.error("Failed to remove member:", error);
+            showToast("Failed to remove member.", "error");
         }
     };
     const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -110,7 +111,7 @@ const EditGroup = () => {
             await editGroupDetail(id, groupName, groupDescription);
             setIsModified(false);
         } catch (error) {
-            console.error("Error updating group details:", error);
+            showToast("Failed to update group details.", "error");
         }
     };
 

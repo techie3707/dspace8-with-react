@@ -63,7 +63,6 @@ const PDFFlipBook: React.FC = () => {
 
                 setTimeout(loadRemainingPages, 100);
             } catch (error) {
-                console.error("Error loading PDF:", error);
                 setError("Failed to load PDF");
             }
         };

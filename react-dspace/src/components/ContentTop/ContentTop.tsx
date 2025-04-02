@@ -7,6 +7,7 @@ import { SidebarContext } from "../../contexts/sidebarContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { Menu, MenuItem } from "@mui/material";
 import { logout } from "../../api/authApi";
+import { showToast } from "../../contexts/ToastProvider";
 
 const ContentTop: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -48,7 +49,7 @@ const ContentTop: React.FC = () => {
       await logout();
       window.location.href = "/";
     } catch (error) {
-      console.error("Logout failed", error);
+      showToast("Logout failed. Please try again.", "error");
     }
     handleClose();
   };

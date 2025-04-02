@@ -1,6 +1,7 @@
 import axios from "axios";
 import { siteConfig } from "../data/data";
 import { fetchCsrfToken, getCsrfToken } from "./csrf";
+import { showToast } from "../contexts/ToastProvider";
 
 export interface EPerson {
   id: string;
@@ -42,13 +43,15 @@ export const userList = async (page: number = 0, size: number = 10, query: strin
         withCredentials: true,
       }
     );
-
+if (response.status === 200) {
+      showToast('User list fetched successfully!', 'success');
+}
     return {
       epersons: response.data._embedded?.epersons || [],
       totalPages: response.data.page?.totalPages || 1,
     };
   } catch (error: any) {
-    console.error("Error fetching user list:", error?.response?.data || error.message);
+    showToast("Failed to fetch user list.", "error");
     throw error;
   }
 };
@@ -61,12 +64,12 @@ export const removeUser = async (userId: string) => {
   try {
     const csrfToken = localStorage.getItem("csrfToken");
     if (!csrfToken) {
-      console.error("CSRF token is missing. Aborting delete request.");
+      showToast("CSRF token is missing. Aborting delete request.", "error");
       return false;
     }
 
     const response = await axios.delete(
-      `http://localhost:8080/server/api/eperson/epersons/${userId}`,
+      `${siteConfig.apiEndpoint}/api/eperson/epersons/${userId}`,
       {
         headers: {
           'X-XSRF-TOKEN': csrfToken,
@@ -75,10 +78,13 @@ export const removeUser = async (userId: string) => {
         withCredentials: true,
       }
     );
+    if (response.status === 204) {
+      showToast('User deleted successfully!', 'success');
+    }
 
     return response.status === 204;
   } catch (error) {
-    console.error("Failed to delete user:", error);
+    showToast("Failed to delete user.", "error");
     return false;
   }
 };
@@ -100,11 +106,13 @@ export const addUser = async (userData: object) => {
         withCredentials: true,
       }
     );
+    if (response.status === 201) {
+      showToast('User added successfully!', 'success');
+    }
 
-    console.log("User added successfully:", response.data);
     return response.data;
   } catch (error: any) {
-    console.error("Failed to add user:", error?.response?.data || error.message);
+    showToast("Failed to add user.", "error");
     throw error;
   }
 };
@@ -122,10 +130,13 @@ export const getUserById = async (userId: string, authToken: string) => {
     if (!response.ok) {
       throw new Error("Failed to fetch user details");
     }
+    if (response.status === 200) {
+      showToast('User details fetched successfully!', 'success');
+    }
 
     return await response.json();
   } catch (error) {
-    console.error("Error fetching user details:", error);
+    showToast("Failed to fetch user details.", "error");
     throw error;
   }
 };
@@ -170,8 +181,9 @@ export const updateUser = async (userId: string, userData: Record<string, any>, 
         withCredentials: true,
       });
     }
+    showToast('User updated successfully!', 'success');
   } catch (error) {
-    console.error("Error updating user:", error);
+    showToast("Failed to update user.", "error");
     throw error;
   }
 };

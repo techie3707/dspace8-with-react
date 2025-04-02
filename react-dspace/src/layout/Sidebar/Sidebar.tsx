@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { FaChevronDown, FaChevronRight, FaTimes } from "react-icons/fa";
 import "./Sidebar.css";
 import { fetchCollections } from "../../api/collection";
+import { showToast } from "../../contexts/ToastProvider";
 
 const Sidebar: React.FC = () => {
   const [navigationLinks, setNavigationLinks] = useState<NavigationLink[]>(staticNavigationLinks);
@@ -55,7 +56,7 @@ const Sidebar: React.FC = () => {
   
         setNavigationLinks([...staticNavigationLinks, ...dynamicLinks]);
       } catch (error) {
-        console.error("Failed to load collections:", error);
+        showToast("Failed to load collections", "error");
       }
     };
   

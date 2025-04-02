@@ -21,7 +21,6 @@ export const fetchCommunities = async (): Promise<Community[]> => {
 
         return response.data._embedded?.communities || [];
     } catch (error) {
-        console.error("Error fetching communities:", error);
         showToast("Failed to fetch communities", "error");
         return [];
     }
