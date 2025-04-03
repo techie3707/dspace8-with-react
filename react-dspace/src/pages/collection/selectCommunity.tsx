@@ -40,7 +40,7 @@ const SelectCommunity: React.FC = () => {
     };
 
     return (
-        <div className="dspace-app">
+        <div className="container">
             {show && (
                 <div className="modal-overlay">
                     <div className="modal-container">
