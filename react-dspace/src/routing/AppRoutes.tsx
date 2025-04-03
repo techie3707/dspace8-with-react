@@ -27,6 +27,7 @@ import Error403 from "../pages/error/error403";
 import Error422 from "../pages/error/error422";
 import Error404 from "../pages/error/error404";
 import Error500 from "../pages/error/error500";
+import TopCommunity from "../pages/community/topCommunity";
 
 
 
@@ -68,6 +69,7 @@ const AppRoutes = () => {
         <Route path="/error-500" element={<Error500 />} />   
         <Route path="/pdf-viewer" element={<PDFViewer />} />
         <Route path="/flip-book-viewer" element={<PDFFlipBook />} />
+        <Route path="/create-community" element={<TopCommunity />} />
         <Route path="/usermanagement" element={<ProtectedRoute element={<UserManagement />} />} />
         <Route path="/metadataSchemas" element={<ProtectedRoute element={<MetadataSchemas />} />} />
         <Route path="/bitstream/:schemaId/:schemaName" element={<ProtectedRoute element={<Bitstream />} />} />

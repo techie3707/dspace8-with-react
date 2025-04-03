@@ -13,14 +13,14 @@ export const fetchUserByEmail = async (token: string) => {
         const response = await axios.get<RegistrationResponse>(
             `${siteConfig.apiEndpoint}/api/eperson/registrations/search/findByToken?token=${token}`
         );
-
+        if (response.status === 200) {
+            showToast("User fetched successfully!", "success");
+        }
         return {
             email: response.data.email,
             epersonId: response.data.user
         };
-        if(response.status === 200) {
-            showToast("User fetched successfully!", "success");
-        }
+
     } catch (error: any) {
         const errorStatus = error.response?.status || 500;
         if (errorStatus === 400) {
