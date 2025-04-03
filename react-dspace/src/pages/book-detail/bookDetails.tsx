@@ -6,6 +6,8 @@ import { Bitstream, BookDetailsData } from '../../data/bookDetail';
 import { siteConfig } from '../../data/data';
 import { downloadPDF } from '../../api/bitstream';
 import { useAuth } from '../../contexts/AuthContext';
+import { iconsImgs } from '../../utils/images';
+import { IconButton } from '@mui/material';
 
 
 
@@ -38,6 +40,7 @@ const BookDetails: React.FC = () => {
                 }
             } catch (error) {
                 setError("Data not found");
+                console.error(error);
             } finally {
                 setIsLoading(false);
             }
@@ -64,100 +67,98 @@ const BookDetails: React.FC = () => {
     if (!item) return <div>Item not found</div>;
 
     return (
-        <div className='full-section'>
-            <button onClick={() => navigate(-1)}> ← Back to result</button>
-            <h1>{title}</h1>
-            <div className='container' style={{ display: 'flex', justifyContent: "center" }}>
-                <div className='left-section'>
-                    {thumbnailBitstreams
-                        .filter(bitstream => /\.jpe?g|\.png$/i.test(bitstream.name))
-                        .map(bitstream => (
-                            <img
-                                key={bitstream.uuid}
-                                style={{ width: "200px", height: "300px" }}
-                                src={`${siteConfig.apiEndpoint}/api/core/bitstreams/${bitstream.uuid}/content`}
-                            />
-                        ))}
-
-                    {originalBitstreams.length > 0 && (
-                        <div>
-                            <h4>Files</h4>
-                            <ul>
-                                {originalBitstreams
-                                    .filter(bitstream => /.pdf$/i.test(bitstream.name))
-                                    .map(bitstream => (
-                                        <li key={bitstream.uuid}>
-                                            <p>{bitstream.metadata['dc.title']?.[0]?.value || bitstream.name}</p>
-                                            <button
-                                                onClick={() => window.open(`/pdf-viewer?uuid=${bitstream.uuid}`, '_blank')}
-                                            >
-                                                View PDF
-                                            </button>
-
-                                            <button
-                                                onClick={() => window.open(`/flip-book-viewer?uuid=${bitstream.uuid}`, '_blank')}
-                                            >
-                                                View In Flip PDF
-                                            </button>
-
-                                            {isAuthenticated && (
-                                                <button onClick={() => downloadPDF(bitstream.uuid, bitstream.name)}>
-                                                    Download PDF
-                                                </button>
-                                            )}
-                                        </li>
-                                    ))}
-                            </ul>
-                        </div>
-                    )}
-
-
-                    <div>
-                        <h4>Date</h4>
-                        <h6>{dateIssued}</h6>
-                    </div>
-
-                    {author && (
-                        <div>
-                            <h3>Author</h3>
-                            {author}
-                        </div>
-                    )}
-
-                    {publisher && (
-                        <div>
-                            <h3>Publisher</h3>
-                            {publisher}
-                        </div>
-                    )}
-                </div>
-
-                <div className='right-section'>
-                    {abstract && (
-                        <div>
-                            <h3>Abstract</h3>
-                            <p>{abstract}</p>
-                        </div>
-                    )}
-
-                    <div>
-                        <h3>URI</h3>
-                        <p>
-                            <a href={uri || ''} target="_blank" rel="noopener noreferrer">
-                                {uri}
-                            </a>
-                        </p>
-                    </div>
-
-                    {description && (
-                        <div>
-                            <h3>Description</h3>
-                            <p>{description}</p>
-                        </div>
-                    )}
-                </div>
+        <div className='container main_bdtl_div'>
+        <div className='d-flex align-items-center mb-3'>
+            <IconButton color="primary" className="back_btn" onClick={() => navigate(-1)} title="back_btn">
+                <img className="back_icon" src={iconsImgs.back_btn} alt="Back" />
+            </IconButton>
+            <h1 className='bdtl_title ms-2'>{title}</h1>
+        </div>
+        <div className='row'>
+            <div className='col-lg-4 col-md-12 col-12 text-center mb-3'>
+                {thumbnailBitstreams
+                    .filter(bitstream => /\.(jpe?g|png)$/i.test(bitstream.name))
+                    .map(bitstream => (
+                        <img
+                            key={bitstream.uuid}
+                            className='thumbnail-img img-fluid'
+                            src={`${siteConfig.apiEndpoint}/api/core/bitstreams/${bitstream.uuid}/content`}
+                            alt='Thumbnail'
+                        />
+                    ))}
+            </div>
+            
+            <div className='col-lg-8 col-md-12 col-12'>
+                <table className='modern-table w-100'>
+                    <tbody>
+                        {abstract && (
+                            <tr>
+                                <th>Abstract</th>
+                                <td>{abstract}</td>
+                            </tr>
+                        )}
+                        <tr>
+                            <th>URI</th>
+                            <td>
+                                <a href={uri || ''} target="_blank" rel="noopener noreferrer">
+                                    {uri}
+                                </a>
+                            </td>
+                        </tr>
+                        {description && (
+                            <tr>
+                                <th>Description</th>
+                                <td>{description}</td>
+                            </tr>
+                        )}
+                        {author && (
+                            <tr>
+                                <th>Author</th>
+                                <td>{author}</td>
+                            </tr>
+                        )}
+                        {publisher && (
+                            <tr>
+                                <th>Publisher</th>
+                                <td>{publisher}</td>
+                            </tr>
+                        )}
+                        <tr>
+                            <th>Date</th>
+                            <td>{dateIssued}</td>
+                        </tr>
+                        {originalBitstreams.length > 0 && (
+                            <tr>
+                                <th>Action</th>
+                                <td>
+                                    <ul className='list-unstyled'>
+                                        {originalBitstreams
+                                            .filter(bitstream => /.pdf$/i.test(bitstream.name))
+                                            .map(bitstream => (
+                                                <li key={bitstream.uuid} className='mb-2'>
+                                                    <button className='custom-btn' onClick={() => window.open(`/pdf-viewer?uuid=${bitstream.uuid}`, '_blank')}>
+                                                        View PDF
+                                                    </button>
+                                                    <button className='custom-btn' onClick={() => window.open(`/flip-book-viewer?uuid=${bitstream.uuid}`, '_blank')}>
+                                                        View In Flip PDF
+                                                    </button>
+                                                    {isAuthenticated && (
+                                                        <button className='custom-btn' onClick={() => downloadPDF(bitstream.uuid, bitstream.name)}>
+                                                            Download PDF
+                                                        </button>
+                                                    )}
+                                                </li>
+                                            ))}
+                                    </ul>
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
             </div>
         </div>
+    </div>
+    
     );
 };
 

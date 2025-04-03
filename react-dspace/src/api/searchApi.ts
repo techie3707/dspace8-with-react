@@ -3,7 +3,6 @@ import { siteConfig } from "../data/data";
 import { FacetResult, ObjectSearchResult, SearchParams, filterSections, FilterOption, SearchFilters } from "../data/searchData";
 import { Bitstream, BitstreamsResponse, BookDetailsData, Bundle, BundlesResponse } from "../data/bookDetail";
 import { showToast } from "../contexts/ToastProvider";
-// import { BookDetailsData } from "../search/bookDetailsData";
 
 
  const buildApiQueryParams = (params: SearchParams): string => {
@@ -114,9 +113,6 @@ export const searchObjects = async (
   apiUrl += '&embed=thumbnail&embed=item/thumbnail'
   try {
     const response = await axios.get<ObjectSearchResult>(apiUrl);
-    if (response.status === 200) {
-      showToast( 'Search completed successfully!','success');
-    }
     return {
       results: response.data._embedded.searchResult._embedded.objects || [],
       totalElements: response.data._embedded.searchResult.page?.totalElements || 0,

@@ -37,9 +37,6 @@ export const fetchCollections = async (): Promise<Collection[]> => {
         },
       }
     );
-    if (response.status === 200) {
-      showToast('Collections fetched successfully!', 'success');
-    }
     const objects = response.data._embedded?.searchResult?._embedded?.objects || [];
     return objects.map((obj) => ({
       id: obj._embedded.indexableObject.uuid,

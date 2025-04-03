@@ -19,9 +19,8 @@ import {
     FilterOption
 } from '../../data/searchData';
 import { useNavigate } from 'react-router-dom';
-import { Button, Grid, TextField } from '@mui/material';
+import { Button, Grid, IconButton, TextField } from '@mui/material';
 import { iconsImgs } from '../../utils/images';
-import { showToast } from '../../contexts/ToastProvider';
 
 const Search: React.FC = () => {
     const initialParams = parseSearchParamsFromUrl();
@@ -74,7 +73,7 @@ const Search: React.FC = () => {
             setFacets(facetsResponse);
             setHasFileCounts(hasFileResponse);
         } catch (error) {
-            showToast('Error fetching filter', 'error');
+            console.error('Error fetching facets:', error);
         }
     };
 
@@ -109,7 +108,7 @@ const Search: React.FC = () => {
 
             await fetchAllFacets(currentFilters);
         } catch (error) {
-            showToast('Error fetching search data', 'error');
+            console.error('Error fetching data:', error);
         } finally {
             setIsLoading(false);
         }
@@ -179,7 +178,7 @@ const Search: React.FC = () => {
                     facets[section.id]?.length ? (
                         <ul style={{ listStyle: 'none', padding: '0' }}>
                             {facets[section.id].map((option, index) => (
-                                <li key={index} style={{ marginBottom: '10px' }}>
+                                <li key={index}>
                                     <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                         <div style={{ display: 'flex', alignItems: 'center' }}>
                                             <input
@@ -238,15 +237,15 @@ const Search: React.FC = () => {
                 <div className='filters-and-setting'>
                     <div className="filters col-3">
                         <div className="Zns0ac"><span className="I75YIf">Filter by</span></div>
-                          {filterSections.map(section => (
+                        {filterSections.map(section => (
                             <div key={section.id}>
                                 <div className={`filter_name ${expandedSections[section.id] ? '' : 'border-bottom'}`}>
-                                   <h2 className='ZF0dQe'>{section.label}</h2>
-                                      <button
+                                    <h2 className='ZF0dQe'>{section.label}</h2>
+                                    <button
                                         className={`toggle-button ${expandedSections[section.id] ? 'up' : 'down'}`}
-                                         onClick={() => toggleSection(section.id)}
+                                        onClick={() => toggleSection(section.id)}
                                     ></button>
-                               </div>
+                                </div>
                                 {expandedSections[section.id] && (
                                     <div className='li_filter'>
                                         {renderFilterSection(section)}
@@ -254,7 +253,7 @@ const Search: React.FC = () => {
                                 )}
                             </div>
                         ))}
-                        
+
                     </div>
                     <div className='filter_reset'>
                         <button className='filter_reset_btn'
@@ -263,7 +262,7 @@ const Search: React.FC = () => {
                         >
                             Reset filters
                         </button>
-                        </div>
+                    </div>
                     <div className="dropdown-container">
                         <h1>Setting</h1>
                         <div>
@@ -304,10 +303,10 @@ const Search: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="search-results col-10">
+                <div className="search-results col-11">
                     <div className='col-12'>
                         <Grid container alignItems="center" className="search-container">
-                            <Grid item xs={8.5} sm={8.5} lg={10}>
+                            <Grid item xs={8.5} sm={8.5} lg={11}>
                                 <TextField
                                     label="Search the repository..."
                                     variant="outlined"
@@ -324,7 +323,7 @@ const Search: React.FC = () => {
                                 />
                             </Grid>
 
-                            <Grid item>
+                            <Grid item xs={2} sm={2} lg={1}>
                                 <Button
                                     className="button_search"
                                     variant="contained"
@@ -339,7 +338,7 @@ const Search: React.FC = () => {
 
 
 
-                    <div className="results-header col-11">
+                    <div className="results-header col-12">
                         <h2>Search Results</h2>
                         <div>
                             <button
@@ -447,61 +446,87 @@ const Search: React.FC = () => {
                                         };
 
                                         return (
-                                            <li key={index} className='grid_main'>
-                                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                            <li key={index} className="grid_main" onClick={handleTitleClick} style={{
+                                                border: '1px solid #ddd',
+                                                borderRadius: '8px',
+                                                position: 'relative',
+                                                maxWidth: '210px',
+                                                cursor: 'pointer'
+                                            }}>
+                                                {/* Title */}
+                                                <h3
+                                                    style={{cursor: 'pointer' }}
+                                                    onClick={handleTitleClick}
+                                                    className='item_title'
+                                                >
+                                                    {title}
+                                                </h3>
+
+                                                {/* Year */}
+                                                {date && (
+                                                    <p className='item_date' style={{ margin: '0', color: '#666', fontSize: '14px' }}>
+                                                        {date}
+                                                    </p>
+                                                )}
+
+                                                {/* Thumbnail */}
+                                                <div style={{ display: 'flex', justifyContent: 'center', margin: '10px 0' }}>
                                                     <img
                                                         src="#"
                                                         alt="No thumbnail Available"
-                                                        style={{ width: '50px', height: '50px', marginRight: '10px', backgroundColor: '#eee' }}
+                                                        style={{ width: '200px', height: '240px', backgroundColor: '#eee',}}
                                                     />
-                                                    <div style={{ border: 'none' }}>
-                                                        <div style={{ marginBottom: '10px' }}>
-                                                            <span style={{
-                                                                border: 'none',
-                                                                backgroundColor: '#eee',
-                                                                padding: '2px 5px'
-                                                            }}>
-                                                                {displayType}
-                                                            </span>
-                                                        </div>
-                                                        <h3
-                                                            style={{ margin: '0', cursor: 'pointer' }}
-                                                            onClick={handleTitleClick}
-                                                        >{title}</h3>
-                                                        {date && (
-                                                            <p style={{ margin: '10px 0', color: '#666' }}>
-                                                                {`(${publisher},${date}) ${author}`}
-                                                            </p>
-                                                        )}
-                                                        {abstract && (
-                                                            <>
-                                                                <p style={{ margin: '10px 0', color: '#666' }}>{abstract}</p>
-                                                                <button style={{ padding: '5px 10px', backgroundColor: '#f0f0f0', border: 'none', borderRadius: '4px' }}>
-                                                                    Show more
-                                                                </button>
-                                                            </>
-                                                        )}
-                                                    </div>
                                                 </div>
+
+                                                {/* Abstract */}
+                                                {abstract && (
+                                                    <p style={{ margin: '10px 0', color: '#666', fontSize: '14px' }}>
+                                                        {abstract}
+                                                    </p>
+                                                )}
+
+                                                {/* Navigation Arrow */}
+                                                <IconButton
+                                                    className='itemh_btn'
+                                                    onClick={handleTitleClick}
+                                                    color="primary"
+                                                    style={{
+                                                        position: 'absolute',
+                                                        bottom: '3px',
+                                                        right: '14px',
+                                                        fontSize: '18px',
+                                                        cursor: 'pointer',
+                                                        padding: '5px', 
+                                                    }}
+                                                >
+                                                    <img className="itemh_icon" src={iconsImgs.arrow} alt="Edit" />
+                                                </IconButton>
+
                                             </li>
+
                                         );
                                     })}
                                 </ul>
                             )}
 
-                            {totalData > 0 && (
-                                <PaginationComponent
-                                    totalData={totalData}
-                                    perPage={size}
-                                    currentPage={page}
-                                    onPageChange={handlePageChange}
-                                />
-                            )}
+
                         </>
                     )}
                 </div>
             </div>
+            <div style={{ bottom: 10, padding: "10px", }}>
+                <PaginationComponent
+                    totalData={totalData}
+                    perPage={size}
+                    currentPage={page}
+                    onPageChange={(newPage) => {
+                        handlePageChange(newPage);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                />
+            </div>
         </div>
+
     );
 };
 

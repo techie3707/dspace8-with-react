@@ -82,7 +82,9 @@
 .nav-link-icon {
   width: 22px;
 }
-
+.nav-list{
+  padding-left: 0px;
+}
 .submenu {
   list-style: none;
   padding-left: 20px;

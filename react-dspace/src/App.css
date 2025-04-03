@@ -466,6 +466,7 @@ button {
   background-color: white;
   box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
+  margin-bottom: 2rem !important;
 }
 
 .create-item-title {
@@ -605,4 +606,7 @@ button {
 
 .css-16htz67-MuiPaper-root-MuiDialog-paper{
   margin: 0 !important;
+}
+.b_import_label{
+  display: unset;
 }

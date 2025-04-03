@@ -1,89 +1,113 @@
-.full-section {
+
+.thumbnail-img {
     width: 100%;
-    padding: 20px;
-}
-
-.full-section button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-bottom: 20px;
-}
-
-.full-section button:hover {
-    background-color: #0056b3;
-}
-.left-section{
-width: 30%;
-}
-.right-section{
-width: 70%;
-}
-
-.left-section,
-.right-section {
-    flex: 1;
-    padding: 10px;
-}
-
-.left-section img {
-    width: 100%;
-    max-width: 200px;
+    max-width: 250px;
     height: auto;
-    border-radius: 4px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    margin-bottom: 10px;
+    display: block;
+    margin: 0 auto 10px;
+    border: 1px solid rgb(129, 20, 246);
+    transition: transform 0.3s ease-in-out;
+}
+.thumbnail-img:hover {
+    transform: scale(1.2); 
+  }
+
+    .custom-btn {
+        background-color: white;
+        color: rgb(129, 20, 246);
+        border: 2px solid rgb(129, 20, 246);
+        padding: 5px 6px;
+        font-size: 12px;
+        cursor: pointer;
+        margin-right: 5px;
+        border-radius: 4px;
+        transition: background-color 0.3s, color 0.3s;
+    }
+    
+    .custom-btn:hover {
+        background-color: rgb(129, 20, 246);
+        color: white;
+    }
+    
+.back_btn{
+    position: relative;
+    bottom: 4px;
+}
+.back_icon{
+    width: 2rem;
+    height: 2rem; 
 }
 
-.left-section h4,
-.right-section h3 {
-    margin-top: 20px;
-    margin-bottom: 10px;
+.modern-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 12px;
+    background: linear-gradient(to right, #ffffff, #f8f9fa);
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
-.full-section>.flex-container {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-    margin-top: 20px;
+.modern-table th, .modern-table td {
+    padding: 14px 20px;
+    text-align: left;
+    font-size: 16px;
 }
 
+.modern-table th {
+    background: rgba(0, 0, 0, 0.05);
+    color: #000;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.modern-table tr:nth-child(even) {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.modern-table tr:hover {
+    background: rgba(0, 0, 0, 0.1);
+    transition: background 0.3s ease-in-out;
+}
+
+.modern-table a {
+    color: rgb(129, 20, 246);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.modern-table a:hover {
+    text-decoration: underline;
+}
+.main_bdtl_div{
+    background: rgba(0, 0, 0, 0.05);
+    padding: 25px 20px 25px 20px;
+    border-radius: 5px;
+}
+.bdtl_title{
+    color: rgb(129, 20, 246);
+    font-size: 2rem;
+}
 @media (max-width: 768px) {
-    .full-section>.container {
-        flex-direction: column;
+    .modern-table th, .modern-table td {
+        font-size: 14px;
+        padding: 10px;
     }
-
-    .left-section img {
-        width: 100%;
-        height: auto;
-    }
-
-    .left-section,
-    .right-section {
-        padding: 0;
+    .custom-btn {
+        font-size: 10px;
+        padding: 4px 5px;
     }
 }
 
-@media (max-width: 480px) {
-    .full-section {
-        padding: 10px;
+@media (max-width: 576px) {
+    .bdtl_title {
+        font-size: 1.5rem;
     }
-
-    .full-section button {
-        width: 100%;
-        padding: 10px;
+    .back_btn {
+        bottom: 10px;
     }
-
-    .left-section img {
-        width: 100%;
-        height: auto;
-    }
-
-    .left-section h4,
-    .right-section h3 {
-        font-size: 1.2rem;
+    .back_icon {
+        width: 2rem;
+        height: 2rem;
     }
 }

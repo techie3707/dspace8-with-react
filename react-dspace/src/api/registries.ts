@@ -37,9 +37,6 @@ export const fetchMetadataSchemas = async (authToken: string, page: number = 0, 
                 withCredentials: true,
             }
         );
-        if (response.status === 200) {
-            showToast('Metadata schemas fetched successfully!', 'success');
-        }
         return {
             metadataschemas: response.data._embedded?.metadataschemas || [],
             totalPages: response.data.page?.totalPages || 1,

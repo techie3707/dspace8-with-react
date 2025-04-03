@@ -40,9 +40,6 @@ export const fetchMetadataFields = async (
                 withCredentials: true,
             }
         );
-        if (response.status === 200) {
-            showToast('Metadata fields fetched successfully!', 'success');
-        }
         return response.data._embedded?.metadatafields || [];
     } catch (error: any) {
         const errorStatus = error.response?.status || 500;

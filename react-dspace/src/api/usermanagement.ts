@@ -43,9 +43,6 @@ export const userList = async (page: number = 0, size: number = 10, query: strin
         withCredentials: true,
       }
     );
-if (response.status === 200) {
-      showToast('User list fetched successfully!', 'success');
-}
     return {
       epersons: response.data._embedded?.epersons || [],
       totalPages: response.data.page?.totalPages || 1,

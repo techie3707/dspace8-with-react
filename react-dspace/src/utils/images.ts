@@ -24,6 +24,8 @@ import brand_one from "../assets/images/Final LogoESD.png";
 import home_main from "../assets/images/homepage.svg";
 import grid from "../assets/icons/grid.png";
 import list from "../assets/icons/list.png";
+import arrow from "../assets/icons/right-arrow.png";
+import back_btn from "../assets/icons/back-button.png";
 
 
 interface IconsImages {
@@ -50,6 +52,8 @@ interface IconsImages {
     access: string;
     list:   string;
     grid:   string;
+    arrow:  string;
+    back_btn:  string;
 }
 
 
@@ -61,7 +65,7 @@ interface PersonsImages {
 
 // Export typed objects
 export const iconsImgs: IconsImages = {
-    alert, bell, bills, budget, card, check, empty_check, gears, home, menu, plane, plus, report, search, user, wallet, wealth, login, edit, remove, access, list, grid
+    alert, bell, bills, budget, card, check, empty_check, gears, home, menu, plane, plus, report, search, user, wallet, wealth, login, edit, remove, access, list, grid,arrow,back_btn
 };
 
 export const personsImgs: PersonsImages = {

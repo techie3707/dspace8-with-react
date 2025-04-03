@@ -85,22 +85,32 @@ const BatchImport: React.FC = () => {
       </FormControl>
 
       <input type="file" accept=".zip" style={{ display: "none" }} id="file-upload" onChange={handleFileChange} />
-      <label htmlFor="file-upload">
-        <Box
-          sx={{
-            border: "2px dashed gray",
-            padding: 3,
-            textAlign: "center",
-            marginTop: 2,
-            cursor: "pointer",
-            backgroundColor: "#f9f9f9",
-          }}
-        >
-          <CloudUploadIcon fontSize="large" color="action" />
-          <Typography variant="body2" gutterBottom>
-            {selectedFile ? selectedFile.name : "Drop a batch ZIP to import, or browse"}
-          </Typography>
-        </Box>
+      <label htmlFor="file-upload" className="b_import_label">
+        <Box 
+  className="upload-container" 
+  sx={{
+    border: "2px dashed gray",
+    padding: 3,
+    textAlign: "center",
+    marginTop: 2,
+    cursor: "pointer",
+    backgroundColor: "#f9f9f9",
+  }}
+  onClick={() => document.getElementById('fileInput')?.click()}
+>
+  <input 
+    type="file" 
+    id="fileInput" 
+    hidden 
+    onChange={handleFileChange} 
+  />
+  <Typography variant="body2" className="upload-text">
+    <span className="upload-icon">☁️</span> Upload a File
+  </Typography>
+  <Typography variant="caption" color="gray">
+    {selectedFile ? selectedFile.name : "Drag and drop files here"}
+  </Typography>
+</Box>
       </label>
 
       <Box display="flex" justifyContent="space-between" alignItems="center" marginTop={3}>
