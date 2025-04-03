@@ -29,7 +29,7 @@ export const fetchCollections = async (): Promise<Collection[]> => {
     const authToken = localStorage.getItem("authToken") || "";
 
     const response = await axios.get<ApiResponse>(
-     `${siteConfig.apiEndpoint}/api/discover/search/objects?page=0&size=10&dsoType=COLLECTION`,
+      `${siteConfig.apiEndpoint}/api/discover/search/objects?page=0&size=10&dsoType=COLLECTION`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -37,9 +37,9 @@ export const fetchCollections = async (): Promise<Collection[]> => {
         },
       }
     );
-       if(response.status === 200) {
-        showToast('Collections fetched successfully!', 'success');
-       }
+    if (response.status === 200) {
+      showToast('Collections fetched successfully!', 'success');
+    }
     const objects = response.data._embedded?.searchResult?._embedded?.objects || [];
     return objects.map((obj) => ({
       id: obj._embedded.indexableObject.uuid,
@@ -50,3 +50,34 @@ export const fetchCollections = async (): Promise<Collection[]> => {
     throw error;
   }
 };
+
+
+export const AddCollection = async (parentId: string, title: string, description: string) => {
+  try {
+    const response = await axios.post(`${siteConfig.apiEndpoint}/api/core/collections?parent=${parentId}`, {
+      metadata: {
+        "dc.title": [{ value: title }],
+        "dc.description": [{ value: description }],
+      },
+      withCredentials: true,
+    });
+    if (response.status === 201) {
+      showToast("Collection created successfully!", "success");
+    }
+  } catch (error: any) {
+    const errorStatus = error.response?.status || 500;
+    if (errorStatus === 400) {
+      window.location.href = `/error-400`;
+    } else if (errorStatus === 401) {
+      window.location.href = `/error-401`;
+    } else if (errorStatus === 403) {
+      window.location.href = `/error-403`;
+    } else if (errorStatus === 422) {
+      window.location.href = `/error-422`;
+    } else if (errorStatus === 500) {
+      window.location.href = `/error-500`;
+    } else {
+      window.location.href = `/error-404`;
+    }
+  }
+}

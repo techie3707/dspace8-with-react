@@ -28,6 +28,8 @@ import Error422 from "../pages/error/error422";
 import Error404 from "../pages/error/error404";
 import Error500 from "../pages/error/error500";
 import TopCommunity from "../pages/community/topCommunity";
+import SelectCommunity from "../pages/collection/selectCommunity";
+import CreateCollection from "../pages/collection/createCollection";
 
 
 
@@ -70,6 +72,8 @@ const AppRoutes = () => {
         <Route path="/pdf-viewer" element={<PDFViewer />} />
         <Route path="/flip-book-viewer" element={<PDFFlipBook />} />
         <Route path="/create-community" element={<TopCommunity />} />
+        <Route path="/select-Community" element={<SelectCommunity />} />
+        <Route path="/create-collection/:communityId/:titleText" element={<CreateCollection />} />
         <Route path="/usermanagement" element={<ProtectedRoute element={<UserManagement />} />} />
         <Route path="/metadataSchemas" element={<ProtectedRoute element={<MetadataSchemas />} />} />
         <Route path="/bitstream/:schemaId/:schemaName" element={<ProtectedRoute element={<Bitstream />} />} />
