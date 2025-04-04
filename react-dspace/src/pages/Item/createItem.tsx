@@ -5,6 +5,7 @@ import { Box, IconButton, MenuItem, Select, Typography } from "@mui/material";
 import { ArrowDropUp, ArrowDropDown } from "@mui/icons-material";
 import { FormField, formFields } from "../../data/itemFormData";
 import { createItem } from "../../api/item";
+import Loader from "../loader/loader";
 
 interface CreateItemProps {
     collectionId: string;
@@ -18,6 +19,7 @@ const CreateItem: React.FC<CreateItemProps> = ({ collectionId }) => {
         month: new Date().getMonth() + 1,
         day: new Date().getDate(),
     });
+    const [loading, setLoading] = useState(false);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -60,17 +62,20 @@ const CreateItem: React.FC<CreateItemProps> = ({ collectionId }) => {
         }
 
         try {
+            setLoading(true);
             await createItem(collectionId, formData);
         } catch (error) {
             alert("Failed to create item. Please try again.");
+        } finally {
+            setLoading(false);
         }
     };
-
     return (
         <Box className="create-item-container">
             <Typography variant="h5" gutterBottom className="create-item-title">
                 Create Item
             </Typography>
+            {loading && <Loader />}
             <form onSubmit={handleSubmit}>
                 {formFields.map((field: FormField) => (
                     <Box key={field.id}>
@@ -166,8 +171,6 @@ const CreateItem: React.FC<CreateItemProps> = ({ collectionId }) => {
 
             </form>
         </Box>
-
-
     );
 };
 

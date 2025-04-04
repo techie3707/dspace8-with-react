@@ -34,8 +34,8 @@ export interface CommunityApiResponse {
 }
 const authToken = localStorage.getItem("authToken") || "";
 
-export const fetchCommunities = async (page: number = 0, size: number = 10) => {
-    const apiUrl = `${siteConfig.apiEndpoint}/api/discover/search/objects?sort=dc.title,ASC&page=${page}&size=${size}&dsoType=COMMUNITY`
+export const fetchCommunities = async (page: number = 0, size: number = 10, search: string = '') => {
+    const apiUrl = `${siteConfig.apiEndpoint}/api/discover/search/objects?sort=dc.title,ASC&page=${page}&size=${size}${search ? `&query=${search}` : ''}&dsoType=COMMUNITY`
     try{
         const response = await axios.get<CommunityApiResponse>(apiUrl, {
         headers: {
@@ -49,7 +49,7 @@ export const fetchCommunities = async (page: number = 0, size: number = 10) => {
             id: obj._embedded?.indexableObject?.id || '',
             metadata: obj._embedded?.indexableObject?.metadata || {}
         })) || [],
-        totalPages: response.data._embedded?.searchResult?.page?.totalPages || 0
+        totalElements: response.data._embedded?.searchResult?.page?.totalElements || 0
     };
 
     return result;

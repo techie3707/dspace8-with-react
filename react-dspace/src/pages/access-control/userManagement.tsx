@@ -51,7 +51,7 @@ const UserManagement = () => {
       setUsers(data.epersons);
       setTotalPages(data.totalPages);
     } catch (error) {
-      showToast("Failed to fetch users.", "error");
+      console.error("Error fetching users:", error);
     } finally {
       setLoading(false);
     }

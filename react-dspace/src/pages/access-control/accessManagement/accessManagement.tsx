@@ -52,7 +52,7 @@ const AccessManagement: React.FC<AccessManagementProps> = ({ open, onClose, user
                 }
                 setCollections(allCollections);
             } catch (error) {
-                // console.error("Error fetching collections:", error);
+                console.error("Error fetching collections:", error);
             }
         };
         fetchData();
@@ -87,7 +87,7 @@ const AccessManagement: React.FC<AccessManagementProps> = ({ open, onClose, user
                 });
                 setCollectionPermissions(permissionsMap);
             } catch (error) {
-                showToast("Failed to fetch groups list.", "error");
+                console.error("Error fetching groups:", error);
             }
         };
         fetchGroups();
@@ -118,7 +118,7 @@ const AccessManagement: React.FC<AccessManagementProps> = ({ open, onClose, user
                 });
                 setSelectedPermissions(updatedPermissions);
             } catch (error) {
-                showToast("Failed to fetch user groups.", "error");
+                console.error("Error fetching user groups:", error);
             }
         };
         fetchUserAssignedGroups();
@@ -189,7 +189,7 @@ const AccessManagement: React.FC<AccessManagementProps> = ({ open, onClose, user
     
             onClose();
         } catch (error) {
-            showToast("Failed to update group memberships.", "error");
+            console.error("Error updating user groups:", error);
         }
     };
     

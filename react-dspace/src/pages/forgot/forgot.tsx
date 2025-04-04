@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import CloseIcon from "@mui/icons-material/Close";
 import { fetchUserByEmail, resetPassword } from "../../api/forgotPassword";
 import { login } from "../../api/authApi";
+import Loader from "../loader/loader";
 
 const Forgot: React.FC = () => {
   const { token } = useParams();
@@ -71,7 +72,7 @@ const Forgot: React.FC = () => {
     setConfirmPassword(e.target.value);
   };
 
-  if (loading) return <Typography>Loading...</Typography>;
+  if (loading) return <Typography><Loader /></Typography>;
   if (error) return <Typography color="error">{error}</Typography>;
 
   return (

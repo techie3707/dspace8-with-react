@@ -32,9 +32,6 @@ export const uploadBatchImport = async (
         withCredentials: true,
       }
     );
-    if (response.status === 202) {
-      showToast("BThe process was successfully created", "success");
-    }
     return response;
   } catch (error: any) {
     const errorStatus = error.response?.status || 500;

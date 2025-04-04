@@ -8,6 +8,7 @@ import { downloadPDF } from '../../api/bitstream';
 import { useAuth } from '../../contexts/AuthContext';
 import { iconsImgs } from '../../utils/images';
 import { IconButton } from '@mui/material';
+import Loader from '../loader/loader';
 
 
 
@@ -62,11 +63,13 @@ const BookDetails: React.FC = () => {
     const uri = getMetadataValue('dc.identifier.uri');
     const publisher = getMetadataValue('dc.publisher');
 
-    if (isLoading) return <div>Loading...</div>;
+    if (isLoading) return <Loader />;
     if (error) return <h3>{error}</h3>;
     if (!item) return <div>Item not found</div>;
 
     return (
+        <>
+        
         <div className='container main_bdtl_div'>
         <div className='d-flex align-items-center mb-3'>
             <IconButton color="primary" className="back_btn" onClick={() => navigate(-1)} title="back_btn">
@@ -158,7 +161,7 @@ const BookDetails: React.FC = () => {
             </div>
         </div>
     </div>
-    
+    </>
     );
 };
 

@@ -10,7 +10,7 @@ import { showToast } from "../contexts/ToastProvider";
   queryParams.append('configuration', 'default');
 
   if (params.sort) {
-    queryParams.append('sort', params.sort);
+    queryParams.append('sort', params.sort || 'score,DESC');
   }
 
   queryParams.append('page', (params.page || 0).toString());

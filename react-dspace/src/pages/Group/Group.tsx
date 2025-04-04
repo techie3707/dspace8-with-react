@@ -40,7 +40,7 @@ const Groups = () => {
             setGroups(data.groups);
             setTotalPages(data.totalPages);
         } catch (error) {
-            showToast("Failed to fetch groups.", "error");
+            console.error("Error fetching groups:", error);
         } finally {
             setLoading(false);
         }

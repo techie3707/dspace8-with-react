@@ -75,12 +75,16 @@ const Bitstream: React.FC = () => {
     };
     const handleDeleteSelected = async () => {
         try {
+            setLoading(true);
             await Promise.all(selected.map((id) => deleteBitstream(id)));
             setSelected([]);
             const fields = await fetchMetadataFields(schemaName ?? "", authToken, page, rowsPerPage);
             setMetadataFields(fields);
         } catch (error) {
-            showToast("Error deleting metadata fields", "error");
+            console.error("Failed to delete metadata fields:", error);
+        }
+        finally {
+            setLoading(false);
         }
     };
 

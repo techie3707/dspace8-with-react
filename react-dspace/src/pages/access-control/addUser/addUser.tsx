@@ -5,6 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 import "./addUser.css";
 import CloseIcon from "@mui/icons-material/Close";
 import { addUser } from "../../../api/usermanagement";
+import Loader from "../../loader/loader";
 interface AddUserProps {
     open: boolean;
     onClose: () => void;
@@ -17,6 +18,7 @@ const AddUser: React.FC<AddUserProps> = ({ open, onClose, fetchUsers }) => {
         lastname: "",
         email: "",
     });
+    const [loading,setLoading] = useState(false)
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -43,12 +45,15 @@ const AddUser: React.FC<AddUserProps> = ({ open, onClose, fetchUsers }) => {
         };
 
         try {
+            setLoading(true);
             await addUser(userData);
             toast.success("User added successfully!");
             fetchUsers();
             onClose();
         } catch (error) {
             toast.error("Failed to add user. Please try again.");
+        } finally {
+            setLoading(false);
         }
     };
     return (
@@ -60,7 +65,7 @@ const AddUser: React.FC<AddUserProps> = ({ open, onClose, fetchUsers }) => {
                         <CloseIcon />
                     </IconButton>
                 </div>
-
+                {loading && <Loader />}
                 <Box component="form" onSubmit={handleSubmit} className="modal-form">
                     <TextField
                         label="First Name"

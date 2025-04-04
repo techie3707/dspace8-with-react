@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, IconButton, Box } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { addGroup, GroupPayload } from "../../api/group";
+import Loader from "../loader/loader";
 
 interface AddGroupProps {
   open: boolean;
@@ -12,6 +13,7 @@ interface AddGroupProps {
 const AddGroup = ({ open, onClose, onGroupAdded }: AddGroupProps) => {
   const [groupName, setGroupName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
+  const [loading,setLoading] = useState(false)
 
   const handleSave = async () => {
     const payload: GroupPayload = {
@@ -20,14 +22,14 @@ const AddGroup = ({ open, onClose, onGroupAdded }: AddGroupProps) => {
         "dc.description": [{ value: description }],
       },
     };
-
+    setLoading(true)
     const success = await addGroup(payload);
     if (success) {
       onGroupAdded();
       onClose();
     }
+    setLoading(false)
   };
-
   return (
     <Dialog
       open={open}
@@ -42,6 +44,7 @@ const AddGroup = ({ open, onClose, onGroupAdded }: AddGroupProps) => {
           <CloseIcon />
         </IconButton>
       </div>
+      {loading && <Loader />}
       <DialogContent className="modal-form group_form">
         <TextField
           className="custom-textfield"
