@@ -5,6 +5,7 @@ export interface SearchParams {
   page?: number;
   size?: number;
   sort?: string;
+  scope?: string;
   filters?: SearchFilters;
 }
 

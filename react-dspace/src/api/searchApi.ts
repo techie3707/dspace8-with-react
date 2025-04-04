@@ -65,6 +65,7 @@ export const parseSearchParamsFromUrl = (): SearchParams => {
     size: parseInt(params.get('size') || '10'),
     query: params.get('query') || undefined,
     sort: params.get('sort') || undefined,
+    scope: params.get('scope') || undefined,
     filters: Object.keys(filters).length ? filters : undefined
   };
 };
@@ -84,7 +85,10 @@ export const updateUrlWithSearchParams = (params: SearchParams) => {
   if (params.sort) {
     urlParams.set('sort', params.sort);
   }
-
+  if (params.scope) {
+    urlParams.set('scope', params.scope);
+  }
+  
   if (params.filters) {
     Object.entries(params.filters).forEach(([key, value]) => {
       if (!value) return;
@@ -97,7 +101,6 @@ export const updateUrlWithSearchParams = (params: SearchParams) => {
     });
   }
 
-  // Update URL without reloading
   const newUrl = `${window.location.pathname}?${urlParams.toString()}`;
   window.history.pushState({ path: newUrl }, '', newUrl);
 };
@@ -105,11 +108,12 @@ export const updateUrlWithSearchParams = (params: SearchParams) => {
 export const searchObjects = async (
   params: SearchParams
 ): Promise<{ results: any[]; totalElements: number }> => {
-  let apiUrl = `${siteConfig.apiEndpoint}/api/discover/search/objects?${buildApiQueryParams(params)}`;
+  let apiUrl = `${siteConfig.apiEndpoint}/api/discover/search/objects?${buildApiQueryParams(params)}&dsoType=item&scope=${params.scope}`;
 
   if (params.query?.trim()) {
     apiUrl += `&query=${encodeURIComponent(params.query)}`;
   }
+
   apiUrl += '&embed=thumbnail&embed=item/thumbnail'
   try {
     const response = await axios.get<ObjectSearchResult>(apiUrl);
@@ -143,7 +147,8 @@ export const fetchFacet = async (
   facetName: string,
   params: SearchParams
 ): Promise<FilterOption[]> => {
-  let f_url = `${siteConfig.apiEndpoint}/api/discover/facets/${facetName}?${buildApiQueryParams(params)}`;
+  let f_url = `${siteConfig.apiEndpoint}/api/discover/facets/${facetName}?${buildApiQueryParams(params)}&dsoType=item$scope=${params.scope}`;
+
 
   if (params.query) {
     f_url += `&query=${encodeURIComponent(params.query)}`;

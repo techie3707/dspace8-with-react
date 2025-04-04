@@ -6,6 +6,7 @@ export interface NavigationLink {
     image?: string;
     path: string;
     collectionId?: string;
+    onClick?: () => void;
     submenu?: NavigationLink[];
 }
 
@@ -24,7 +25,7 @@ export const generateNavigationLinks = (
     collections: { id: string; name: string }[]
   ): NavigationLink[] => {
     return collections.map((collection, index) => ({
-      id: index + 7,
+      id: index + 9,
       title: collection.name.charAt(0).toUpperCase() + collection.name.slice(1),
       image: iconsImgs.bills,
       path: `/collections/${collection.name.toLowerCase()}`,
@@ -38,8 +39,9 @@ export const generateNavigationLinks = (
         {
           id: (index + 1) * 10 + 2,
           title: "Advanced Search",
-          path: `/collections/${collection.name.toLowerCase()}/advanced-search`,
+          path: `/adminSearch?page=0&size=10&sort=score%2CDESC&scope=${collection.id}`, 
           collectionId: collection.id, 
+          
         },
         {
           id: (index + 1) * 10 + 3,
@@ -62,6 +64,8 @@ export const navigationLinks: NavigationLink[] = [
     { id: 4, title: "Groups", image: iconsImgs.gears, path: "/groups" },
     { id: 5, title: "Batch Import", image: iconsImgs.gears, path: "/batchImport" },
     { id: 6, title: "Admin Search", image: iconsImgs.gears, path: "/adminSearch" },
+    { id: 7, title: "Create Community", image: iconsImgs.gears, path: "/create-community" },
+    { id: 8, title: "Create Collection", image: iconsImgs.gears, path: "/select-Community" },
 ];
 
 

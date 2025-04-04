@@ -32,6 +32,7 @@ const Search: React.FC = () => {
 
     const [inputValue, setInputValue] = useState<string>(initialParams.query || '');
     const [searchResults, setSearchResults] = useState<any[]>([]);
+    const [scope, setScope] = useState<string | undefined>(initialParams.scope);
     const [filters, setFilters] = useState<Record<string, any>>(initialParams.filters || {});
     const [facets, setFacets] = useState<Record<string, FilterOption[]>>({});
     const [hasFileCounts, setHasFileCounts] = useState({
@@ -69,7 +70,8 @@ const Search: React.FC = () => {
                 page: 0,
                 size: 5,
                 filters: currentFilters,
-                sort: getSortParam()
+                sort: getSortParam(),
+                scope: scope 
             };
 
             const [facetsResponse, hasFileResponse] = await Promise.all([
@@ -99,7 +101,8 @@ const Search: React.FC = () => {
                 page: pageToFetch - 1,
                 size: itemsPerPage,
                 sort: sort,
-                filters: currentFilters
+                filters: currentFilters,
+                scope: scope 
             };
 
             updateUrlWithSearchParams(params);
