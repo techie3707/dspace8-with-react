@@ -7,10 +7,11 @@ import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 import { useSearchParams } from "react-router-dom";
 import { siteConfig } from "../../data/data";
 import "./PDFViewer.css";
+import Loader from "../loader/loader";
 
 const PDFViewer: React.FC = () => {
     const [pdfUrl, setPdfUrl] = useState<string | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [searchParams] = useSearchParams();
     const uuid = searchParams.get("uuid");
@@ -22,6 +23,7 @@ const PDFViewer: React.FC = () => {
 
         const fetchPDF = async () => {
             try {
+                setLoading(true);
                 const response = await axios.get(
                     `${siteConfig.apiEndpoint}/api/core/bitstreams/${uuid}/content`,
                     { responseType: "blob" }
@@ -44,7 +46,7 @@ const PDFViewer: React.FC = () => {
         };
     }, [uuid]);
 
-    if (loading) return <p>Loading PDF...</p>;
+    if (loading) return <Loader />;
     if (error) return <p style={{ color: "red" }}>{error}</p>;
 
     return (

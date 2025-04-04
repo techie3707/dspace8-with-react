@@ -15,7 +15,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import { addMemberToGroup, deleteGroup, editGroupDetail, EPerson, fetchGroupMembers, fetchNonMembers, removeMemberToGroup } from "../../api/group";
 import { Delete } from "@mui/icons-material";
-import { showToast } from "../../contexts/ToastProvider";
+import Loader from "../loader/loader";
 
 const EditGroup = () => {
     const location = useLocation();
@@ -38,6 +38,7 @@ const EditGroup = () => {
     const [nonMemberTotalPages, setNonMemberTotalPages] = useState(1);
     const [nonMemberSize] = useState(5);
     const navigate = useNavigate();
+    const [laoding, setLoading] = useState(false)
 
     useEffect(() => {
         loadMembers();
@@ -49,11 +50,14 @@ const EditGroup = () => {
 
     const loadMembers = async () => {
         try {
+            setLoading(true)
             const response = await fetchGroupMembers(id, memberPage - 1, memberSize);
             setMembers(response._embedded?.epersons || []);
             setMemberTotalPages(response.page?.totalPages || 1);
         } catch (error) {
-            showToast("Failed to fetch group members.", "error");
+            console.error("Failed to fetch members:", error);
+        } finally {
+            setLoading(false)
         }
     };
 
@@ -63,7 +67,7 @@ const EditGroup = () => {
             setNonMembers(response._embedded?.epersons || []);
             setNonMemberTotalPages(response.page?.totalPages || 1);
         } catch (error) {
-            showToast("Failed to fetch non-members.", "error");
+            console.error("Failed to fetch non-members:", error);
         }
     };
 
@@ -78,7 +82,7 @@ const EditGroup = () => {
             setNonMembers(updatedNonMembers._embedded?.epersons || []);
             setNonMemberTotalPages(updatedNonMembers.page?.totalPages || 1);
         } catch (error) {
-            showToast("Failed to add member.", "error");
+            console.error("Failed to add member:", error);
         }
     };
 
@@ -93,7 +97,7 @@ const EditGroup = () => {
             setNonMembers(updatedNonMembers._embedded?.epersons || []);
             setNonMemberTotalPages(updatedNonMembers.page?.totalPages || 1);
         } catch (error) {
-            showToast("Failed to remove member.", "error");
+            console.error("Failed to remove member:", error);
         }
     };
     const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -108,16 +112,20 @@ const EditGroup = () => {
 
     const handleSave = async () => {
         try {
+            setLoading(true)
             await editGroupDetail(id, groupName, groupDescription);
             setIsModified(false);
         } catch (error) {
-            showToast("Failed to update group details.", "error");
+            console.error("Failed to save group details:", error);
+        } finally {
+            setLoading(false)
         }
     };
 
     const handleSearch = () => {
         setSearchTerm(searchQuery);
     };
+    if (laoding) return <Loader />
     return (
         <Container>
             <Grid container justifyContent="space-between" alignItems="center" className="header_group">

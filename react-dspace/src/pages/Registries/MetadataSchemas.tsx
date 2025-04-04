@@ -4,6 +4,7 @@ import { Paper, TableContainer, Table, TableHead, TableRow, TableCell, TableBody
 import "../../pages/Registries/MetadataSchemas.css"
 import { useNavigate } from "react-router-dom";
 import { showToast } from "../../contexts/ToastProvider";
+import Loader from "../loader/loader";
 
 interface MetadataSchema {
     id: number;
@@ -21,6 +22,7 @@ const MetadataSchemas = () => {
     const [isSaveEnabled, setIsSaveEnabled] = useState(false);
     const navigate = useNavigate();
     const authToken = localStorage.getItem("authToken") || "";
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         setIsSaveEnabled(namespace.trim() !== "" && name.trim() !== "");
@@ -28,11 +30,14 @@ const MetadataSchemas = () => {
 
     const getSchemas = async () => {
         try {
+            setLoading(true);
             const { metadataschemas, totalPages } = await fetchMetadataSchemas(authToken, page - 1, 10);
             setSchemas(metadataschemas);
             setTotalPages(totalPages);
         } catch (error) {
             showToast("Error fetching metadata schemas", "error");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -56,26 +61,34 @@ const MetadataSchemas = () => {
         const payload = { prefix: name, namespace };
 
         try {
+            setLoading(true);
             await addMetadataSchema(payload);
             setNamespace("");
             setName("");
             getSchemas();
         } catch (error) {
-            showToast("Error saving metadata schema", "error");
+            console.error("Error adding metadata schema:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
     const handleDeleteSelected = async () => {
         try {
+            setLoading(true);
             await Promise.all(selected.map((id) => deleteMetadataSchema(id)));
             setSelected([]);
             getSchemas();
         } catch (error) {
-            showToast("Error deleting metadata schemas", "error");
+            console.error("Error deleting metadata schemas:", error);
+        } finally {
+            setLoading(false);
         }
     };
     const handleView = (prefix: string, schemaId: number) => {
+        setLoading(true);
         navigate(`/bitstream/${schemaId}/${encodeURIComponent(prefix)}`);
+        setLoading(false);
     };
 
 
@@ -90,6 +103,7 @@ const MetadataSchemas = () => {
                     Create metadata schema
                 </h2>
             </div>
+            {loading && <Loader />}
             <Box className="form-container">
                 <TextField
                     label="Namespace *"

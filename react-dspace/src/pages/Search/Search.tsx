@@ -25,6 +25,7 @@ import { Button, Grid, IconButton, TextField } from '@mui/material';
 import { iconsImgs } from '../../utils/images';
 import { siteConfig } from '../../data/data';
 import { Bitstream } from '../../data/bookDetail';
+import Loader from '../loader/loader';
 
 const Search: React.FC = () => {
     const initialParams = parseSearchParamsFromUrl();
@@ -270,7 +271,7 @@ const Search: React.FC = () => {
                 return null;
         }
     };
-
+    if(isLoading) return <Loader />;
     return (
         <div className="search-container row">
             <div className="filters-and-results">

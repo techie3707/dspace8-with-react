@@ -99,7 +99,7 @@ export const register = async (email: string) => {
     );
 
     if (response.status === 201) {
-      showToast('Password reset link sent to your email.', 'success');
+      showToast('Registration link sent to your email.', 'success');
       return { success: true, message: "Password reset link sent to your email." };
     } else {
       throw new Error("Failed to send password reset request.");

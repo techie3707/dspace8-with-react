@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import CloseIcon from "@mui/icons-material/Close";
 import { fetchUserByEmail, userRegister } from "../../api/forgotPassword";
 import { login } from "../../api/authApi";
+import Loader from "../loader/loader";
 
 const Register: React.FC = () => {
     const { token } = useParams();
@@ -59,6 +60,8 @@ const Register: React.FC = () => {
         } catch (err: any) {
             const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred.";
             toast.error(errorMessage);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -73,7 +76,7 @@ const Register: React.FC = () => {
         }
     };
 
-    if (loading) return <Typography>Loading...</Typography>;
+    if (loading) return <Typography><Loader /> </Typography>;
     if (error) return <Typography color="error">{error}</Typography>;
 
     return (

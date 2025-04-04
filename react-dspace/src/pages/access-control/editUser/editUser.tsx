@@ -3,6 +3,7 @@ import { Modal, Paper, Typography, TextField, IconButton, Box, CircularProgress 
 import CloseIcon from "@mui/icons-material/Close";
 import { getUserById, updateUser } from "../../../api/usermanagement";
 import "../addUser/addUser.css";
+import Loader from "../../loader/loader";
 
 interface EditUserProps {
     open: boolean;
@@ -71,7 +72,7 @@ const EditUser: React.FC<EditUserProps> = ({ open, onClose, userId, fetchUsers }
             fetchUsers();
             onClose();
         } catch (error) {
-            // console.error("Failed to update user:", error);
+            console.error("Failed to update user:", error);
         } finally {
             setUpdating(false);
         }
@@ -88,7 +89,7 @@ const EditUser: React.FC<EditUserProps> = ({ open, onClose, userId, fetchUsers }
                 </div>
                 <Box component="form" className="modal-form">
                     {loading ? (
-                        <CircularProgress className="loading-indicator" />
+                        <Loader />
                     ) : (
                         <>
                             <TextField

@@ -48,17 +48,25 @@ export const fetchCollections = async (): Promise<Collection[]> => {
   }
 };
 
-
+const authToken = localStorage.getItem("authToken") || "";
+const csrfToken = localStorage.getItem("csrfToken") || "";
 export const AddCollection = async (parentId: string, title: string, description: string) => {
   try {
     const response = await axios.post(`${siteConfig.apiEndpoint}/api/core/collections?parent=${parentId}`, {
       metadata: {
         "dc.title": [{ value: title }],
         "dc.description": [{ value: description }],
-      },
-      
-      withCredentials: true,
-    });
+      }
+    },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "X-XSRF-TOKEN": csrfToken,
+          "Authorization": authToken 
+        },
+        withCredentials: true
+      }
+    );
     if (response.status === 201) {
       showToast("Collection created successfully!", "success");
     }

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "./ForgotPassword.css";
 import { forgotPassword } from "../../api/authApi";
+import Loader from "../loader/loader";
 
 const ForgotPassword = () => {
     const navigate = useNavigate();
@@ -18,7 +19,7 @@ const ForgotPassword = () => {
 
         setLoading(true);
         try {
-
+            setLoading(true);
             await forgotPassword(email);
             toast.success("Password reset link sent to your email.");
         } catch (error: any) {
@@ -30,6 +31,7 @@ const ForgotPassword = () => {
 
     return (
         <Container maxWidth="sm" className="forgot-password-container">
+             {loading && <Loader />}
             <Box className="forgot-password-box">
                 <Typography variant="h4" className="forgot-password-title">
                     Forgot Password
