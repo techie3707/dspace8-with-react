@@ -1,0 +1,5 @@
+.rpv-toolbar__item button[data-testid="open__button"],  
+.rpv-toolbar__item button[data-testid="get-file__download-button"],
+.rpv-toolbar__item button[data-testid="print__button"] {
+    display: none !important;
+}

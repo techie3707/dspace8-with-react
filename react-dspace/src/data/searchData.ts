@@ -1,3 +1,5 @@
+import { Bitstream } from "./bookDetail";
+
 export interface SearchParams {
   query?: string;
   page?: number;
@@ -131,5 +133,12 @@ export interface ObjectSearchResult {
 export interface FacetResult {
   _embedded: {
     values: Array<{ label: string; count: number }>;
+  };
+}
+
+export interface Bundle {
+  name: string;
+  _embedded?: {
+      bitstreams?: Bitstream[];
   };
 }

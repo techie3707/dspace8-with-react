@@ -29,7 +29,11 @@ const Login = () => {
     }
   };
   
-  
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleLogin();
+    }
+  };
   
 
   return (
@@ -46,6 +50,7 @@ const Login = () => {
           margin="normal"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          onKeyDown={handleKeyDown}
         />
         <TextField
           fullWidth
@@ -55,6 +60,7 @@ const Login = () => {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          onKeyDown={handleKeyDown}
         />
         <Button
           fullWidth
