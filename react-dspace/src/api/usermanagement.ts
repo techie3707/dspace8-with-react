@@ -127,9 +127,6 @@ export const getUserById = async (userId: string, authToken: string) => {
     if (!response.ok) {
       throw new Error("Failed to fetch user details");
     }
-    if (response.status === 200) {
-      showToast('User details fetched successfully!', 'success');
-    }
 
     return await response.json();
   } catch (error) {

@@ -18,3 +18,23 @@ export interface APIResponse<T> {
         collections?: Collection[];
     };
 }
+
+export interface AuthStatusResponse {
+    id: string | null;
+    okay: boolean;
+    authenticated: boolean;
+    authenticationMethod: string;
+    type: string;
+    _links: {
+        eperson?: {
+            href: string;
+        };
+        specialGroups?: {
+            href: string;
+        };
+        self?: {
+            href: string;
+        };
+    };
+}
+

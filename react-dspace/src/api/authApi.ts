@@ -3,6 +3,7 @@ import { siteConfig } from "../data/data";
 import { setAuthToken } from "./authToken";
 import { fetchCsrfToken } from "./csrf";
 import { showToast } from "../contexts/ToastProvider";
+import { AuthStatusResponse } from "../data/accessAPI";
 
 const csrfToken = localStorage.getItem("csrfToken") || "";
 const authToken = localStorage.getItem("authToken") || "";
@@ -55,6 +56,34 @@ export const login = async (email: string, password: string) => {
   }
 };
 
+export const getAuthStatus = async (): Promise<string | null> => {
+  try {
+    const response = await axios.get<AuthStatusResponse>(
+      `${siteConfig.apiEndpoint}/api/authn/status`,
+      {
+        headers: {
+          Authorization: authToken,
+        },
+        withCredentials: true,
+      }
+    );
+
+    if (response.status === 200 && response.data.authenticated) {
+      const epersonHref = response.data._links?.eperson?.href;
+      if (epersonHref) {
+        const uuid = epersonHref.split("/").pop();
+        return uuid || null;
+      } else {
+        throw new Error("Authenticated, but no eperson link found.");
+      }
+    } else {
+      return null;
+    }
+  } catch (error: any) {
+    console.error("Failed to get auth status:", error);
+    throw error;
+  }
+};
 
 export const forgotPassword = async (email: string) => {
   try {
