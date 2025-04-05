@@ -610,3 +610,6 @@ button {
 .b_import_label{
   display: unset;
 }
+.row {
+  --bs-gutter-x: 0 !important; 
+}

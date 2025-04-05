@@ -5,12 +5,10 @@
     height: auto;
     display: block;
     margin: 0 auto 10px;
-    border: 1px solid rgb(129, 20, 246);
+    box-shadow: 0 0 10px 2px black;
     transition: transform 0.3s ease-in-out;
 }
-.thumbnail-img:hover {
-    transform: scale(1.2); 
-  }
+
 
     .custom-btn {
         background-color: white;

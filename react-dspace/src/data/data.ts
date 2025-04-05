@@ -27,13 +27,13 @@ export const generateNavigationLinks = (
     return collections.map((collection, index) => ({
       id: index + 9,
       title: collection.name.charAt(0).toUpperCase() + collection.name.slice(1),
-      image: iconsImgs.bills,
+      image: iconsImgs.collectionname,
       path: `/collections/${collection.name.toLowerCase()}`,
       submenu: [
         {
           id: (index + 1) * 10 + 1,
           title: "Metadata Search",
-          path: `/collections/${collection.name.toLowerCase()}/metadata-search`,
+          path: `/adminSearch?page=0&size=10&sort=score%2CDESC&scope=${collection.id}`,
           collectionId: collection.id, 
         },
         {
@@ -59,13 +59,13 @@ export const generateNavigationLinks = (
 
 export const navigationLinks: NavigationLink[] = [
     { id: 1, title: "Home", image: iconsImgs.home, path: "/" },
-    { id: 2, title: "User Management", image: iconsImgs.gears, path: "/UserManagement" },
-    { id: 3, title: "Metadata Schemas", image: iconsImgs.gears, path: "/metadataSchemas" },
-    { id: 4, title: "Groups", image: iconsImgs.gears, path: "/groups" },
-    { id: 5, title: "Batch Import", image: iconsImgs.gears, path: "/batchImport" },
-    { id: 6, title: "Admin Search", image: iconsImgs.gears, path: "/adminSearch" },
-    { id: 7, title: "Create Community", image: iconsImgs.gears, path: "/create-community" },
-    { id: 8, title: "Create Collection", image: iconsImgs.gears, path: "/select-Community" },
+    { id: 2, title: "User Management", image: iconsImgs.epople, path: "/UserManagement" },
+    { id: 3, title: "Metadata Schemas", image: iconsImgs.registries, path: "/metadataSchemas" },
+    { id: 4, title: "Groups", image: iconsImgs.group, path: "/groups" },
+    { id: 5, title: "Batch Import", image: iconsImgs.batchimport, path: "/batchImport" },
+    { id: 6, title: "Admin Search", image: iconsImgs.searchLight, path: "/adminSearch" },
+    { id: 7, title: "Create Community", image: iconsImgs.community, path: "/create-community" },
+    { id: 8, title: "Create Collection", image: iconsImgs.collection, path: "/select-Community" },
 ];
 
 

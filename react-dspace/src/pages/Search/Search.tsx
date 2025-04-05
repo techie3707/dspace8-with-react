@@ -155,39 +155,38 @@ const Search: React.FC = () => {
             return newFilters;
         });
     };
-    // useEffect(() => {
-    //     const fetchThumbnails = async () => {
-    //         try {
-    //             setIsLoading(true);
-    //             if (searchResults.length > 0) {
-    //                 const thumbnails: { [uuid: string]: string } = {};
+    useEffect(() => {
+        const fetchThumbnails = async () => {
+            try {
+                setIsLoading(true);
+                if (searchResults.length > 0) {
+                    const thumbnails: { [uuid: string]: string } = {};
 
-    //                 for (const result of searchResults) {
-    //                     const uuid = result._embedded?.indexableObject?.uuid;
-    //                     if (!uuid) continue;
+                    for (const result of searchResults) {
+                        const uuid = result._embedded?.indexableObject?.uuid;
+                        if (!uuid) continue;
 
-    //                     const bundles = await fetchItemBundles(uuid);
-    //                     if (bundles.length > 0) {
-    //                         const originalBundle = bundles.find(b => b.name === 'ORIGINAL') || bundles[0];
-    //                         const thumbnailBundle = bundles.find(b => b.name === 'THUMBNAIL') || bundles[0];
-    //                         const originalbitstreamsData = await fetchBitstreams(originalBundle.uuid);
-    //                         const thumbnailbitstreamsData = await fetchBitstreams(thumbnailBundle.uuid);
-    //                         setOriginalBitstreams(originalbitstreamsData);
-    //                         setThumbnailBitstreams(thumbnailbitstreamsData);
-    //                     }
-    //                 }
+                        const bundles = await fetchItemBundles(uuid);
+                        if (bundles.length > 0) {
+                            const originalBundle = bundles.find(b => b.name === 'ORIGINAL') || bundles[0];
+                            const thumbnailBundle = bundles.find(b => b.name === 'THUMBNAIL') || bundles[0];
+                            const originalbitstreamsData = await fetchBitstreams(originalBundle.uuid);
+                            const thumbnailbitstreamsData = await fetchBitstreams(thumbnailBundle.uuid);
+                            setOriginalBitstreams(originalbitstreamsData);
+                            setThumbnailBitstreams(thumbnailbitstreamsData);
+                        }
+                    }
 
-    //             }
-    //         } catch (error) {
-    //             console.error(error);
-    //         } finally {
-    //             setIsLoading(false);
-    //         }
-    //     };
+                }
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
 
-    //     fetchThumbnails();
-    // }, [searchResults]);
-
+        fetchThumbnails();
+    }, [searchResults]);
 
 
     const getMetadataValue = (metadata: any, field: string): string | null => {
@@ -214,14 +213,6 @@ const Search: React.FC = () => {
             [sectionId]: !prev[sectionId]
         }));
     };
-    const getThumbnailUrl = (item: any): string | null => {
-        const thumbnail = item._embedded?.indexableObject?._embedded?.thumbnail;
-        if (thumbnail && thumbnail._links?.content?.href) {
-            return thumbnail._links.content.href;
-        }
-        return null;
-    };
-
     const renderFilterSection = (section: FilterSection) => {
         switch (section.filterType) {
             case 'checkbox':
@@ -308,7 +299,7 @@ const Search: React.FC = () => {
                     </div>
                     <div className='filter_reset'>
                         <button className='filter_reset_btn'
-                            style={{ width: '50%', padding: '10px', border: 'none', borderRadius: '4px' }}
+                            style={{ width: '93%', padding: '10px', border: 'none', borderRadius: '4px' }}
                             onClick={resetFilters}
                         >
                             Reset filters
@@ -357,10 +348,10 @@ const Search: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="search-results col-11">
+                <div className="search-results col-12">
                     <div className='col-12'>
                         <Grid container alignItems="center" className="search-container">
-                            <Grid item xs={8.5} sm={8.5} lg={11}>
+                            <Grid item xs={8.5} sm={10} md={11}>
                                 <TextField
                                     label="Search the repository..."
                                     variant="outlined"
@@ -377,140 +368,152 @@ const Search: React.FC = () => {
                                 />
                             </Grid>
 
-                            <Grid item xs={2} sm={2} lg={1}>
+                            <Grid item xs={2} sm={2} md={1} style={{ paddingLeft: 0 }}>
                                 <Button
                                     className="button_search"
                                     variant="contained"
                                     onClick={() => handleSearch(filters, 1, size, true, getSortParam())}
                                     disabled={isLoading}
+                                    fullWidth
                                 >
                                     {isLoading ? 'Searching...' : 'Search'}
                                 </Button>
                             </Grid>
                         </Grid>
+
+
+
                     </div>
 
 
 
-                    <div className="results-header col-12">
-                        <h2>Search Results</h2>
-                        <div>
-                            <button
-                                className={`view-mode-button ${viewMode === 'grid' ? 'active' : ''}`}
-                                onClick={() => setViewMode('grid')}
-                            >
-                                <img className="sresult_icon" src={iconsImgs.grid} alt="Grid" />
-                            </button>
-                            <button
-                                className={`view-mode-button ${viewMode === 'list' ? 'active' : ''}`}
-                                onClick={() => setViewMode('list')}
-                            >
-                                <img className="sresult_icon" src={iconsImgs.list} alt="List" />
-                            </button>
-                        </div>
+                    <div className="col-12">
+                        <Grid container alignItems="center" className="results-header">
+                            <Grid item xs={8.5} sm={8.5} lg={11}>
+                                <h2>Search Results</h2>
+                            </Grid>
+                            <Grid item xs={2} sm={2} lg={1}>
+                                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                                    <button
+                                        className={`view-mode-button ${viewMode === 'grid' ? 'active' : ''}`}
+                                        onClick={() => setViewMode('grid')}
+                                    >
+                                        <img className="sresult_icon" src={iconsImgs.grid} alt="Grid" />
+                                    </button>
+                                    <button
+                                        className={`view-mode-button ${viewMode === 'list' ? 'active' : ''}`}
+                                        onClick={() => setViewMode('list')}
+                                    >
+                                        <img className="sresult_icon" src={iconsImgs.list} alt="List" />
+                                    </button>
+                                </div>
+                            </Grid>
+                        </Grid>
                     </div>
+
 
                     {isLoading ? (
                         <div className="loading-indicator">Loading results...</div>
                     ) : (
-                        <>
+                        <Grid container spacing={2} className="results-body">
                             {viewMode === 'list' ? (
-                                <ul className="results-list" style={{ width: '145vh' }}>
-                                    {searchResults.map((result, index) => {
-                                        const metadata = result._embedded?.indexableObject?.metadata;
-                                        const type = result._embedded?.indexableObject?.type;
-                                        const title = metadata?.['dc.title']?.[0]?.value || 'Unknown Title';
-                                        const uuid = result._embedded?.indexableObject?.uuid;
-                                        const abstract = metadata?.['dc.description.abstract']?.[0]?.value;
-                                        const date = metadata?.['dc.date.issued']?.[0]?.value;
-                                        const author = metadata?.['dc.contributor.author']?.[0]?.value;
-                                        const publisher = metadata?.['dc.publisher']?.[0]?.value;
-                                        const displayType = metadata?.['dc.type']?.[0]?.value || type;
-                                        const thumbnailUrl = getThumbnailUrl(result);
+                                searchResults.map((result, index) => {
+                                    const metadata = result._embedded?.indexableObject?.metadata;
+                                    const type = result._embedded?.indexableObject?.type;
+                                    const title = metadata?.['dc.title']?.[0]?.value || 'Unknown Title';
+                                    const uuid = result._embedded?.indexableObject?.uuid;
+                                    const abstract = metadata?.['dc.description.abstract']?.[0]?.value;
+                                    const date = metadata?.['dc.date.issued']?.[0]?.value;
+                                    const author = metadata?.['dc.contributor.author']?.[0]?.value;
+                                    const publisher = metadata?.['dc.publisher']?.[0]?.value;
+                                    const displayType = metadata?.['dc.type']?.[0]?.value || type;
 
-                                        const handleTitleClick = () => {
-                                            if (uuid) {
-                                                navigate(`/items/${uuid}`);
-                                            }
-                                        };
+                                    const handleTitleClick = () => {
+                                        if (uuid) {
+                                            navigate(`/items/${uuid}`);
+                                        }
+                                    };
 
-                                        return (
-                                            <li key={index}>
-                                                <div style={{ display: 'flex', alignItems: 'center' }}>
-
-                                                    {thumbnailUrl && (
+                                    return (
+                                        <Grid item xs={12} key={index}>
+                                            <div style={{ display: 'flex', alignItems: 'center', padding: '10px', border: '1px solid #ddd', borderRadius: '6px' }}>
+                                                {thumbnailBitstreams
+                                                    .filter(bitstream => /\.(jpe?g|png)$/i.test(bitstream.name))
+                                                    .map(bitstream => (
                                                         <img
-                                                            src={thumbnailUrl}
-                                                            alt={`Thumbnail for ${title}`}
-                                                             className='thumbnail-img img-fluid'
+                                                            key={bitstream.uuid}
+                                                            className='thumbnail-img_list img-fluid'
+                                                            src={`${siteConfig.apiEndpoint}/api/core/bitstreams/${bitstream.uuid}/content`}
+                                                            alt='Thumbnail'
+                                                            style={{ marginRight: '16px', maxHeight: '100px' }}
                                                         />
-                                                    )}
-                                                    <div>
-                                                        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-                                                            <span style={{
-                                                                backgroundColor: '#eee', padding: '2px 5px', borderRadius: '3px', marginRight: '10px'
-                                                            }}>
-                                                                {displayType}
-                                                            </span>
-                                                            <h3 style={{ margin: '0', cursor: 'pointer' }} onClick={handleTitleClick}>
-                                                                {title}
-                                                            </h3>
-                                                        </div>
-                                                        {date && (
-                                                            <p style={{ margin: '0', color: '#666' }}>
-                                                                ({publisher}, {date}) {author}
-                                                            </p>
-                                                        )}
-                                                        {abstract && (
-                                                            <>
-                                                                <p style={{ margin: '10px 0', color: '#666' }}>{abstract}</p>
-                                                                <button style={{
-                                                                    padding: '5px 10px', backgroundColor: '#f0f0f0', border: 'none', borderRadius: '4px'
-                                                                }}>
-                                                                    Show more
-                                                                </button>
-                                                            </>
-                                                        )}
+                                                    ))}
+                                                <div>
+                                                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                                                        <span style={{
+                                                            backgroundColor: '#eee', padding: '2px 5px', borderRadius: '3px', marginRight: '10px'
+                                                        }}>
+                                                            {displayType}
+                                                        </span>
+                                                        <h3 style={{ margin: '0', cursor: 'pointer' }} onClick={handleTitleClick}>
+                                                            {title}
+                                                        </h3>
                                                     </div>
+                                                    {date && (
+                                                        <p style={{ margin: '0', color: '#666' }}>
+                                                            ({publisher}, {date}) {author}
+                                                        </p>
+                                                    )}
+                                                    {abstract && (
+                                                        <>
+                                                            <p style={{ margin: '10px 0', color: '#666' }}>{abstract}</p>
+                                                            <button style={{
+                                                                padding: '5px 10px', backgroundColor: '#f0f0f0', border: 'none', borderRadius: '4px'
+                                                            }}>
+                                                                Show more
+                                                            </button>
+                                                        </>
+                                                    )}
                                                 </div>
-                                            </li>
-                                        );
-                                    })}
-                                </ul>
+                                            </div>
+                                        </Grid>
+                                    );
+                                })
                             ) : (
-                                <ul className="results-grid" style={{ width: '145vh' }}>
-                                    {searchResults.map((result, index) => {
-                                        const metadata = result._embedded?.indexableObject?.metadata;
-                                        const type = result._embedded?.indexableObject?.type;
-                                        const title = getMetadataValue(metadata, metadataFields.title);
-                                        const uuid = result._embedded?.indexableObject?.uuid;
-                                        const abstract = getMetadataValue(metadata, metadataFields.abstract);
-                                        const date = getMetadataValue(metadata, metadataFields.date);
-                                        const author = getMetadataValue(metadata, metadataFields.author);
-                                        const entity = getMetadataValue(metadata, metadataFields.entityType);
-                                        const publisher = getMetadataValue(metadata, metadataFields.publisher);
-                                        const displayType = entity || type;
-                                        const thumbnailUrl = getThumbnailUrl(result);
-                                        const handleTitleClick = () => {
-                                            if (uuid) {
-                                                navigate(`/items/${uuid}`);
-                                            }
-                                        };
+                                searchResults.map((result, index) => {
+                                    const metadata = result._embedded?.indexableObject?.metadata;
+                                    const type = result._embedded?.indexableObject?.type;
+                                    const title = getMetadataValue(metadata, metadataFields.title);
+                                    const uuid = result._embedded?.indexableObject?.uuid;
+                                    const abstract = getMetadataValue(metadata, metadataFields.abstract);
+                                    const date = getMetadataValue(metadata, metadataFields.date);
+                                    const author = getMetadataValue(metadata, metadataFields.author);
+                                    const entity = getMetadataValue(metadata, metadataFields.entityType);
+                                    const publisher = getMetadataValue(metadata, metadataFields.publisher);
+                                    const displayType = entity || type;
 
-                                        return (
-                                            <li key={index} className="grid_main" onClick={handleTitleClick} style={{
-                                                border: '1px solid #ddd',
-                                                borderRadius: '8px',
-                                                position: 'relative',
-                                                maxWidth: '210px',
-                                                cursor: 'pointer'
-                                            }}>
+                                    const handleTitleClick = () => {
+                                        if (uuid) {
+                                            navigate(`/items/${uuid}`);
+                                        }
+                                    };
+
+                                    return (
+                                        <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+                                            <div
+                                                className="grid_main"
+                                                onClick={handleTitleClick}
+                                                style={{
+                                                    border: '1px solid #ddd',
+                                                    borderRadius: '8px',
+                                                    padding: '10px',
+                                                    position: 'relative',
+                                                    cursor: 'pointer',
+                                                    height: '100%'
+                                                }}
+                                            >
                                                 {/* Title */}
-                                                <h3
-                                                    style={{ cursor: 'pointer' }}
-                                                    onClick={handleTitleClick}
-                                                    className='item_title'
-                                                >
+                                                <h3 className='item_title' style={{ cursor: 'pointer' }}>
                                                     {title}
                                                 </h3>
 
@@ -523,16 +526,16 @@ const Search: React.FC = () => {
 
                                                 {/* Thumbnail */}
                                                 <div style={{ display: 'flex', justifyContent: 'center', margin: '10px 0' }}>
-                                                    {thumbnailUrl && (
-                                                        <img
-                                                            src={thumbnailUrl}
-                                                            alt={`Thumbnail for ${title}`}
-                                                            key={uuid}
-                                                            className='thumbnail-img img-fluid'
-                                                            
-                                                        />
-                                                    )}
-
+                                                    {thumbnailBitstreams
+                                                        .filter(bitstream => /\.(jpe?g|png)$/i.test(bitstream.name))
+                                                        .map(bitstream => (
+                                                            <img
+                                                                key={bitstream.uuid}
+                                                                className='thumbnail-img img-fluid'
+                                                                src={`${siteConfig.apiEndpoint}/api/core/bitstreams/${bitstream.uuid}/content`}
+                                                                alt='Thumbnail'
+                                                            />
+                                                        ))}
                                                 </div>
 
                                                 {/* Abstract */}
@@ -554,21 +557,19 @@ const Search: React.FC = () => {
                                                         fontSize: '18px',
                                                         cursor: 'pointer',
                                                         padding: '5px',
+                                                        background: 'none',
                                                     }}
                                                 >
-                                                    <img className="itemh_icon" src={iconsImgs.arrow} alt="Edit" />
+                                                    <img className="itemh_icon" src={iconsImgs.arrow} alt="Arrow" />
                                                 </IconButton>
-
-                                            </li>
-
-                                        );
-                                    })}
-                                </ul>
+                                            </div>
+                                        </Grid>
+                                    );
+                                })
                             )}
-
-
-                        </>
+                        </Grid>
                     )}
+
                 </div>
             </div>
             <div style={{ bottom: 10, padding: "10px", }}>

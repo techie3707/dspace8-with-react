@@ -69,8 +69,12 @@
   color: white;
   transition: var(--transition-default);
 }
-.nav-link:hover{
-  color: chocolate !important;
+.nav-link {
+  transition: color 0.3s ease; /* smooth transition effect */
+}
+
+.nav-link:hover {
+  color: chocolate;
 }
 
 .nav-link.active {
@@ -78,7 +82,9 @@
   box-shadow: rgba(0, 0, 0, 0.1) 0px 20px 25px -5px, rgba(0, 0, 0, 0.04) 0px 10px 10px -5px;
   color: burlywood;
 }
-
+.nav-link.active:hover {
+  color: white !important;
+}
 .nav-link-icon {
   width: 22px;
 }
@@ -139,7 +145,15 @@
 .nav-link.active .submenu-toggle {
   transform: rotate(180deg);
 }
+.nav-link:focus {
+  color: #fff !important;
+}
 
 
-
+.submenu-link:hover{
+  color: chocolate !important;
+}
+.submenu-link.active:hover {
+  color: white !important;
+}
 
