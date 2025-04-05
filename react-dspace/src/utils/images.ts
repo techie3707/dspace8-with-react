@@ -7,11 +7,12 @@ import check from "../assets/icons/check.svg";
 import empty_check from "../assets/icons/empty_check.svg";
 import gears from "../assets/icons/gears.svg";
 import home from "../assets/icons/home.svg";
-import menu from "../assets/icons/menu.svg";
+import menu from "../assets/icons/hamburger.png";
 import plane from "../assets/icons/plane.svg";
 import plus from "../assets/icons/plus.svg";
 import report from "../assets/icons/report.svg";
 import search from "../assets/icons/search.svg";
+import searchLight from "../assets/icons/search.png";
 import user from "../assets/icons/user.svg";
 import wallet from "../assets/icons/wallet.svg";
 import wealth from "../assets/icons/wealth.svg";
@@ -26,6 +27,14 @@ import grid from "../assets/icons/grid.png";
 import list from "../assets/icons/list.png";
 import arrow from "../assets/icons/right-arrow.png";
 import back_btn from "../assets/icons/back-button.png";
+import batchimport from "../assets/icons/file-importpng.png";
+import group from "../assets/icons/group.png";
+import epople from "../assets/icons/user.png";
+import registries from "../assets/icons/registries.png";
+import community from "../assets/icons/communities.png";
+import collection from "../assets/icons/collection.png";
+import collectionname from "../assets/icons/collectionname.png";
+
 
 
 interface IconsImages {
@@ -50,10 +59,18 @@ interface IconsImages {
     edit: string;
     remove: string;
     access: string;
-    list:   string;
-    grid:   string;
-    arrow:  string;
-    back_btn:  string;
+    list: string;
+    grid: string;
+    arrow: string;
+    back_btn: string;
+    searchLight: string;
+    batchimport: string;
+    group: string;
+    epople: string;
+    registries: string;
+    collection: string;
+    community: string;
+    collectionname: string;
 }
 
 
@@ -65,9 +82,9 @@ interface PersonsImages {
 
 // Export typed objects
 export const iconsImgs: IconsImages = {
-    alert, bell, bills, budget, card, check, empty_check, gears, home, menu, plane, plus, report, search, user, wallet, wealth, login, edit, remove, access, list, grid,arrow,back_btn
+    alert, bell, bills, budget, card, check, empty_check, gears, home, menu, plane, plus, report, search, searchLight, user, wallet, wealth, login, edit, remove, access, list, grid, arrow, back_btn, batchimport, group, epople, registries, collection, community , collectionname
 };
 
 export const personsImgs: PersonsImages = {
-    person_one, brand_one,home_main
+    person_one, brand_one, home_main
 };
