@@ -71,7 +71,7 @@ const Search: React.FC = () => {
                 size: 5,
                 filters: currentFilters,
                 sort: getSortParam(),
-                scope: scope 
+                scope: scope
             };
 
             const [facetsResponse, hasFileResponse] = await Promise.all([
@@ -102,7 +102,7 @@ const Search: React.FC = () => {
                 size: itemsPerPage,
                 sort: sort,
                 filters: currentFilters,
-                scope: scope 
+                scope: scope
             };
 
             updateUrlWithSearchParams(params);
@@ -155,38 +155,38 @@ const Search: React.FC = () => {
             return newFilters;
         });
     };
-    useEffect(() => {
-        const fetchThumbnails = async () => {
-            try {
-                setIsLoading(true);
-                if (searchResults.length > 0) {
-                    const thumbnails: { [uuid: string]: string } = {};
+    // useEffect(() => {
+    //     const fetchThumbnails = async () => {
+    //         try {
+    //             setIsLoading(true);
+    //             if (searchResults.length > 0) {
+    //                 const thumbnails: { [uuid: string]: string } = {};
 
-                    for (const result of searchResults) {
-                        const uuid = result._embedded?.indexableObject?.uuid;
-                        if (!uuid) continue;
+    //                 for (const result of searchResults) {
+    //                     const uuid = result._embedded?.indexableObject?.uuid;
+    //                     if (!uuid) continue;
 
-                        const bundles = await fetchItemBundles(uuid);
-                        if (bundles.length > 0) {
-                            const originalBundle = bundles.find(b => b.name === 'ORIGINAL') || bundles[0];
-                            const thumbnailBundle = bundles.find(b => b.name === 'THUMBNAIL') || bundles[0];
-                            const originalbitstreamsData = await fetchBitstreams(originalBundle.uuid);
-                            const thumbnailbitstreamsData = await fetchBitstreams(thumbnailBundle.uuid);
-                            setOriginalBitstreams(originalbitstreamsData);
-                            setThumbnailBitstreams(thumbnailbitstreamsData);
-                        }
-                    }
+    //                     const bundles = await fetchItemBundles(uuid);
+    //                     if (bundles.length > 0) {
+    //                         const originalBundle = bundles.find(b => b.name === 'ORIGINAL') || bundles[0];
+    //                         const thumbnailBundle = bundles.find(b => b.name === 'THUMBNAIL') || bundles[0];
+    //                         const originalbitstreamsData = await fetchBitstreams(originalBundle.uuid);
+    //                         const thumbnailbitstreamsData = await fetchBitstreams(thumbnailBundle.uuid);
+    //                         setOriginalBitstreams(originalbitstreamsData);
+    //                         setThumbnailBitstreams(thumbnailbitstreamsData);
+    //                     }
+    //                 }
 
-                }
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
+    //             }
+    //         } catch (error) {
+    //             console.error(error);
+    //         } finally {
+    //             setIsLoading(false);
+    //         }
+    //     };
 
-        fetchThumbnails();
-    }, [searchResults]);
+    //     fetchThumbnails();
+    // }, [searchResults]);
 
 
 
@@ -213,6 +213,13 @@ const Search: React.FC = () => {
             ...prev,
             [sectionId]: !prev[sectionId]
         }));
+    };
+    const getThumbnailUrl = (item: any): string | null => {
+        const thumbnail = item._embedded?.indexableObject?._embedded?.thumbnail;
+        if (thumbnail && thumbnail._links?.content?.href) {
+            return thumbnail._links.content.href;
+        }
+        return null;
     };
 
     const renderFilterSection = (section: FilterSection) => {
@@ -274,7 +281,7 @@ const Search: React.FC = () => {
                 return null;
         }
     };
-    if(isLoading) return <Loader />;
+    if (isLoading) return <Loader />;
     return (
         <div className="search-container row">
             <div className="filters-and-results">
@@ -315,8 +322,11 @@ const Search: React.FC = () => {
                                 id="sort"
                                 value={sortOption}
                                 onChange={(e) => {
-                                    setSortOption(e.target.value);
-                                    handleSearch(filters, page, size, false, getSortParam());
+                                    const newSortOption = e.target.value;
+                                    setSortOption(newSortOption);
+                                    const option = sortOptions.find(opt => opt.value === newSortOption);
+                                    const apiSortValue = option ? option.apiValue : 'score,DESC';
+                                    handleSearch(filters, page, size, false, apiSortValue);
                                 }}
                             >
                                 {sortOptions.map(option => (
@@ -416,6 +426,7 @@ const Search: React.FC = () => {
                                         const author = metadata?.['dc.contributor.author']?.[0]?.value;
                                         const publisher = metadata?.['dc.publisher']?.[0]?.value;
                                         const displayType = metadata?.['dc.type']?.[0]?.value || type;
+                                        const thumbnailUrl = getThumbnailUrl(result);
 
                                         const handleTitleClick = () => {
                                             if (uuid) {
@@ -426,16 +437,14 @@ const Search: React.FC = () => {
                                         return (
                                             <li key={index}>
                                                 <div style={{ display: 'flex', alignItems: 'center' }}>
-                                                    {thumbnailBitstreams
-                                                        .filter(bitstream => /\.(jpe?g|png)$/i.test(bitstream.name))
-                                                        .map(bitstream => (
-                                                            <img
-                                                                key={bitstream.uuid}
-                                                                className='thumbnail-img img-fluid'
-                                                                src={`${siteConfig.apiEndpoint}/api/core/bitstreams/${bitstream.uuid}/content`}
-                                                                alt='Thumbnail'
-                                                            />
-                                                        ))}
+
+                                                    {thumbnailUrl && (
+                                                        <img
+                                                            src={thumbnailUrl}
+                                                            alt={`Thumbnail for ${title}`}
+                                                             className='thumbnail-img img-fluid'
+                                                        />
+                                                    )}
                                                     <div>
                                                         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
                                                             <span style={{
@@ -481,6 +490,7 @@ const Search: React.FC = () => {
                                         const entity = getMetadataValue(metadata, metadataFields.entityType);
                                         const publisher = getMetadataValue(metadata, metadataFields.publisher);
                                         const displayType = entity || type;
+                                        const thumbnailUrl = getThumbnailUrl(result);
                                         const handleTitleClick = () => {
                                             if (uuid) {
                                                 navigate(`/items/${uuid}`);
@@ -513,16 +523,16 @@ const Search: React.FC = () => {
 
                                                 {/* Thumbnail */}
                                                 <div style={{ display: 'flex', justifyContent: 'center', margin: '10px 0' }}>
-                                                     {thumbnailBitstreams
-                                                                       .filter(bitstream => /\.(jpe?g|png)$/i.test(bitstream.name))
-                                                                       .map(bitstream => (
-                                                                           <img
-                                                                               key={bitstream.uuid}
-                                                                               className='thumbnail-img img-fluid'
-                                                                               src={`${siteConfig.apiEndpoint}/api/core/bitstreams/${bitstream.uuid}/content`}
-                                                                               alt='Thumbnail'
-                                                                           />
-                                                                       ))}
+                                                    {thumbnailUrl && (
+                                                        <img
+                                                            src={thumbnailUrl}
+                                                            alt={`Thumbnail for ${title}`}
+                                                            key={uuid}
+                                                            className='thumbnail-img img-fluid'
+                                                            
+                                                        />
+                                                    )}
+
                                                 </div>
 
                                                 {/* Abstract */}

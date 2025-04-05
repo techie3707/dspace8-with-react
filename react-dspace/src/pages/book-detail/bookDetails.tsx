@@ -160,6 +160,7 @@ const BookDetails: React.FC = () => {
                 </table>
             </div>
         </div>
+        <button className='mt-5 custom-btn'>Edit Item</button>
     </div>
     </>
     );
