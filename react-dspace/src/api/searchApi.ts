@@ -147,7 +147,7 @@ export const fetchFacet = async (
   facetName: string,
   params: SearchParams
 ): Promise<FilterOption[]> => {
-  let f_url = `${siteConfig.apiEndpoint}/api/discover/facets/${facetName}?${buildApiQueryParams(params)}&dsoType=item$scope=${params.scope}`;
+  let f_url = `${siteConfig.apiEndpoint}/api/discover/facets/${facetName}?${buildApiQueryParams(params)}&dsoType=item&scope=${params.scope}`;
 
 
   if (params.query) {

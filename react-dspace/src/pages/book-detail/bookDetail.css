@@ -88,6 +88,18 @@
     color: rgb(129, 20, 246);
     font-size: 2rem;
 }
+.custom-btn{
+    background-color: white;
+    color: rgb(129, 20, 246);
+    border: 2px solid rgb(129, 20, 246);
+    padding: 5px 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-right: 5px;
+    border-radius: 4px;
+    transition: background-color 0.3s, color 0.3s;
+}
 @media (max-width: 768px) {
     .modern-table th, .modern-table td {
         font-size: 14px;
