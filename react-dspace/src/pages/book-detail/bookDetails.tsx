@@ -69,103 +69,106 @@ const BookDetails: React.FC = () => {
 
     return (
         <>
-        
-        <div className='container main_bdtl_div'>
-        <div className='d-flex align-items-center mb-3'>
-            <IconButton color="primary" className="back_btn" onClick={() => navigate(-1)} title="back_btn">
-                <img className="back_icon" src={iconsImgs.back_btn} alt="Back" />
-            </IconButton>
-            <h1 className='bdtl_title ms-2'>{title}</h1>
-        </div>
-        <div className='row'>
-            <div className='col-lg-4 col-md-12 col-12 text-center mb-3'>
-                {thumbnailBitstreams
-                    .filter(bitstream => /\.(jpe?g|png)$/i.test(bitstream.name))
-                    .map(bitstream => (
-                        <img
-                            key={bitstream.uuid}
-                            className='thumbnail-img img-fluid'
-                            src={`${siteConfig.apiEndpoint}/api/core/bitstreams/${bitstream.uuid}/content`}
-                            alt='Thumbnail'
-                        />
-                    ))}
+
+            <div className='container main_bdtl_div'>
+                <div className='d-flex align-items-center mb-3'>
+                    <IconButton color="primary" className="back_btn" onClick={() => navigate(-1)} title="back_btn">
+                        <img className="back_icon" src={iconsImgs.back_btn} alt="Back" />
+                    </IconButton>
+                    <h1 className='bdtl_title ms-2'>{title}</h1>
+                </div>
+                <div className='row'>
+                    <div className='col-lg-4 col-md-12 col-12 text-center mb-3'>
+                        {thumbnailBitstreams
+                            .filter(bitstream => /\.(jpe?g|png)$/i.test(bitstream.name))
+                            .map(bitstream => (
+                                <img
+                                    key={bitstream.uuid}
+                                    className='thumbnail-img img-fluid'
+                                    src={`${siteConfig.apiEndpoint}/api/core/bitstreams/${bitstream.uuid}/content`}
+                                    alt='Thumbnail'
+                                />
+                            ))}
+                    </div>
+
+                    <div className='col-lg-8 col-md-12 col-12'>
+                        <table className='modern-table w-100'>
+                            <tbody>
+                                {abstract && (
+                                    <tr>
+                                        <th>Abstract</th>
+                                        <td>{abstract}</td>
+                                    </tr>
+                                )}
+                                <tr>
+                                    <th>URI</th>
+                                    <td>
+                                        <a href={uri || ''} target="_blank" rel="noopener noreferrer">
+                                            {uri}
+                                        </a>
+                                    </td>
+                                </tr>
+                                {description && (
+                                    <tr>
+                                        <th>Description</th>
+                                        <td>{description}</td>
+                                    </tr>
+                                )}
+                                {author && (
+                                    <tr>
+                                        <th>Author</th>
+                                        <td>{author}</td>
+                                    </tr>
+                                )}
+                                {publisher && (
+                                    <tr>
+                                        <th>Publisher</th>
+                                        <td>{publisher}</td>
+                                    </tr>
+                                )}
+                                <tr>
+                                    <th>Date</th>
+                                    <td>{dateIssued}</td>
+                                </tr>
+                                {originalBitstreams.length > 0 && (
+                                    <tr>
+                                        <th>Action</th>
+                                        <td>
+                                            <ul className='list-unstyled'>
+                                                {originalBitstreams
+                                                    .filter(bitstream => /.pdf$/i.test(bitstream.name))
+                                                    .map(bitstream => (
+                                                        <li key={bitstream.uuid} className='mb-2'>
+                                                            <button className='custom-btn' onClick={() => window.open(`/pdf-viewer?uuid=${bitstream.uuid}`, '_blank')}>
+                                                                View PDF
+                                                            </button>
+                                                            <button className='custom-btn' onClick={() => window.open(`/flip-book-viewer?uuid=${bitstream.uuid}`, '_blank')}>
+                                                                View In Flip PDF
+                                                            </button>
+                                                            {isAuthenticated && (
+                                                                <>
+                                                                    <button className='custom-btn' onClick={() => downloadPDF(bitstream.uuid, bitstream.name)}>
+                                                                        Download PDF
+                                                                    </button>
+                                                                    <button className='custom-btn'
+                                                                        onClick={() => navigate(`/edit-item/${id}`)}>
+                                                                        Edit Item
+                                                                    </button>
+                                                                </>
+                                                            )}
+                                                        </li>
+                                                    ))}
+                                            </ul>
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
             </div>
-            
-            <div className='col-lg-8 col-md-12 col-12'>
-                <table className='modern-table w-100'>
-                    <tbody>
-                        {abstract && (
-                            <tr>
-                                <th>Abstract</th>
-                                <td>{abstract}</td>
-                            </tr>
-                        )}
-                        <tr>
-                            <th>URI</th>
-                            <td>
-                                <a href={uri || ''} target="_blank" rel="noopener noreferrer">
-                                    {uri}
-                                </a>
-                            </td>
-                        </tr>
-                        {description && (
-                            <tr>
-                                <th>Description</th>
-                                <td>{description}</td>
-                            </tr>
-                        )}
-                        {author && (
-                            <tr>
-                                <th>Author</th>
-                                <td>{author}</td>
-                            </tr>
-                        )}
-                        {publisher && (
-                            <tr>
-                                <th>Publisher</th>
-                                <td>{publisher}</td>
-                            </tr>
-                        )}
-                        <tr>
-                            <th>Date</th>
-                            <td>{dateIssued}</td>
-                        </tr>
-                        {originalBitstreams.length > 0 && (
-                            <tr>
-                                <th>Action</th>
-                                <td>
-                                    <ul className='list-unstyled'>
-                                        {originalBitstreams
-                                            .filter(bitstream => /.pdf$/i.test(bitstream.name))
-                                            .map(bitstream => (
-                                                <li key={bitstream.uuid} className='mb-2'>
-                                                    <button className='custom-btn' onClick={() => window.open(`/pdf-viewer?uuid=${bitstream.uuid}`, '_blank')}>
-                                                        View PDF
-                                                    </button>
-                                                    <button className='custom-btn' onClick={() => window.open(`/flip-book-viewer?uuid=${bitstream.uuid}`, '_blank')}>
-                                                        View In Flip PDF
-                                                    </button>
-                                                    {isAuthenticated && (
-                                                        <button className='custom-btn' onClick={() => downloadPDF(bitstream.uuid, bitstream.name)}>
-                                                            Download PDF
-                                                        </button>
-                                                    )}
-                                                </li>
-                                            ))}
-                                    </ul>
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <button className='mt-5 custom-btn'
-        onClick={() => navigate(`/edit-item/${id}`)}>
-            Edit Item
-            </button>
-    </div>
-    </>
+        </>
     );
 };
 
