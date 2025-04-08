@@ -31,6 +31,9 @@ import TopCommunity from "../pages/community/topCommunity";
 import SelectCommunity from "../pages/collection/selectCommunity";
 import CreateCollection from "../pages/collection/createCollection";
 import UserProfile from "../pages/UserProfile/UserProfile";
+import EditItem from "../pages/Item/editItem";
+import AddBitstream from "../pages/addBitstream/addBitstream";
+import EditBitstream from "../pages/addBitstream/editBitstream";
 
 
 
@@ -79,6 +82,9 @@ const AppRoutes = () => {
         <Route path="/flip-book-viewer" element={<PDFFlipBook />} />
         <Route path="/create-community" element={<TopCommunity />} />
         <Route path="/select-Community" element={<SelectCommunity />} />
+        <Route path="/edit-item/:itemId" element={<EditItem />} />
+        <Route path="/add-bitstream/:itemId" element={<AddBitstream />} />
+        <Route path="/edit-bitstream/:bitstreamId/:itemId" element={<EditBitstream />} />
         <Route path="/create-collection/:communityId/:titleText" element={<CreateCollection />} />
         <Route path="/usermanagement" element={<ProtectedRoute element={<UserManagement />} />} />
         <Route path="/userProfile/:userId" element={<ProtectedRoute element={<UserProfileWrapper />} />}/>

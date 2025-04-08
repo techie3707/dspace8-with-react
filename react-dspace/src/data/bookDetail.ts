@@ -18,10 +18,17 @@ export interface MetadataEntry {
         [key: string]: MetadataEntry[] | undefined;
     };
   }
+  interface MetadataValue {
+    value: string;
+  }
   
+  interface Metadata {
+    [key: string]: MetadataValue[];
+  }
   export interface Bundle {
     uuid: string;
     name: string;
+    metadata: Metadata;
   }
   
   export interface BundlesResponse {

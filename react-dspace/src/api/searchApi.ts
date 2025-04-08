@@ -203,3 +203,38 @@ export const fetchBitstreams = async (bundleId: string): Promise<Bitstream[]> =>
   const response = await axios.get<BitstreamsResponse>(`${siteConfig.apiEndpoint}/api/core/bundles/${bundleId}/bitstreams?page=0&size=5`);
   return response.data._embedded.bitstreams;
 };
+
+interface BitstreamUploadResponse {
+  uuid: string;
+  name: string;
+  sizeBytes: number;
+} 
+const authToken = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJlaWQiOiI4MmRkN2MzNC01OGQyLTQyNWUtYTVmNS04ZTA1ZmYwN2QxNmEiLCJzZyI6W10sImF1dGhlbnRpY2F0aW9uTWV0aG9kIjoicGFzc3dvcmQiLCJleHAiOjE3NDQxMzA0MjV9.616Owf67uiaZ-341yyzTVSwle-MvrLjv9kwF6lkEv4g";
+  const csrfToken ="fc3829c4-11a9-4720-a2af-5839578908a3";
+export const postBitstream = async ( bundleId: string,
+   file: File
+): Promise<BitstreamUploadResponse> => {
+  // const authToken = localStorage.getItem("authToken") || "";
+  // const csrfToken = localStorage.getItem("csrfToken") || "";
+ 
+  const formData = new FormData();
+  formData.append("file", file);
+
+  try {
+    const { data } = await axios.post<BitstreamUploadResponse>(
+      `${siteConfig.apiEndpoint}/api/core/bundles/${bundleId}/bitstreams`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'X-XSRF-TOKEN': csrfToken,
+          'Authorization': authToken,
+        },
+      }
+    );
+    return data; 
+  } catch (error: any) {
+    console.error("Error uploading file:", error);
+    throw error; 
+  }
+};
