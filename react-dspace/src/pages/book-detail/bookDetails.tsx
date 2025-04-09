@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { fetchBitstreams, fetchItemBundles, fetchItemDetails } from '../../api/searchApi';
+import { fetchItemDetails } from '../../api/item';
+import {fetchBitstreams, fetchItemBundles} from '../../api/bitstream';
 import { useNavigate, useParams } from 'react-router-dom';
 import './bookDetail.css';
 import { Bitstream, BookDetailsData } from '../../data/bookDetail';

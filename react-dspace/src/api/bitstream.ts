@@ -1,149 +1,131 @@
 import { showToast } from "../contexts/ToastProvider";
+import { Bitstream, BitstreamsResponse, BitstreamUploadResponse, Bundle, BundlesResponse, PatchOperation } from "../data/bookDetail";
 import { siteConfig } from "../data/data";
 import axios from "axios";
+const authToken = localStorage.getItem("authToken") || "";
+const csrfToken = localStorage.getItem("csrfToken") || "";
 
 export const downloadPDF = async (uuid: string, name: string) => {
-    try {
-        const response = await fetch(`${siteConfig.apiEndpoint}/api/core/bitstreams/${uuid}/content`, {
-            method: 'GET'
-        });
+  try {
+    const response = await fetch(`${siteConfig.apiEndpoint}/api/core/bitstreams/${uuid}/content`, {
+      method: 'GET'
+    });
 
-        if (!response.ok) {
-            throw new Error('Failed to download PDF');
-        }
+    if (!response.ok) {
+      throw new Error('Failed to download PDF');
+    }
 
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = name;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-        if (response.status === 200) {
-            showToast('PDF downloaded successfully!', 'success');
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+    if (response.status === 200) {
+      showToast('PDF downloaded successfully!', 'success');
     }
-    } catch (error) {
-        showToast('Failed to download PDF', 'error');
-    }
+  } catch (error) {
+    showToast('Failed to download PDF', 'error');
+  }
 };
 
 export const getPDFUrl = (uuid: string): string => {
-    return `${siteConfig.apiEndpoint}/api/core/bitstreams/${uuid}/content`;
+  return `${siteConfig.apiEndpoint}/api/core/bitstreams/${uuid}/content`;
 };
 
 
 export const fetchPDFUrl = async (uuid: string): Promise<string> => {
-    try {
-        const response = await fetch(`${siteConfig.apiEndpoint}/api/core/bitstreams/${uuid}/content`, {
-            method: "GET",
-        });
-
-        if (!response.ok) {
-            throw new Error("Failed to fetch PDF.");
-        }
-
-        const blob = await response.blob();
-        return URL.createObjectURL(blob);
-    } catch (error) {
-        throw error;
-    }
-};
-
-
-interface MetadataValue {
-    value: string;
-    language: string | null;
-    authority: string | null;
-    confidence: number;
-    place: number;
-  }
-  
-  export interface Bitstream {
-    id: string;
-    uuid: string;
-    metadata: {
-      'dc.title': MetadataValue[];
-    };
-    _embedded: {
-      format:{
-        _links: {
-            self:{
-                href: string;
-            }
-          };
-      }
-    };
-  }
-
-export const fetchBitstreamMetadata = async (bitstreamId: string): Promise<Bitstream> => {
   try {
-    const response = await axios.get<Bitstream>(
-      `${siteConfig.apiEndpoint}/api/core/bitstreams/${bitstreamId}?embed=bundle/FprimaryBitstream&embed=bundle/FprimaryBitstream/Fitem&embed=format`,
-      {
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        withCredentials: true,
-      }
-    );
-    
-    return response.data;
+    const response = await fetch(`${siteConfig.apiEndpoint}/api/core/bitstreams/${uuid}/content`, {
+      method: "GET",
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch PDF.");
+    }
+
+    const blob = await response.blob();
+    return URL.createObjectURL(blob);
   } catch (error) {
-    console.error('Error fetching bitstream metadata:', error);
     throw error;
   }
 };
 
-interface Format {
-    id: string;
-    shortDescription: string;
-}
-interface BitstreamFormatResponse {
-    _embedded: {
-        bitstreamformats: Format[];
-    };
-}
- export const fetchFormate = async ():  Promise<Format[]>  => {
-    try{
-        const response = await axios.get<BitstreamFormatResponse>(`${siteConfig.apiEndpoint}/api/core/bitstreamformats?page=0&size=10`, {
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            withCredentials: true,
-        });
-        return response.data._embedded.bitstreamformats;
-    } catch (error) {
-        console.error('Error fetching bitstream formats:', error);
-        throw error;
-    }
-}
 
-const csrfToken = "cad42f52-a148-4687-ac15-8576964a0124";
-const authToken = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJlaWQiOiI4MmRkN2MzNC01OGQyLTQyNWUtYTVmNS04ZTA1ZmYwN2QxNmEiLCJzZyI6W10sImF1dGhlbnRpY2F0aW9uTWV0aG9kIjoicGFzc3dvcmQiLCJleHAiOjE3NDQxMzA0MjV9.616Owf67uiaZ-341yyzTVSwle-MvrLjv9kwF6lkEv4g"
-export const updateBitstreamFormat = async (
-  bitstreamId: string,
-  payload: string
-) => {
-//   const authToken = localStorage.getItem('authToken') || '';
-//   const csrfToken = localStorage.getItem('csrfToken') || '';
+export const fetchItemBundles = async (id: string): Promise<Bundle[]> => {
+  const response = await axios.get<BundlesResponse>(`${siteConfig.apiEndpoint}/api/core/items/${id}/bundles?size=9999`);
+  return response.data._embedded.bundles;
+};
+
+export const fetchBitstreams = async (bundleId: string): Promise<Bitstream[]> => {
+  const response = await axios.get<BitstreamsResponse>(`${siteConfig.apiEndpoint}/api/core/bundles/${bundleId}/bitstreams?page=0&size=5`);
+  return response.data._embedded.bitstreams;
+};
+
+
+
+export const postBitstream = async (bundleId: string,
+  file: File
+): Promise<BitstreamUploadResponse> => {
+
+  const formData = new FormData();
+  formData.append("file", file);
 
   try {
-    const response = await axios.put(
-      `${siteConfig.apiEndpoint}/api/core/bitstreams/${bitstreamId}/format`,
-      payload,
+    const { data } = await axios.post<BitstreamUploadResponse>(
+      `${siteConfig.apiEndpoint}/api/core/bundles/${bundleId}/bitstreams`,
+      formData,
       {
         headers: {
-          'Content-Type': 'text/uri-list',
+          'Content-Type': 'multipart/form-data',
           'X-XSRF-TOKEN': csrfToken,
           'Authorization': authToken,
         },
+        withCredentials: true,
+      }
+    );
+    return data;
+  } catch (error: any) {
+    console.error("Error uploading file:", error);
+    throw error;
+  }
+};
+
+
+
+export const removeBitstream = async (patchOperations: PatchOperation[]) => {
+  try {
+    const response = await axios.patch(
+      `${siteConfig.apiEndpoint}/api/core/bitstreams`,
+      patchOperations,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-XSRF-TOKEN': csrfToken,
+          'Authorization': authToken,
+        },
+        withCredentials: true,
       }
     );
     return response.data;
-  } catch (error) {
-    console.error('Error updating bitstream format:', error);
+  } catch (error: any) {
+    const errorStatus = error.response?.status || 500;
+    if (errorStatus === 400) {
+      window.location.href = `/error-400`;
+    } else if (errorStatus === 401) {
+      window.location.href = `/error-401`;
+    } else if (errorStatus === 403) {
+      window.location.href = `/error-403`;
+    } else if (errorStatus === 422) {
+      window.location.href = `/error-422`;
+    } else if (errorStatus === 500) {
+      window.location.href = `/error-500`;
+    } else {
+      window.location.href = `/error-404`;
+    }
     throw error;
   }
 };

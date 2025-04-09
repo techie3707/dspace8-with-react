@@ -13,3 +13,17 @@ export const formFields: FormField[] = [
     { id: 5, name: "dc.description", label: "Description", type: "textarea", required: true },
 ];
 
+export interface PatchOperation {
+    op: 'add' | 'remove' | 'replace' ;
+    path: string;
+    value?: any;
+  }
+
+  export interface ItemInfo {
+    id: string;
+    uuid: string;
+    name: string;
+    metadata: {
+        [key: string]: { value: string }[];
+    };
+}

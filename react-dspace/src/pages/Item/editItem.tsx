@@ -14,38 +14,22 @@ import {
     TextField,
     IconButton,
     Box,
+    
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
-import { Bitstream } from "../../data/bookDetail";
-import { fetchBitstreams, fetchItemBundles } from "../../api/searchApi";
+import { Bitstream, PatchOperation } from "../../data/bookDetail";
+import { fetchBitstreams, fetchItemBundles, removeBitstream } from "../../api/bitstream";
 import GetAppRoundedIcon from '@mui/icons-material/GetAppRounded';
 import DownloadRoundedIcon from '@mui/icons-material/DownloadRounded';
 import { useNavigate } from "react-router-dom";
+import { ItemInfo } from "../../data/itemFormData";
+import AddIcon from '@mui/icons-material/Add';
 
-interface MetadataValue {
-    value: string;
-}
 
-interface Metadata {
-    [key: string]: MetadataValue[];
-}
 
-interface ItemLinks {
-    thumbnail: { href: string };
-    self: { href: string };
-}
-
-export interface ItemInfo {
-    id: string;
-    uuid: string;
-    name: string;
-    metadata: Metadata;
-    type: string;
-    _links: ItemLinks;
-}
 
 const EditItem = () => {
     const { itemId } = useParams<{ itemId: string }>();
@@ -61,6 +45,8 @@ const EditItem = () => {
     const [pendingUpdates, setPendingUpdates] = useState<any[]>([]);
     const [originalBitstreams, setOriginalBitstreams] = useState<Bitstream[]>([]);
     const [thumbnailBitstreams, setThumbnailBitstreams] = useState<Bitstream[]>([]);
+    const [pendingBitstreamDeletions, setPendingBitstreamDeletions] = useState<string[]>([]);
+    const [deletedBitstreams, setDeletedBitstreams] = useState<Bitstream[]>([]);
     const Navigate = useNavigate();
 
     useEffect(() => {
@@ -189,34 +175,77 @@ const EditItem = () => {
     };
 
     useEffect(() => {
-           const fetchThumbnails = async () => {
-               try {
-                   setLoading(true);
-                   
-   
-                       
-                           if (!itemId) return;
-   
-                           const bundles = await fetchItemBundles(itemId);
-                           if (bundles.length > 0) {
-                               const originalBundle = bundles.find(b => b.name === 'ORIGINAL') || bundles[0];
-                               const thumbnailBundle = bundles.find(b => b.name === 'THUMBNAIL') || bundles[0];
-                               const originalbitstreamsData = await fetchBitstreams(originalBundle.uuid);
-                               const thumbnailbitstreamsData = await fetchBitstreams(thumbnailBundle.uuid);
-                               setOriginalBitstreams(originalbitstreamsData);
-                               setThumbnailBitstreams(thumbnailbitstreamsData);
-                   }
-               } catch (error) {
-                   console.error(error);
-               } finally {
-                   setLoading(false);
-               }
-           };
-   
-           fetchThumbnails();
-       }, []);
-    const handleShowBitstream = async () => {
-       
+        const fetchThumbnails = async () => {
+            try {
+                setLoading(true);
+
+
+
+                if (!itemId) return;
+
+                const bundles = await fetchItemBundles(itemId);
+                if (bundles.length > 0) {
+                    const originalBundle = bundles.find(b => b.name === 'ORIGINAL') || bundles[0];
+                    const thumbnailBundle = bundles.find(b => b.name === 'THUMBNAIL') || bundles[0];
+                    const originalbitstreamsData = await fetchBitstreams(originalBundle.uuid);
+                    const thumbnailbitstreamsData = await fetchBitstreams(thumbnailBundle.uuid);
+                    setOriginalBitstreams(originalbitstreamsData);
+                    setThumbnailBitstreams(thumbnailbitstreamsData);
+                }
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchThumbnails();
+    }, []);
+
+    const handleDeleteBitstream = (bitstreamId: string) => {
+
+        const bitstreamToDelete = originalBitstreams.find(bs => bs.uuid === bitstreamId);
+        if (!bitstreamToDelete) return;
+
+        setPendingBitstreamDeletions([...pendingBitstreamDeletions, bitstreamId]);
+
+        setOriginalBitstreams(originalBitstreams.filter(bs => bs.uuid !== bitstreamId));
+
+        setDeletedBitstreams([...deletedBitstreams, bitstreamToDelete]);
+    };
+    const handleBitstreamSave = async () => {
+        if (pendingBitstreamDeletions.length === 0) return;
+
+        try {
+            setLoading(true);
+
+            const deleteOperations: PatchOperation[] = pendingBitstreamDeletions.map(bitstreamId => ({
+                op: "remove",
+                path: `/bitstreams/${bitstreamId}`
+            }));
+
+            await Promise.all(deleteOperations.map(op =>  removeBitstream([op])));
+
+            setPendingBitstreamDeletions([]);
+            setDeletedBitstreams([]);
+
+            Navigate(`/edit-item/${itemId}`);
+        } catch (err) {
+            console.error("Error deleting bitstreams:", err);
+            setError("Failed to delete bitstreams");
+
+            setOriginalBitstreams([...originalBitstreams, ...deletedBitstreams]);
+            setPendingBitstreamDeletions([]);
+            setDeletedBitstreams([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDiscardBitstreamChanges = () => {
+        setOriginalBitstreams([...originalBitstreams, ...deletedBitstreams]);
+        setPendingBitstreamDeletions([]);
+        setDeletedBitstreams([]);
     };
 
     if (loading && !editingField) {
@@ -365,72 +394,92 @@ const EditItem = () => {
                 </TableContainer>
             </Container>
             <Container>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleShowBitstream}
-                    sx={{ marginLeft: "10px", marginBottom: "20px" }}
-                >
-                    Show Bitstream
-                </Button>
+                <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleBitstreamSave}
+                        disabled={pendingBitstreamDeletions.length === 0 || loading}
+                        sx={{ marginBottom: "20px" }}
+                    >
+                        {loading ? 'Saving...' : 'Save Bitstream Changes'}
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        color="error"
+                        onClick={handleDiscardBitstreamChanges}
+                        disabled={pendingBitstreamDeletions.length === 0 || loading}
+                        sx={{ marginBottom: "20px" }}
+                    >
+                        Discard Bitstream Changes
+                    </Button>
+                </Box>
                 <Table>
-                        <TableHead>
-                            <TableRow sx={{ backgroundColor: "gray", color: "white" }}>
-                            
-                                <TableCell><b>Name</b></TableCell>
-                                <TableCell><b>Format</b></TableCell>
-                                <TableCell><b>Actions</b></TableCell>
-                                 
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
-                                <TableCell colSpan={2}>
-                                    <Typography variant="h6">BUNDLE: ORIGINAL</Typography>
-                                </TableCell>
-                                <TableCell>
-                                <Box sx={{ display: 'flex', gap: 1 }}>
-                                            <IconButton
-                                                color="primary"
-                                                onClick={() => Navigate(`/add-bitstream/${itemId}`)}
-                                                title="View"
-                                                size="small"
-                                            >
-                                                <GetAppRoundedIcon />
-                                            </IconButton>
-                                        </Box>
-                                </TableCell>
-                            </TableRow>
-                        </TableBody>
+                    <TableHead>
+                        <TableRow sx={{ backgroundColor: "gray", color: "white" }}>
 
-                        <TableBody>
-                            {originalBitstreams.map((bitstream) => (
-                                
-                                <TableRow key={bitstream.uuid}>
-                                    
-                                    <TableCell>
-                                        <Typography variant="body2">
-                                            {bitstream.name}
-                                        </Typography>
-                                    </TableCell>
-                                    <TableCell></TableCell>
-                                        
-                                    <TableCell>
-                                        <Box sx={{ display: 'flex', gap: 1 }}>
-                                            <IconButton
-                                                color="primary"
-                                                onClick={() => window.open(bitstream._links.content.href, "_blank")}
-                                                title="View"
-                                                size="small"
-                                            >
-                                                <DownloadRoundedIcon />
-                                            </IconButton>
-                                        </Box>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                        </Table>
+                            <TableCell><b>Name</b></TableCell>
+                            <TableCell><b>Format</b></TableCell>
+                            <TableCell><b>Actions</b></TableCell>
+
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
+                            <TableCell colSpan={2}>
+                                <Typography variant="h6">BUNDLE: ORIGINAL</Typography>
+                            </TableCell>
+                            <TableCell>
+                                <Box sx={{ display: 'flex', gap: 1 }}>
+                                    <IconButton
+                                        color="primary"
+                                        onClick={() => Navigate(`/add-bitstream/${itemId}`)}
+                                        title="View"
+                                        size="small"
+                                    >
+                                        <AddIcon sx={{ color: "green",fontWeight: "bold" }}/>
+                                    </IconButton>
+                                </Box>
+                            </TableCell>
+                        </TableRow>
+                    </TableBody>
+
+                    <TableBody>
+                        {originalBitstreams.map((bitstream) => (
+
+                            <TableRow key={bitstream.uuid}>
+
+                                <TableCell>
+                                    <Typography variant="body2">
+                                        {bitstream.name}
+                                    </Typography>
+                                </TableCell>
+                                <TableCell></TableCell>
+
+                                <TableCell>
+                                    <Box sx={{ display: 'flex', gap: 1 }}>
+                                        <IconButton
+                                            color="primary"
+                                            onClick={() => window.open(bitstream._links.content.href, "_blank")}
+                                            title="View"
+                                            size="small"
+                                        >
+                                            <DownloadRoundedIcon />
+                                        </IconButton>
+                                        <IconButton
+                                            color="error"
+                                            onClick={() => handleDeleteBitstream(bitstream.uuid)}
+                                            title="Delete"
+                                            size="small"
+                                        >
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    </Box>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
             </Container>
         </Container>
 
