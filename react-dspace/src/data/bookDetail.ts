@@ -18,12 +18,10 @@ export interface MetadataEntry {
         [key: string]: MetadataEntry[] | undefined;
     };
   }
-  interface MetadataValue {
-    value: string;
-  }
+  
   
   interface Metadata {
-    [key: string]: MetadataValue[];
+    [key: string]: {value: string}[];
   }
   export interface Bundle {
     uuid: string;
@@ -55,4 +53,16 @@ export interface MetadataEntry {
     _embedded: {
         bitstreams: Bitstream[];
     };
+  }
+
+ export interface BitstreamUploadResponse {
+    uuid: string;
+    name: string;
+  } 
+
+  export interface PatchOperation {
+    op: 'replace' | 'remove' ;
+    path: string;
+    value?: any; 
+    from?: string; 
   }

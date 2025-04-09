@@ -15,7 +15,7 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { useNavigate } from "react-router-dom";
 import { showToast } from "../../contexts/ToastProvider";
 import { useParams } from "react-router-dom";
-import { fetchItemBundles, postBitstream } from "../../api/searchApi";
+import { fetchItemBundles, postBitstream } from "../../api/bitstream";
 
 interface Bundle {
   uuid: string;
@@ -72,7 +72,7 @@ const AddBitstream: React.FC = () => {
     try {
       const response = await postBitstream(selectedBundle, selectedFile);
       showToast("Bitstream uploaded successfully!", "success");
-      navigate(`/edit-bitstream/${response.uuid}/${itemId}`); 
+      navigate(`/edit-item/${itemId}`); 
     } catch (error) {
       showToast("Upload failed. Please try again.", "error");
       console.error("Upload error:", error);

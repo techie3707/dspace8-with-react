@@ -5,9 +5,8 @@ import {
     fetchHasFileCounts,
     parseSearchParamsFromUrl,
     updateUrlWithSearchParams,
-    fetchItemBundles,
-    fetchBitstreams
 } from '../../api/searchApi';
+import {  fetchItemBundles, fetchBitstreams} from '../../api/bitstream';
 import './Search.css';
 import PaginationComponent from '../../components/Pagination/PaginationComponent';
 import YearRangeSlider from '../Search/YearRangeSlider';

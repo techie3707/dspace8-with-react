@@ -1,13 +1,14 @@
 import axios from "axios";
 import { siteConfig } from "../data/data";
 import { showToast } from "../contexts/ToastProvider";
-import { ItemInfo } from "../pages/Item/editItem";
+import { ItemInfo } from "../data/itemFormData";
+import { BookDetailsData } from "../data/bookDetail";
+import { PatchOperation } from "../data/itemFormData";
 
-// const authToken = localStorage.getItem("authToken") || "";
-// const csrfToken = localStorage.getItem("csrfToken") || "";
+const authToken = localStorage.getItem("authToken") || "";
+const csrfToken = localStorage.getItem("csrfToken") || "";
 
-const authToken = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJlaWQiOiI4MmRkN2MzNC01OGQyLTQyNWUtYTVmNS04ZTA1ZmYwN2QxNmEiLCJzZyI6W10sImF1dGhlbnRpY2F0aW9uTWV0aG9kIjoicGFzc3dvcmQiLCJleHAiOjE3NDQxMjgzOTN9.VVFGe31tGA1ubKHKMshjKsnieqflbcOt3zCLVOG6caU";
-const csrfToken = "08d69977-d171-4525-83f2-31768f0418d8";
+
 
 export const createItem = async (
     collectionId: string,
@@ -92,11 +93,7 @@ export const fetchItemInfo = async (itemId: string) => {
 
 
 
-interface PatchOperation {
-  op: 'add' | 'remove' | 'replace' ;
-  path: string;
-  value?: any;
-}
+
 
 export const patchItemMetadata = async (itemId: string, patchOperations: PatchOperation[]) => {
   try {
@@ -131,3 +128,9 @@ export const patchItemMetadata = async (itemId: string, patchOperations: PatchOp
     throw error;
   }
 };
+
+export const fetchItemDetails = async (id: string): Promise<BookDetailsData> => {
+    const response = await axios.get<BookDetailsData>(`${siteConfig.apiEndpoint}/api/core/items/${id}?embed=thumbnail&embed=accessStatus`);
+    return response.data;
+  };
+
