@@ -82,6 +82,7 @@ const BookDetails: React.FC = () => {
                     <div className='col-lg-4 col-md-12 col-12 text-center mb-3'>
                         {thumbnailBitstreams
                             .filter(bitstream => /\.(jpe?g|png)$/i.test(bitstream.name))
+                            .slice(0, 1)
                             .map(bitstream => (
                                 <img
                                     key={bitstream.uuid}

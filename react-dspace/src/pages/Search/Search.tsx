@@ -438,6 +438,7 @@ const Search: React.FC = () => {
                                             <div style={{ display: 'flex', alignItems: 'center', padding: '10px', border: '1px solid #ddd', borderRadius: '6px' }}>
                                                 {thumbnailBitstreams
                                                     .filter(bitstream => /\.(jpe?g|png)$/i.test(bitstream.name))
+                                                    .slice(0, 1)
                                                     .map(bitstream => (
                                                         <img
                                                             key={bitstream.uuid}
@@ -527,6 +528,7 @@ const Search: React.FC = () => {
                                                 <div style={{ display: 'flex', justifyContent: 'center', margin: '10px 0' }}>
                                                     {thumbnailBitstreams
                                                         .filter(bitstream => /\.(jpe?g|png)$/i.test(bitstream.name))
+                                                        .slice(0, 1)
                                                         .map(bitstream => (
                                                             <img
                                                                 key={bitstream.uuid}
