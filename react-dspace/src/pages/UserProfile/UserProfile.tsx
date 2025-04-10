@@ -1,17 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Button,
-  TextField,
-  CircularProgress,
   Box,
+  Paper,
+  Typography,
+  Avatar,
+  TextField,
+  Button,
+  CircularProgress,
 } from '@mui/material';
+import { Person, Email, Visibility } from '@mui/icons-material';
 import { getUserById } from '../../api/usermanagement';
 
 type UserProfileProps = {
@@ -49,13 +46,11 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId }) => {
     try {
       const authToken = localStorage.getItem('authToken') || '';
       const user = await getUserById(id, authToken);
-
       const userDetails: UserDetails = {
         firstName: user.metadata?.['eperson.firstname']?.[0]?.value || '',
         lastName: user.metadata?.['eperson.lastname']?.[0]?.value || '',
         email: user.email || '',
       };
-
       setUserData(userDetails);
       setOriginalData(userDetails);
     } catch (error) {
@@ -80,7 +75,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId }) => {
   };
 
   const handleResetPassword = () => {
-    alert("Reset password functionality goes here.");
+    alert('Reset password functionality goes here.');
   };
 
   if (loading) {
@@ -92,83 +87,134 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId }) => {
   }
 
   return (
-    <TableContainer component={Paper} sx={{ maxWidth: 700, mx: 'auto', mt: 4 }}>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>Field</TableCell>
-            <TableCell>Value</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          <TableRow>
-            <TableCell>First Name</TableCell>
-            <TableCell>
-              {isEditing ? (
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  value={userData.firstName}
-                  onChange={(e) => handleChange('firstName', e.target.value)}
-                />
-              ) : (
-                userData.firstName
-              )}
-            </TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell>Last Name</TableCell>
-            <TableCell>
-              {isEditing ? (
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  value={userData.lastName}
-                  onChange={(e) => handleChange('lastName', e.target.value)}
-                />
-              ) : (
-                userData.lastName
-              )}
-            </TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell>Email</TableCell>
-            <TableCell>
-              {isEditing ? (
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  value={userData.email}
-                  onChange={(e) => handleChange('email', e.target.value)}
-                />
-              ) : (
-                userData.email
-              )}
-            </TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
-
-      <Box display="flex" justifyContent="space-between" p={2}>
-        <Button variant="outlined" color="error" onClick={handleResetPassword}>
-          Reset Password
-        </Button>
-        {isEditing ? (
-          <Box>
-            <Button variant="contained" color="primary" onClick={handleSave} sx={{ mr: 1 }}>
-              Save
-            </Button>
-            <Button variant="outlined" onClick={handleCancel}>
-              Cancel
-            </Button>
-          </Box>
-        ) : (
-          <Button variant="contained" onClick={() => setIsEditing(true)}>
-            Edit
-          </Button>
-        )}
+    <Paper
+      sx={{
+        maxWidth: 400,
+        mx: 'auto',
+        mt: 6,
+        borderRadius: 4,
+        overflow: 'hidden',
+      }}
+    >
+      {/* Gradient Header */}
+      <Box
+        sx={{
+          background: 'linear-gradient(135deg, #6e00ff, #b72eff)',
+          textAlign: 'center',
+          p: 3,
+        }}
+      >
+        <Typography variant="h6" color="white">
+          {userData.firstName} {userData.lastName}
+        </Typography>
+        <Avatar
+          sx={{
+            mx: 'auto',
+            mt: 2,
+            width: 64,
+            height: 64,
+            bgcolor: 'white',
+            color: '#6e00ff',
+          }}
+        >
+          <Person />
+        </Avatar>
       </Box>
-    </TableContainer>
+
+      {/* Profile Info */}
+      <Box p={3}>
+        {[
+          {
+            icon: <Person color="primary" />,
+            label: 'First Name',
+            value: userData.firstName,
+            key: 'firstName',
+          },
+          {
+            icon: <Person color="primary" />,
+            label: 'Last Name',
+            value: userData.lastName,
+            key: 'lastName',
+          },
+          {
+            icon: <Email color="primary" />,
+            label: 'Email',
+            value: userData.email,
+            key: 'email',
+          },
+          {
+            icon: <Visibility color="primary" />,
+            label: 'Password',
+            value: '********',
+            key: 'password',
+            disabled: true,
+          },
+        ].map(({ icon, label, value, key, disabled }) => (
+          <Box key={key} display="flex" alignItems="center" mb={2}>
+            <Box mr={2}>{icon}</Box>
+            {isEditing && key !== 'password' ? (
+              <TextField
+                label={label}
+                value={userData[key as keyof UserDetails]}
+                onChange={(e) => handleChange(key as keyof UserDetails, e.target.value)}
+                variant="standard"
+                fullWidth
+              />
+            ) : (
+              <Typography>{value}</Typography>
+            )}
+          </Box>
+        ))}
+
+        {/* Buttons */}
+        <Box mt={4} textAlign="center">
+          <Button
+            onClick={handleResetPassword}
+            variant="outlined"
+            color="error"
+            sx={{ textTransform: 'none', borderRadius: 3, mb: 2 }}
+          >
+            Reset Password
+          </Button>
+          <br />
+          {isEditing ? (
+            <>
+              <Button
+                variant="contained"
+                onClick={handleSave}
+                sx={{
+                  mr: 2,
+                  borderRadius: 3,
+                  textTransform: 'none',
+                  background: 'linear-gradient(135deg, #6e00ff, #b72eff)',
+                }}
+              >
+                Save
+              </Button>
+              <Button
+                variant="outlined"
+                onClick={handleCancel}
+                sx={{ borderRadius: 3, textTransform: 'none' }}
+              >
+                Cancel
+              </Button>
+            </>
+          ) : (
+            <Button
+              variant="contained"
+              onClick={() => setIsEditing(true)}
+              sx={{
+                borderRadius: 3,
+                textTransform: 'none',
+                background: 'linear-gradient(135deg, #6e00ff, #b72eff)',
+              }}
+            >
+              Edit Profile
+            </Button>
+          )}
+        </Box>
+      </Box>
+    </Paper>
   );
 };
 

@@ -74,15 +74,24 @@ const BatchImport: React.FC = () => {
       </Typography>
 
       <FormControl fullWidth sx={{ marginBottom: 2 }}>
-        <InputLabel>Select Collection</InputLabel>
-        <Select value={selectedCollection} onChange={handleCollectionChange}>
-          {collections.map((collection) => (
-            <MenuItem key={collection.id} value={collection.id}>
-              {collection.name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+  <Select
+    value={selectedCollection}
+    onChange={handleCollectionChange}
+    displayEmpty
+    renderValue={
+      selectedCollection !== '' 
+        ? () => collections.find(col => col.id === selectedCollection)?.name 
+        : () => <span style={{ color: '#aaa' }}>Select Collection</span>
+    }
+  >
+    {collections.map((collection) => (
+      <MenuItem key={collection.id} value={collection.id}>
+        {collection.name}
+      </MenuItem>
+    ))}
+  </Select>
+</FormControl>
+
 
       <input type="file" accept=".zip" style={{ display: "none" }} id="file-upload" onChange={handleFileChange} />
       <label htmlFor="file-upload" className="b_import_label">
