@@ -26,6 +26,8 @@ interface UserListResponse {
       number: number;
   };
 }
+const csrfToken = localStorage.getItem("csrfToken");
+const authToken = localStorage.getItem("authToken");
 
 
 export const userList = async (page: number = 0, size: number = 10, query: string = "") => {
@@ -56,10 +58,9 @@ export const userList = async (page: number = 0, size: number = 10, query: strin
 
 
 export const removeUser = async (userId: string) => {
-  const authToken = localStorage.getItem("authToken");
 
   try {
-    const csrfToken = localStorage.getItem("csrfToken");
+   
     if (!csrfToken) {
       showToast("CSRF token is missing. Aborting delete request.", "error");
       return false;
@@ -88,7 +89,6 @@ export const removeUser = async (userId: string) => {
 
 export const addUser = async (userData: object) => {
   try {
-    const authToken = localStorage.getItem("authToken");
     const csrfToken = await fetchCsrfToken();
 
     const response = await axios.post(
@@ -181,6 +181,7 @@ export const updateUser = async (userId: string, userData: Record<string, any>, 
     throw error;
   }
 };
+
 
 
 

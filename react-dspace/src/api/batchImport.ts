@@ -1,13 +1,16 @@
 import axios from "axios";
 import { siteConfig } from "../data/data";
-import { showToast } from "../contexts/ToastProvider";
+
+
+
+const authToken = localStorage.getItem("authToken") || "";
+const csrfToken = localStorage.getItem("csrfToken") || "";
 
 export const uploadBatchImport = async (
   selectedCollection: string,
   selectedFile: File
 ): Promise<Awaited<ReturnType<typeof axios.post>>> => {
-  const authToken = localStorage.getItem("authToken") || "";
-  const csrfToken = localStorage.getItem("csrfToken") || "";
+
 
   try {
     const formData = new FormData();

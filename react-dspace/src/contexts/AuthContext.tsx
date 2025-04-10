@@ -1,32 +1,52 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { login as authLogin } from "../api/authApi";
+import { login as authLogin, getAuthStatus } from "../api/authApi";
 import { showToast } from "./ToastProvider";
+import { fetchUserGroupsList } from "../api/accessManagement";
 
 interface AuthContextType {
     isAuthenticated: boolean;
+    isAdmin?: boolean; 
     login: (email: string, password: string) => Promise<void>;
     logout: () => void;
-    loading: boolean; // Add loading state
+    loading: boolean;
 }
+
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-    const [loading, setLoading] = useState<boolean>(true); // Loading state to prevent redirect before checking auth
-    const csrfToken = localStorage.getItem("csrfToken") || "";
+    const [loading, setLoading] = useState<boolean>(true); 
+    const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
     useEffect(() => {
-        const authToken = localStorage.getItem("authToken");
-
-        if (authToken && !isTokenExpired(authToken)) {
+        const checkAuth = async () => {
+          const authToken = localStorage.getItem("authToken");
+      
+          if (authToken && !isTokenExpired(authToken)) {
             setIsAuthenticated(true);
-        } else {
+      
+            const userId = await getAuthStatus();
+            if (userId) {
+              const groupsData = await fetchUserGroupsList(userId);
+              const adminGroup = groupsData.groups?.some(
+                (group: any) => group.name === "Administrator"
+              );
+              setIsAdmin(!!adminGroup);
+            }
+          } else {
             localStorage.removeItem("authToken");
             setIsAuthenticated(false);
-        }
-        setLoading(false); // Set loading to false after checking
-    }, []);
+            setIsAdmin(false);
+          }
+      
+          setLoading(false);
+        };
+      
+        checkAuth();
+      }, []);
+      
+      
 
     const login = async (email: string, password: string) => {
         try {

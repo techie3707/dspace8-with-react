@@ -74,7 +74,6 @@ const ContentTop: React.FC = () => {
       const rawFirstName = user.metadata?.["eperson.firstname"]?.[0]?.value || "";
       const fName = toCamelCase(rawFirstName);
       setFirstName(fName);
-      console.log("First Name:", fName);
     } catch (error) {
       console.error("Failed to fetch user data:", error);
     }

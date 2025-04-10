@@ -1,15 +1,17 @@
 import { useEffect, useState, useContext, useRef } from "react";
 import { iconsImgs, personsImgs } from "../../utils/images";
-import { navigationLinks as staticNavigationLinks, generateNavigationLinks, NavigationLink } from "../../data/data";
+import { getNavigationLinks, generateNavigationLinks, NavigationLink } from "../../data/data";
 import { SidebarContext } from "../../contexts/sidebarContext";
 import { useNavigate } from "react-router-dom";
 import { FaChevronDown, FaChevronRight, FaTimes } from "react-icons/fa";
 import "./Sidebar.css";
 import { fetchCollections } from "../../api/collection";
 import { showToast } from "../../contexts/ToastProvider";
+import { useAuth } from "../../contexts/AuthContext";
 
 const Sidebar: React.FC = () => {
-  const [navigationLinks, setNavigationLinks] = useState<NavigationLink[]>(staticNavigationLinks);
+  const { isAdmin = false } = useAuth(); 
+  const [navigationLinks, setNavigationLinks] = useState<NavigationLink[]>(getNavigationLinks(isAdmin));
   const [activeLinkIdx, setActiveLinkIdx] = useState<number | null>(1);
   const [openSubMenuIdx, setOpenSubMenuIdx] = useState<number | null>(null);
   const context = useContext(SidebarContext);
@@ -54,7 +56,7 @@ const Sidebar: React.FC = () => {
         const collections = await fetchCollections();
         const dynamicLinks = generateNavigationLinks(collections);
   
-        setNavigationLinks([...staticNavigationLinks, ...dynamicLinks]);
+        setNavigationLinks([...getNavigationLinks(isAdmin), ...dynamicLinks]);
       } catch (error) {
         showToast("Failed to load collections", "error");
       }
