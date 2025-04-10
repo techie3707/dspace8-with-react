@@ -34,20 +34,87 @@ const CreateCollection = () => {
     }
 }
     return (
-        <Paper elevation={3} sx={{ padding: 3, maxWidth: 400, margin: "auto", marginTop: 5 }}>
-            <ToastContainer />
-            <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Typography variant="h5">{`Create a Collection for Community ${titleText}`}</Typography>
-            </Box>
-            {loading && <Loader />}
-            <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
-                <TextField label="Title" fullWidth value={title} onChange={(e) => setTitle(e.target.value)} required sx={{ mb: 2 }} />
-                <TextField label="Description" fullWidth value={description} onChange={(e) => setDescription(e.target.value)} required sx={{ mb: 2 }} />
-                <Button type="submit" variant="contained" color="primary" fullWidth disabled={!isFormValid}>
-                    Submit
-                </Button>
-            </Box>
-        </Paper>
+        <Paper
+  elevation={3}
+  sx={{
+    p: 4,
+    maxWidth: 600,
+    mx: "auto",
+    mt: 8,
+    borderRadius: 4,
+    backgroundColor: "#fdfdfd",
+    boxShadow: "0 6px 20px rgba(0, 0, 0, 0.1)",
+  }}
+>
+  <ToastContainer />
+  <Box
+    display="flex"
+    justifyContent="center"
+    alignItems="center"
+    mb={2}
+  >
+    <Typography variant="h5" fontWeight="bold" color="primary">
+      {`Create a Collection for Community ${titleText}`}
+    </Typography>
+  </Box>
+
+  {loading && <Loader />}
+
+  <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
+    <TextField
+      label="Title"
+      fullWidth
+      value={title}
+      onChange={(e) => setTitle(e.target.value)}
+      required
+      sx={{
+        mb: 3,
+        "& .MuiOutlinedInput-root": {
+          borderRadius: 2,
+          backgroundColor: "#fff",
+        },
+      }}
+    />
+    <TextField
+      label="Description"
+      fullWidth
+      value={description}
+      onChange={(e) => setDescription(e.target.value)}
+      required
+      multiline
+      rows={4}
+      sx={{
+        mb: 3,
+        "& .MuiOutlinedInput-root": {
+          borderRadius: 2,
+          backgroundColor: "#fff",
+        },
+      }}
+    />
+    <Button
+      type="submit"
+      variant="contained"
+      color="primary"
+      fullWidth
+      disabled={!isFormValid}
+      sx={{
+        py: 1.5,
+        borderRadius: 2,
+        fontWeight: "bold",
+        textTransform: "none",
+        fontSize: "1rem",
+        transition: "all 0.3s ease",
+        boxShadow: "0 3px 10px rgba(0,0,0,0.08)",
+        "&:hover": {
+          boxShadow: "0 5px 20px rgba(0,0,0,0.15)",
+          backgroundColor: "primary.dark",
+        },
+      }}
+    >
+      Submit
+    </Button>
+  </Box>
+</Paper>
     );
 
 }

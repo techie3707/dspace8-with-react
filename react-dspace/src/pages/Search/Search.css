@@ -348,6 +348,19 @@
         font-size: 20px;
     }
  }
+ @media (min-width: 1024px){
+    .dropdown-container{
+        width: 93% !important;
+    }
+    .filter_reset_btn{
+        position: relative;
+        width: 90% !important;
+    }
+ }
+ .filter_reset_btn{
+    position: relative;
+    right: 6px;
+ }
 
  @media (max-width: 2560px) {
     .results-grid {
