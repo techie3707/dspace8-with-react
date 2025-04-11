@@ -6,7 +6,7 @@ import {
     parseSearchParamsFromUrl,
     updateUrlWithSearchParams,
 } from '../../api/searchApi';
-import {  fetchItemBundles, fetchBitstreams} from '../../api/bitstream';
+import { fetchItemBundles, fetchBitstreams } from '../../api/bitstream';
 import './Search.css';
 import PaginationComponent from '../../components/Pagination/PaginationComponent';
 import YearRangeSlider from '../Search/YearRangeSlider';
@@ -54,6 +54,8 @@ const Search: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [originalBitstreams, setOriginalBitstreams] = useState<Bitstream[]>([]);
     const [thumbnailBitstreams, setThumbnailBitstreams] = useState<Bitstream[]>([]);
+    const [thumbnailsByItem, setThumbnailsByItem] = useState<Record<string, Bitstream[]>>({});
+
 
     const navigate = useNavigate();
 
@@ -157,9 +159,8 @@ const Search: React.FC = () => {
     useEffect(() => {
         const fetchThumbnails = async () => {
             try {
-                setIsLoading(true);
                 if (searchResults.length > 0) {
-                    const thumbnails: { [uuid: string]: string } = {};
+                    const thumbnails: Record<string, Bitstream[]> = {};
 
                     for (const result of searchResults) {
                         const uuid = result._embedded?.indexableObject?.uuid;
@@ -173,15 +174,14 @@ const Search: React.FC = () => {
                             const thumbnailbitstreamsData = await fetchBitstreams(thumbnailBundle.uuid);
                             setOriginalBitstreams(originalbitstreamsData);
                             setThumbnailBitstreams(thumbnailbitstreamsData);
+                            thumbnails[uuid] = thumbnailbitstreamsData
                         }
                     }
-
+                    setThumbnailsByItem(thumbnails);
                 }
             } catch (error) {
                 console.error(error);
-            } finally {
-                setIsLoading(false);
-            }
+            }  
         };
 
         fetchThumbnails();
@@ -436,8 +436,8 @@ const Search: React.FC = () => {
                                     return (
                                         <Grid item xs={12} key={index}>
                                             <div style={{ display: 'flex', alignItems: 'center', padding: '10px', border: '1px solid #ddd', borderRadius: '6px' }}>
-                                                {thumbnailBitstreams
-                                                    .filter(bitstream => /\.(jpe?g|png)$/i.test(bitstream.name))
+                                                {thumbnailsByItem[result._embedded?.indexableObject?.uuid]
+                                                    ?.filter(bitstream => /\.(jpe?g|png)$/i.test(bitstream.name))
                                                     .slice(0, 1)
                                                     .map(bitstream => (
                                                         <img
@@ -526,8 +526,8 @@ const Search: React.FC = () => {
 
                                                 {/* Thumbnail */}
                                                 <div style={{ display: 'flex', justifyContent: 'center', margin: '10px 0' }}>
-                                                    {thumbnailBitstreams
-                                                        .filter(bitstream => /\.(jpe?g|png)$/i.test(bitstream.name))
+                                                    {thumbnailsByItem[result._embedded?.indexableObject?.uuid]
+                                                        ?.filter(bitstream => /\.(jpe?g|png)$/i.test(bitstream.name))
                                                         .slice(0, 1)
                                                         .map(bitstream => (
                                                             <img
@@ -535,6 +535,7 @@ const Search: React.FC = () => {
                                                                 className='thumbnail-img img-fluid'
                                                                 src={`${siteConfig.apiEndpoint}/api/core/bitstreams/${bitstream.uuid}/content`}
                                                                 alt='Thumbnail'
+                                                                style={{ marginRight: '16px', maxHeight: '100px' }}
                                                             />
                                                         ))}
                                                 </div>
