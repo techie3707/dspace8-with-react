@@ -8,7 +8,7 @@ import {
   Button,
   CircularProgress,
 } from '@mui/material';
-import { Person, Email, Visibility } from '@mui/icons-material';
+import { Person, Email } from '@mui/icons-material';
 import { getUserById } from '../../api/usermanagement';
 
 type UserProfileProps = {
@@ -89,11 +89,14 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId }) => {
   return (
     <Paper
       sx={{
-        maxWidth: 400,
+        width: '100%',
+        maxWidth: '500px',
+        minHeight: 430,
         mx: 'auto',
         mt: 6,
         borderRadius: 4,
         overflow: 'hidden',
+        position: 'relative',
       }}
     >
       {/* Gradient Header */}
@@ -102,27 +105,47 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId }) => {
           background: 'linear-gradient(135deg, #6e00ff, #b72eff)',
           textAlign: 'center',
           p: 3,
+          position: 'relative',
         }}
       >
-        <Typography variant="h6" color="white">
-          {userData.firstName} {userData.lastName}
-        </Typography>
+        {/* Edit Button at Top Right */}
+        {!isEditing && (
+          <Button
+            variant="contained"
+            onClick={() => setIsEditing(true)}
+            sx={{
+              position: 'absolute',
+              top: 16,
+              right: 16,
+              borderRadius: 3,
+              textTransform: 'none',
+              background: 'linear-gradient(135deg, #6e00ff, #b72eff)',
+              boxShadow: 'none',
+            }}
+          >
+            Edit Profile
+          </Button>
+        )}
+
         <Avatar
           sx={{
             mx: 'auto',
             mt: 2,
-            width: 64,
-            height: 64,
+            width: 72,
+            height: 72,
             bgcolor: 'white',
             color: '#6e00ff',
           }}
         >
           <Person />
         </Avatar>
+        <Typography className="profile_header" variant="h5" color="white">
+          {userData.firstName} {userData.lastName}
+        </Typography>
       </Box>
 
       {/* Profile Info */}
-      <Box p={3}>
+      <Box p={4}>
         {[
           {
             icon: <Person color="primary" />,
@@ -142,17 +165,10 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId }) => {
             value: userData.email,
             key: 'email',
           },
-          {
-            icon: <Visibility color="primary" />,
-            label: 'Password',
-            value: '********',
-            key: 'password',
-            disabled: true,
-          },
-        ].map(({ icon, label, value, key, disabled }) => (
-          <Box key={key} display="flex" alignItems="center" mb={2}>
+        ].map(({ icon, label, value, key }) => (
+          <Box key={key} display="flex" alignItems="center" mb={3}>
             <Box mr={2}>{icon}</Box>
-            {isEditing && key !== 'password' ? (
+            {isEditing ? (
               <TextField
                 label={label}
                 value={userData[key as keyof UserDetails]}
@@ -167,7 +183,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId }) => {
         ))}
 
         {/* Buttons */}
-        <Box mt={4} textAlign="center">
+        <Box mt={5} textAlign="center">
           <Button
             onClick={handleResetPassword}
             variant="outlined"
@@ -177,7 +193,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId }) => {
             Reset Password
           </Button>
           <br />
-          {isEditing ? (
+          {isEditing && (
             <>
               <Button
                 variant="contained"
@@ -199,18 +215,6 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId }) => {
                 Cancel
               </Button>
             </>
-          ) : (
-            <Button
-              variant="contained"
-              onClick={() => setIsEditing(true)}
-              sx={{
-                borderRadius: 3,
-                textTransform: 'none',
-                background: 'linear-gradient(135deg, #6e00ff, #b72eff)',
-              }}
-            >
-              Edit Profile
-            </Button>
           )}
         </Box>
       </Box>
