@@ -85,16 +85,17 @@ const SelectCommunity: React.FC = () => {
             />
             <div className="list-container">
                 {communities.map((community, index) => (
-                    <div key={index} className="option-items">
-                        <div
-                            className="option-item"
-                            onClick={() => {
-                                navigate(`/create-collection/${community.id}/${getMetadataValue(community.metadata, 'dc.title')}`);
-                            }}
-                        >
-                            {getMetadataValue(community.metadata, 'dc.title')}
-                        </div>
-                    </div>
+                   <div
+                   key={index}
+                   className="option-items cursor-pointer"
+                   onClick={() => {
+                     navigate(`/create-collection/${community.id}/${getMetadataValue(community.metadata, 'dc.title')}`);
+                   }}
+                 >
+                   <div className="option-item">
+                     {getMetadataValue(community.metadata, 'dc.title')}
+                   </div>
+                 </div>
                 ))}
             </div>
             <div className="pagination-container">

@@ -42,7 +42,7 @@ const TopCommunity = () => {
 >
   <ToastContainer />
   <Box display="flex" justifyContent="center" alignItems="center" mb={2}>
-    <Typography variant="h5" fontWeight="bold" color="primary">
+    <Typography variant="h5" fontWeight="bold" color="secondary">
       Create a Community
     </Typography>
   </Box>

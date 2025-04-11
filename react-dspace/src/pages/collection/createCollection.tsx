@@ -53,7 +53,7 @@ const CreateCollection = () => {
     alignItems="center"
     mb={2}
   >
-    <Typography variant="h5" fontWeight="bold" color="primary">
+    <Typography variant="h5" fontWeight="bold" color="secondary">
       {`Create a Collection for Community ${titleText}`}
     </Typography>
   </Box>
@@ -94,7 +94,7 @@ const CreateCollection = () => {
     <Button
       type="submit"
       variant="contained"
-      color="primary"
+      color="secondary"
       fullWidth
       disabled={!isFormValid}
       sx={{
