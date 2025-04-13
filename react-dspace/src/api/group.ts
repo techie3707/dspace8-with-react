@@ -184,7 +184,7 @@ export const addMemberToGroup = async (groupId: string, epersonId: string) => {
                 withCredentials: true,
             }
         );
-        if (response.status === 201) {
+        if (response.status === 204) {
             showToast("Member added to group successfully!", "success");
         } else {
             showToast("Failed to add member to group.", "error");

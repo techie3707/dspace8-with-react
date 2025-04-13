@@ -5,7 +5,7 @@ import { fetchUserGroupsList } from "../api/accessManagement";
 
 interface AuthContextType {
     isAuthenticated: boolean;
-    isAdmin?: boolean; 
+    isAdmin?: boolean;
     login: (email: string, password: string) => Promise<void>;
     logout: () => void;
     loading: boolean;
@@ -16,37 +16,44 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-    const [loading, setLoading] = useState<boolean>(true); 
-    const [isAdmin, setIsAdmin] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
         const checkAuth = async () => {
-          const authToken = localStorage.getItem("authToken");
-      
-          if (authToken && !isTokenExpired(authToken)) {
-            setIsAuthenticated(true);
-      
-            const userId = await getAuthStatus();
-            if (userId) {
-              const groupsData = await fetchUserGroupsList(userId);
-              const adminGroup = groupsData.groups?.some(
-                (group: any) => group.name === "Administrator"
-              );
-              setIsAdmin(!!adminGroup);
+            const authToken = localStorage.getItem("authToken");
+
+            if (authToken && !isTokenExpired(authToken)) {
+                setIsAuthenticated(true);
+
+                const userId = await getAuthStatus();
+                if (userId) {
+                    const groupsData = await fetchUserGroupsList(userId);
+                    const adminGroup = groupsData.groups?.some(
+                        (group: any) => group.name === "Administrator"
+                    );
+                    setIsAdmin(!!adminGroup);
+                    localStorage.setItem("isAdmin", JSON.stringify(!!adminGroup));
+                }
+            } else {
+                localStorage.removeItem("authToken");
+                localStorage.removeItem("isAdmin");
+                setIsAuthenticated(false);
+                setIsAdmin(false);
             }
-          } else {
-            localStorage.removeItem("authToken");
-            setIsAuthenticated(false);
-            setIsAdmin(false);
-          }
-      
-          setLoading(false);
+
+            setLoading(false);
         };
-      
+
         checkAuth();
-      }, []);
-      
-      
+    }, []);
+
+    const [isAdmin, setIsAdmin] = useState<boolean>(() => {
+        const stored = localStorage.getItem("isAdmin");
+        return stored ? JSON.parse(stored) : false;
+    });
+
+
+
 
     const login = async (email: string, password: string) => {
         try {

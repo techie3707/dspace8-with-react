@@ -53,17 +53,13 @@ export const generateNavigationLinks = (
     }));
   };
   
-
-
-
-
   export const getNavigationLinks = (isAdmin: boolean): NavigationLink[] => [
     { id: 1, title: "Home", image: iconsImgs.home, path: "/" },
-   ...(isAdmin ? [{ id: 2, title: "User Management", image: iconsImgs.epople, path: "/UserManagement" }] : []),
+    { id: 2, title: "User Management", image: iconsImgs.epople, path: "/UserManagement" },
     { id: 3, title: "Metadata Schemas", image: iconsImgs.registries, path: "/metadataSchemas" },
-    ...(isAdmin ? [{ id: 4, title: "Groups", image: iconsImgs.group, path: "/groups" }] : []),
+    { id: 4, title: "Groups", image: iconsImgs.group, path: "/groups" },
     { id: 5, title: "Batch Import", image: iconsImgs.batchimport, path: "/batchImport" },
-    ...(isAdmin ? [{ id: 6, title: "Admin Search", image: iconsImgs.searchLight, path: "/adminSearch" }] : []),
+    { id: 6, title: "Admin Search", image: iconsImgs.searchLight, path: "/adminSearch" },
     { id: 7, title: "Create Community", image: iconsImgs.community, path: "/create-community" },
     { id: 8, title: "Create Collection", image: iconsImgs.collection, path: "/select-Community" },
   ];

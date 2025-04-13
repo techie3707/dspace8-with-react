@@ -156,6 +156,7 @@ export const logout = async () => {
 
     if (response.status === 204) {
       localStorage.removeItem("authToken");
+      localStorage.removeItem("isAdmin");
     }
   } catch (error) {
     showToast("Logout failed. Please try again.", "error");

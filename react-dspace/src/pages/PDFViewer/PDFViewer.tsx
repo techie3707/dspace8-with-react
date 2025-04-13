@@ -8,7 +8,33 @@ import { useSearchParams } from "react-router-dom";
 import { siteConfig } from "../../data/data";
 import "./PDFViewer.css";
 import Loader from "../loader/loader";
-import { Box, Paper } from "@mui/material";
+import {
+    Box,
+    Paper,
+    IconButton,
+    TextField,
+    Button,
+    Slide,
+    Typography
+} from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import CloseIcon from "@mui/icons-material/Close";
+
+const parsePages = (input: string): number[] => {
+    const pages: number[] = [];
+    const parts = input.split(',');
+    parts.forEach((part) => {
+        if (part.includes('-')) {
+            const [start, end] = part.split('-').map(Number);
+            for (let i = start; i <= end; i++) {
+                pages.push(i);
+            }
+        } else {
+            pages.push(Number(part));
+        }
+    });
+    return pages;
+};
 
 const PDFViewer: React.FC = () => {
     const [pdfUrl, setPdfUrl] = useState<string | null>(null);
@@ -17,7 +43,17 @@ const PDFViewer: React.FC = () => {
     const [searchParams] = useSearchParams();
     const uuid = searchParams.get("uuid");
 
-    const defaultLayoutPluginInstance = defaultLayoutPlugin();
+    const [showForm, setShowForm] = useState(false);
+    const [pageInput, setPageInput] = useState("");
+
+    const defaultLayoutPluginInstance = defaultLayoutPlugin({
+        renderToolbar: (Toolbar) => (
+            <>
+                <Toolbar />
+                <OverlayControls />
+            </>
+        ),
+    });
 
     useEffect(() => {
         let pdfBlobUrl: string | null = null;
@@ -47,6 +83,61 @@ const PDFViewer: React.FC = () => {
         };
     }, [uuid]);
 
+    const OverlayControls = () => (
+        <Box
+            sx={{
+                position: "absolute",
+                top: 16,
+                right: 16,
+                zIndex: 9999,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-end",
+            }}
+        >
+            <IconButton
+                color="primary"
+                onClick={() => setShowForm(!showForm)}
+                sx={{ bgcolor: "white", boxShadow: 3 }}
+            >
+                {showForm ? <CloseIcon /> : <AddIcon />}
+            </IconButton>
+
+            <Slide direction="down" in={showForm} mountOnEnter unmountOnExit>
+                <Paper
+                    elevation={4}
+                    sx={{ mt: 1, width: 280, p: 2, bgcolor: "white" }}
+                >
+                    <Typography variant="subtitle1" gutterBottom>
+                        Enter Pages
+                    </Typography>
+                    <TextField
+                        fullWidth
+                        size="small"
+                        label="e.g. 1,2,5-8"
+                        variant="outlined"
+                        value={pageInput}
+                        onChange={(e) => setPageInput(e.target.value)}
+                        sx={{ mb: 2 }}
+                    />
+                    <Button
+                        fullWidth
+                        variant="contained"
+                        onClick={() => {
+                            const pages = parsePages(pageInput);
+                            console.log("Bitstream UUID:", uuid);
+                            console.log("Pages to add:", pages);
+                            setShowForm(false);
+                            setPageInput("");
+                        }}
+                    >
+                        Add to List
+                    </Button>
+                </Paper>
+            </Slide>
+        </Box>
+    );
+
     if (loading) return <Loader />;
     if (error) return <p style={{ color: "red" }}>{error}</p>;
 
@@ -67,10 +158,11 @@ const PDFViewer: React.FC = () => {
                     height: { xs: "80vh", md: "90vh" },
                     overflow: "hidden",
                     boxSizing: "border-box",
+                    position: "relative",
                 }}
             >
                 <Worker workerUrl="https://unpkg.com/pdfjs-dist@2.6.347/build/pdf.worker.min.js">
-                    <div style={{ height: "100%" }}>
+                    <Box sx={{ height: "100%", position: "relative" }}>
                         {pdfUrl && (
                             <Viewer
                                 fileUrl={pdfUrl}
@@ -78,7 +170,7 @@ const PDFViewer: React.FC = () => {
                                 defaultScale={1.0}
                             />
                         )}
-                    </div>
+                    </Box>
                 </Worker>
             </Paper>
         </Box>
