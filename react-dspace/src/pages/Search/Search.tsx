@@ -17,7 +17,8 @@ import {
     metadataFields,
     FilterSection,
     SearchParams,
-    FilterOption
+    FilterOption,
+    advancedSearchFields
 } from '../../data/searchData';
 import { useNavigate } from 'react-router-dom';
 import { Button, Grid, IconButton, TextField } from '@mui/material';
@@ -25,6 +26,13 @@ import { iconsImgs } from '../../utils/images';
 import { siteConfig } from '../../data/data';
 import { Bitstream } from '../../data/bookDetail';
 import Loader from '../loader/loader';
+
+
+interface AdvancedFilter {
+    field: string;
+    operator: string;
+    value: string;
+}
 
 const Search: React.FC = () => {
     const initialParams = parseSearchParamsFromUrl();
@@ -55,6 +63,12 @@ const Search: React.FC = () => {
     const [originalBitstreams, setOriginalBitstreams] = useState<Bitstream[]>([]);
     const [thumbnailBitstreams, setThumbnailBitstreams] = useState<Bitstream[]>([]);
     const [thumbnailsByItem, setThumbnailsByItem] = useState<Record<string, Bitstream[]>>({});
+    const [advancedFilters, setAdvancedFilters] = useState<AdvancedFilter[]>([]);
+    const [currentAdvancedFilter, setCurrentAdvancedFilter] = useState<AdvancedFilter>({
+        field: 'title',
+        operator: 'equals',
+        value: ''
+    });
 
 
     const navigate = useNavigate();
@@ -64,7 +78,10 @@ const Search: React.FC = () => {
         return option ? option.apiValue : 'score,DESC';
     };
 
-    const fetchAllFacets = async (currentFilters: Record<string, any> = filters) => {
+    const fetchAllFacets = async (
+        currentFilters: Record<string, any> = filters,
+        currentAdvancedFilters: AdvancedFilter[] = advancedFilters
+    ) => {
         try {
             const params: SearchParams = {
                 query: inputValue,
@@ -72,7 +89,8 @@ const Search: React.FC = () => {
                 size: 5,
                 filters: currentFilters,
                 sort: getSortParam(),
-                scope: scope
+                scope: scope,
+                advancedFilters: currentAdvancedFilters.length ? currentAdvancedFilters : undefined,
             };
 
             const [facetsResponse, hasFileResponse] = await Promise.all([
@@ -92,7 +110,8 @@ const Search: React.FC = () => {
         currentPage: number = page,
         itemsPerPage: number = size,
         resetPage: boolean = false,
-        sort: string = getSortParam()
+        sort: string = getSortParam(),
+        currentAdvancedFilters: AdvancedFilter[] = advancedFilters
     ) => {
         setIsLoading(true);
         try {
@@ -103,8 +122,9 @@ const Search: React.FC = () => {
                 size: itemsPerPage,
                 sort: sort,
                 filters: currentFilters,
+                advancedFilters: currentAdvancedFilters.length ? currentAdvancedFilters : undefined,
                 scope: scope
-            };
+            } as SearchParams;
 
             updateUrlWithSearchParams(params);
 
@@ -112,6 +132,7 @@ const Search: React.FC = () => {
 
             setSearchResults(data.results);
             setTotalData(data.totalElements);
+            setAdvancedFilters(currentAdvancedFilters);
 
             if (resetPage) {
                 setPage(1);
@@ -181,7 +202,7 @@ const Search: React.FC = () => {
                 }
             } catch (error) {
                 console.error(error);
-            }  
+            }
         };
 
         fetchThumbnails();
@@ -203,6 +224,7 @@ const Search: React.FC = () => {
     const resetFilters = () => {
         const newFilters = {};
         setFilters(newFilters);
+        setAdvancedFilters([]);
         handleSearch(newFilters, 1, size, true);
     };
 
@@ -212,6 +234,87 @@ const Search: React.FC = () => {
             [sectionId]: !prev[sectionId]
         }));
     };
+
+    const handleAddFilter = async () => {
+        if (currentAdvancedFilter.value.trim()) {
+            const newAdvancedFilters = [...advancedFilters, currentAdvancedFilter];
+            setAdvancedFilters(newAdvancedFilters);
+            setCurrentAdvancedFilter({
+                field: 'title',
+                operator: 'equals',
+                value: ''
+            });
+            
+            const params: SearchParams = {
+                query: inputValue,
+                page: 1 - 1, 
+                size: size,
+                sort: getSortParam(),
+                filters: filters,
+                advancedFilters: newAdvancedFilters,
+                scope: scope
+            };
+    
+            setIsLoading(true);
+            try {
+                updateUrlWithSearchParams(params);
+                const data = await searchObjects(params);
+                setSearchResults(data.results);
+                setTotalData(data.totalElements);
+                setPage(1);
+    
+                const [facetsResponse, hasFileResponse] = await Promise.all([
+                    fetchFacets(params),
+                    fetchHasFileCounts(params)
+                ]);
+                setFacets(facetsResponse);
+                setHasFileCounts(hasFileResponse);
+            } catch (error) {
+                console.error('Error:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+    };
+    
+
+    const handleRemoveAdvancedFilter = async (index: number) => {
+        const newAdvancedFilters = [...advancedFilters];
+        newAdvancedFilters.splice(index, 1);
+        setAdvancedFilters(newAdvancedFilters);
+        
+        const params: SearchParams = {
+            query: inputValue,
+            page: 0, 
+            size: size,
+            sort: getSortParam(),
+            filters: filters,
+            advancedFilters: newAdvancedFilters.length ? newAdvancedFilters : undefined,
+            scope: scope
+        };
+    
+        setIsLoading(true);
+        try {
+            updateUrlWithSearchParams(params);
+            const data = await searchObjects(params);
+            setSearchResults(data.results);
+            setTotalData(data.totalElements);
+            setPage(1);
+    
+            const [facetsResponse, hasFileResponse] = await Promise.all([
+                fetchFacets(params),
+                fetchHasFileCounts(params)
+            ]);
+            setFacets(facetsResponse);
+            setHasFileCounts(hasFileResponse);
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+
     const renderFilterSection = (section: FilterSection) => {
         switch (section.filterType) {
             case 'checkbox':
@@ -303,6 +406,88 @@ const Search: React.FC = () => {
                         >
                             Reset filters
                         </button>
+                    </div>
+                    <div className="advanced-search-container">
+                        <h3>Advanced Search</h3>
+                        {advancedFilters.length > 0 && (
+                            <div className="active-advanced-filters">
+                                {advancedFilters.map((filter, index) => {
+                                    const fieldConfig = advancedSearchFields.find(f => f.id === filter.field);
+                                    const operatorConfig = fieldConfig?.operators.find(o => o.apiValue === filter.operator);
+
+                                    return (
+                                        <div key={index} className="active-filter" style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            margin: '5px 0',
+                                            padding: '5px',
+                                            backgroundColor: '#f5f5f5',
+                                            borderRadius: '4px'
+                                        }}>
+                                            <span style={{ flex: 1 }}>
+                                                <strong>{fieldConfig?.label}</strong> {operatorConfig?.label} "{filter.value}"
+                                            </span>
+                                            <button
+                                                onClick={() => handleRemoveAdvancedFilter(index)}
+                                                style={{
+                                                    background: 'none',
+                                                    border: 'none',
+                                                    cursor: 'pointer',
+                                                    color: '#666',
+                                                    marginLeft: '10px'
+                                                }}
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+
+                        <div className="advanced-search-row">
+                            <select
+                                value={currentAdvancedFilter.field}
+                                onChange={(e) => setCurrentAdvancedFilter({
+                                    ...currentAdvancedFilter,
+                                    field: e.target.value
+                                })}
+                            >
+                                {advancedSearchFields.map(field => (
+                                    <option key={field.id} value={field.id}>{field.label}</option>
+                                ))}
+                            </select>
+
+                            <select
+                                value={currentAdvancedFilter.operator}
+                                onChange={(e) => setCurrentAdvancedFilter({
+                                    ...currentAdvancedFilter,
+                                    operator: e.target.value
+                                })}
+                            >
+                                {advancedSearchFields.find(f => f.id === currentAdvancedFilter.field)?.operators.map(op => (
+                                    <option key={op.id} value={op.apiValue}>{op.label}</option>
+                                ))}
+                            </select>
+
+                            <TextField
+                                value={currentAdvancedFilter.value}
+                                onChange={(e) => setCurrentAdvancedFilter({
+                                    ...currentAdvancedFilter,
+                                    value: e.target.value
+                                })}
+                                placeholder="Enter value"
+                                onKeyPress={(e) => {
+                                    if (e.key === 'Enter') {
+                                        handleAddFilter();
+                                    }
+                                }}
+                            />
+
+                            <Button variant="contained" onClick={handleAddFilter}>
+                                Add
+                            </Button>
+                        </div>
                     </div>
                     <div className="dropdown-container">
                         <h1>Setting</h1>
