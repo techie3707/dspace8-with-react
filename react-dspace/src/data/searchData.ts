@@ -1,5 +1,9 @@
 import { Bitstream } from "./bookDetail";
-
+export interface AdvancedFilter {
+  field: string;
+  operator: string;
+  value: string;
+}
 export interface SearchParams {
   query?: string;
   page?: number;
@@ -7,6 +11,7 @@ export interface SearchParams {
   sort?: string;
   scope?: string;
   filters?: SearchFilters;
+  advancedFilters?: AdvancedFilter[];
 }
 
 export interface FilterOption {
@@ -78,13 +83,6 @@ export const filterSections: FilterSection[] = [
     fieldName: 'author',
     filterType: 'checkbox'
   },
-  // { 
-  //     id: 'public', 
-  //     label: 'public', 
-  //     defaultExpanded: true, 
-  //     fieldName: 'public',
-  //     filterType: 'checkbox'
-  //   },
   { 
     id: 'subject', 
     label: 'Subject', 
@@ -143,3 +141,63 @@ export interface Bundle {
       bitstreams?: Bitstream[];
   };
 }
+
+export interface AdvancedSearchField {
+  id: string;
+  label: string;
+  fieldName: string;
+  operators: SearchOperator[];
+}
+
+export interface SearchOperator {
+  id: string;
+  label: string;
+  apiValue: string;
+}
+
+export const advancedSearchFields: AdvancedSearchField[] = [
+  {
+    id: 'title',
+    label: 'Title',
+    fieldName: 'title',
+    operators: [
+      { id: 'equals', label: 'Equals', apiValue: 'equals' },
+      { id: 'notEquals', label: 'Not Equals', apiValue: 'notequals' },
+      { id: 'contains', label: 'Contains', apiValue: 'contains' },
+      { id: 'notContains', label: 'Not Contains', apiValue: 'notcontains' }
+    ]
+  },
+  {
+    id: 'author',
+    label: 'Author',
+    fieldName: 'author',
+    operators: [
+      { id: 'equals', label: 'Equals', apiValue: 'equals' },
+      { id: 'notEquals', label: 'Not Equals', apiValue: 'notequals' },
+      { id: 'contains', label: 'Contains', apiValue: 'contains' },
+      { id: 'notContains', label: 'Not Contains', apiValue: 'notcontains' }
+    ]
+  },
+  {
+    id: 'subject',
+    label: 'Subject',
+    fieldName: 'subject',
+    operators: [
+      { id: 'equals', label: 'Equals', apiValue: 'equals' },
+      { id: 'notEquals', label: 'Not Equals', apiValue: 'notequals' },
+      { id: 'contains', label: 'Contains', apiValue: 'contains' },
+      { id: 'notContains', label: 'Not Contains', apiValue: 'notcontains' }
+    ]
+  },
+  {
+    id: 'itemType',
+    label: 'Item Type',
+    fieldName: 'entityType',
+    operators: [
+      { id: 'equals', label: 'Equals', apiValue: 'equals' },
+      { id: 'notEquals', label: 'Not Equals', apiValue: 'notequals' },
+      { id: 'contains', label: 'Contains', apiValue: 'contains' },
+      { id: 'notContains', label: 'Not Contains', apiValue: 'notcontains' }
+    ]
+  }
+];
