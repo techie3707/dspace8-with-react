@@ -1,6 +1,6 @@
 import axios from "axios";
 import { siteConfig } from "../data/data";
-import { FacetResult, ObjectSearchResult, SearchParams, filterSections, FilterOption, SearchFilters } from "../data/searchData";
+import { FacetResult, ObjectSearchResult, SearchParams, filterSections, FilterOption, SearchFilters, AdvancedFilter, advancedSearchFields } from "../data/searchData";
 
 
  const buildApiQueryParams = (params: SearchParams): string => {
@@ -34,6 +34,13 @@ import { FacetResult, ObjectSearchResult, SearchParams, filterSections, FilterOp
     });
   }
 
+  if (params.advancedFilters && params.advancedFilters.length > 0) {
+    params.advancedFilters.forEach(filter => {
+      const fieldName = advancedSearchFields.find(f => f.id === filter.field)?.fieldName || filter.field;
+      queryParams.append(`f.${fieldName}`, `${filter.value},${filter.operator}`);
+    });
+  }
+
   return queryParams.toString();
 };
 
@@ -44,6 +51,7 @@ export const parseSearchParamsFromUrl = (): SearchParams => {
 
   const params = new URLSearchParams(window.location.search);
   const filters: SearchFilters = {};
+  const advancedFilters: AdvancedFilter[] = [];
 
   filterSections.forEach(section => {
     if (section.filterType === 'checkbox') {
@@ -58,13 +66,29 @@ export const parseSearchParamsFromUrl = (): SearchParams => {
     }
   });
 
+  // Parse advanced filters from URL
+  const advancedFilterFields = params.getAll('af_field');
+  const advancedFilterOperators = params.getAll('af_operator');
+  const advancedFilterValues = params.getAll('af_value');
+
+  advancedFilterFields.forEach((field, index) => {
+    if (field && advancedFilterOperators[index] && advancedFilterValues[index]) {
+      advancedFilters.push({
+        field,
+        operator: advancedFilterOperators[index],
+        value: advancedFilterValues[index]
+      });
+    }
+  });
+
   return {
     page: parseInt(params.get('page') || '0'),
     size: parseInt(params.get('size') || '10'),
     query: params.get('query') || undefined,
     sort: params.get('sort') || undefined,
     scope: params.get('scope') || undefined,
-    filters: Object.keys(filters).length ? filters : undefined
+    filters: Object.keys(filters).length ? filters : undefined,
+    advancedFilters: advancedFilters.length ? advancedFilters : undefined
   };
 };
 
@@ -83,6 +107,7 @@ export const updateUrlWithSearchParams = (params: SearchParams) => {
   if (params.sort) {
     urlParams.set('sort', params.sort);
   }
+  
   if (params.scope) {
     urlParams.set('scope', params.scope);
   }
@@ -99,6 +124,15 @@ export const updateUrlWithSearchParams = (params: SearchParams) => {
     });
   }
 
+  // Add advanced filters to URL
+  if (params.advancedFilters) {
+    params.advancedFilters.forEach(filter => {
+      urlParams.append('af_field', filter.field);
+      urlParams.append('af_operator', filter.operator);
+      urlParams.append('af_value', filter.value);
+    });
+  }
+  
   const newUrl = `${window.location.pathname}?${urlParams.toString()}`;
   window.history.pushState({ path: newUrl }, '', newUrl);
 };
