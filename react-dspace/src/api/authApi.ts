@@ -9,6 +9,10 @@ const csrfToken = localStorage.getItem("csrfToken") || "";
 const authToken = localStorage.getItem("authToken") || "";
 export const login = async (email: string, password: string) => {
   try {
+    const csrfToken = await fetchCsrfToken();
+    if (!csrfToken) {
+      throw new Error("CSRF token not available. Login aborted.");
+    }
     const response = await axios.post(
       `${siteConfig.apiEndpoint}/api/authn/login`,
       { user: email, password },
@@ -157,6 +161,7 @@ export const logout = async () => {
     if (response.status === 204) {
       localStorage.removeItem("authToken");
       localStorage.removeItem("isAdmin");
+      window.location.href = "/";
     }
   } catch (error) {
     showToast("Logout failed. Please try again.", "error");

@@ -65,6 +65,47 @@ export interface APIResponse {
 }
 const authToken = localStorage.getItem("authToken") || "";
 const csrfToken = localStorage.getItem("csrfToken") || "";
+
+export const addMemberToGroup = async (groupId: string, epersonId: string) => {
+    try {
+        const payload = `${siteConfig.apiEndpoint}/api/eperson/epersons/${epersonId}`;
+        const response = await axios.post(
+            `${siteConfig.apiEndpoint}/api/eperson/groups/${groupId}/epersons`,
+            payload,
+            {
+                headers: {
+                    "Content-Type": "text/uri-list",
+                    "X-XSRF-TOKEN": csrfToken,
+                    Authorization: authToken,
+                },
+                withCredentials: true,
+            }
+        );
+        if (response.status === 204) {
+            showToast("Member added to group successfully!", "success");
+        } else {
+            showToast("Failed to add member to group.", "error");
+        }
+        return response.data;
+    } catch (error: any) {
+        const errorStatus = error.response?.status || 500;
+        if (errorStatus === 400) {
+            window.location.href = `/error-400`;
+        } else if (errorStatus === 401) {
+            window.location.href = `/error-401`;
+        } else if (errorStatus === 403) {
+            window.location.href = `/error-403`;
+        } else if (errorStatus === 422) {
+            window.location.href = `/error-422`;
+        } else if (errorStatus === 500) {
+            window.location.href = `/error-500`;
+        } else {
+            window.location.href = `/error-404`;
+        }
+        throw error;
+    }
+};
+
 export const fetchGroups = async (
     authToken: string,
     page: number = 0,
@@ -165,46 +206,6 @@ export const fetchNonMembers = async (groupId: string, page: number = 0, size: n
         return response.data;
     } catch (error) {
         showToast("Failed to fetch non-members.", "error");
-        throw error;
-    }
-};
-
-export const addMemberToGroup = async (groupId: string, epersonId: string) => {
-    try {
-        const payload = `${siteConfig.apiEndpoint}/api/eperson/epersons/${epersonId}`;
-        const response = await axios.post(
-            `${siteConfig.apiEndpoint}/api/eperson/groups/${groupId}/epersons`,
-            payload,
-            {
-                headers: {
-                    "Content-Type": "text/uri-list",
-                    "X-XSRF-TOKEN": csrfToken,
-                    "Authorization": authToken,
-                },
-                withCredentials: true,
-            }
-        );
-        if (response.status === 204) {
-            showToast("Member added to group successfully!", "success");
-        } else {
-            showToast("Failed to add member to group.", "error");
-        }
-        return response.data;
-    } catch (error: any) {
-        const errorStatus = error.response?.status || 500;
-        if (errorStatus === 400) {
-            window.location.href = `/error-400`;
-        } else if (errorStatus === 401) {
-            window.location.href = `/error-401`;
-        } else if (errorStatus === 403) {
-            window.location.href = `/error-403`;
-        } else if (errorStatus === 422) {
-            window.location.href = `/error-422`;
-        } else if (errorStatus === 500) {
-            window.location.href = `/error-500`;
-        } else {
-            window.location.href = `/error-404`;
-        }
         throw error;
     }
 };
