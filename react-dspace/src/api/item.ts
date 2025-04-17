@@ -1,47 +1,41 @@
 import axios from "axios";
 import { siteConfig } from "../data/data";
 import { showToast } from "../contexts/ToastProvider";
-import { ItemInfo } from "../data/itemFormData";
+import { ItemInfo, workspaceitemresponse, Workspaceresponse } from "../data/itemFormData";
 import { BookDetailsData } from "../data/bookDetail";
 import { PatchOperation } from "../data/itemFormData";
 
 const authToken = localStorage.getItem("authToken") || "";
 const csrfToken = localStorage.getItem("csrfToken") || "";
 
-
-
 export const createItem = async (
-    collectionId: string,
+    itemId: string,
     formData: { [key: string]: string | Date | null }
 ) => {
-    const apiUrl = `${siteConfig.apiEndpoint}/api/core/items?owningCollection=${collectionId}`;
+    const apiUrl = `${siteConfig.apiEndpoint}/api/submission/workspaceitems/${itemId}?embed=item`;
 
-    const metadata: Record<string, { value: string; language: string; authority: null; confidence: number }[]> = {};
+    const patchOperations: PatchOperation[] = [];
 
     Object.entries(formData).forEach(([key, value]) => {
         if (value) {
-            metadata[key] = [
-                {
+            patchOperations.push({
+                op: "add",
+                path: `/sections/traditionalpageone/${key}`,
+                value: [{
                     value: value.toString(),
-                    language: "en",
+                    language: null,
                     authority: null,
-                    confidence: -1
-                }
-            ];
+                    display: value.toString(),
+                    confidence: -1,
+                    place: 0,
+                    otherInformation: null
+                }]
+            });
         }
     });
 
-    const payload = {
-        name: formData["dc.title"]?.toString() || "Untitled Item",
-        metadata,
-        inArchive: true,
-        discoverable: true,
-        withdrawn: false,
-        type: "item",
-    };
-
     try {
-        const response = await axios.post(apiUrl, payload, {
+        const response = await axios.patch(apiUrl, patchOperations, {
             headers: {
                 "Content-Type": "application/json",
                 "X-XSRF-TOKEN": csrfToken,
@@ -49,10 +43,29 @@ export const createItem = async (
             },
             withCredentials: true,
         });
-        if (response.status === 201) {
-            showToast("Item created successfully!", "success");
+
+        if (response.status === 200) {
+            const licensePayload = {
+                op: "add",
+                path: "/sections/license/granted",
+                value: "true"
+            };
+
+            try {
+                await axios.patch(apiUrl, [licensePayload], {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-XSRF-TOKEN": csrfToken,
+                        "Authorization": authToken,
+                    },
+                    withCredentials: true,
+                });
+            } catch (patchError) {
+                console.error("Failed to add license information:", patchError);
+            }
+
         } else {
-            showToast(`Error: ${response.statusText}`, "error");
+            console.error('Failed to add license information')
         }
 
         return response.data;
@@ -76,6 +89,23 @@ export const createItem = async (
 };
 
 
+export const fetchWorkspaceItems = async (collectionId: string) => {
+    try {
+        const response = await axios.post<Workspaceresponse>(`${siteConfig.apiEndpoint}/api/submission/workspaceitems?embed=item,sections,collection&owningCollection=${collectionId}`,
+            {}, {
+            headers: {
+                'Content-Type': 'application/json',
+                'X-XSRF-TOKEN': csrfToken,
+                'Authorization': authToken,
+            },
+            withCredentials: true,
+        }
+        )
+        return response.data.id;
+    } catch (error) {
+        console.log("error", error)
+    }
+}
 
 export const fetchItemInfo = async (itemId: string) => {
     const apiUrl = `${siteConfig.apiEndpoint}/api/core/items/${itemId}`;
@@ -92,26 +122,61 @@ export const fetchItemInfo = async (itemId: string) => {
 };
 
 
+export const InsertImage = async (itemId: string, file: File) => {
+    const apiUrl = `${siteConfig.apiEndpoint}/api/submission/workspaceitems/${itemId}`
+    const formData = new FormData();
+    formData.append("file", file);
+    try {
+        const response = await axios.post<workspaceitemresponse>(apiUrl, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+                "X-XSRF-TOKEN": csrfToken,
+                "Authorization": authToken,
+            },
+            withCredentials: true,
+        });
+        return response.data._links.self.href;
+    } catch (error: any) {
+        console.error("Error uploading image:", error);
+    }
+}
 
+export const createWorkflowItem = async (uri: string) => {
+    const apiUrl = `${siteConfig.apiEndpoint}/api/workflow/workflowitems?embed=item,sections,collection`
+    try {
+        const response = await axios.post(apiUrl, uri, {
+            headers: {
+                "Content-Type": "text/uri-list",
+                "X-XSRF-TOKEN": csrfToken,
+                "Authorization": authToken,
+            },
+            withCredentials: true,
+        });
+        return response.data
+    } catch (error) {
+        console.error("Error creating workflow item:", error);
+    }
+
+}
 
 
 export const patchItemMetadata = async (itemId: string, patchOperations: PatchOperation[]) => {
-  try {
-    const response = await axios.patch(
-        `${siteConfig.apiEndpoint}/api/core/items/${itemId}`,
-        patchOperations,
-        {
-            headers: {
-            'Content-Type': 'application/json',
-            'X-XSRF-TOKEN': csrfToken,
-            'Authorization': authToken,
-            },
-            withCredentials: true,
-        }
-    );
-    return response.data;
-  } catch (error:any) {
-    const errorStatus = error.response?.status || 500;
+    try {
+        const response = await axios.patch(
+            `${siteConfig.apiEndpoint}/api/core/items/${itemId}`,
+            patchOperations,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-XSRF-TOKEN': csrfToken,
+                    'Authorization': authToken,
+                },
+                withCredentials: true,
+            }
+        );
+        return response.data;
+    } catch (error: any) {
+        const errorStatus = error.response?.status || 500;
         if (errorStatus === 400) {
             window.location.href = `/error-400`;
         } else if (errorStatus === 401) {
@@ -125,12 +190,12 @@ export const patchItemMetadata = async (itemId: string, patchOperations: PatchOp
         } else {
             window.location.href = `/error-404`;
         }
-    throw error;
-  }
+        throw error;
+    }
 };
 
 export const fetchItemDetails = async (id: string): Promise<BookDetailsData> => {
     const response = await axios.get<BookDetailsData>(`${siteConfig.apiEndpoint}/api/core/items/${id}?embed=thumbnail&embed=accessStatus`);
     return response.data;
-  };
+};
 

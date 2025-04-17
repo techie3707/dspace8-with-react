@@ -1,15 +1,17 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import { Box, IconButton, MenuItem, Select, Typography } from "@mui/material";
 import { ArrowDropUp, ArrowDropDown } from "@mui/icons-material";
-import { FormField, formFields } from "../../data/itemFormData";
-import { createItem } from "../../api/item";
+import { CreateItemProps, FormField, formFields } from "../../data/itemFormData";
+import { createItem, createWorkflowItem, fetchWorkspaceItems, InsertImage } from "../../api/item";
 import Loader from "../loader/loader";
+import { showToast } from "../../contexts/ToastProvider";
+import { error } from "console";
+import { useSearchParams } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
-interface CreateItemProps {
-    collectionId: string;
-}
+
 
 const CreateItem: React.FC<CreateItemProps> = ({ collectionId }) => {
     const [formData, setFormData] = useState<Record<string, string | Date | null>>({});
@@ -20,6 +22,33 @@ const CreateItem: React.FC<CreateItemProps> = ({ collectionId }) => {
         day: new Date().getDate(),
     });
     const [loading, setLoading] = useState(false);
+    const [fileUri, setFileUri] = useState<string | undefined>("");
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [workspaceId, setWorkspaceId] = useState<string | undefined>(
+        searchParams.get('workspaceId') || undefined
+    );
+    const navigate = useNavigate()
+
+    useEffect(() => {
+        if (!workspaceId) {
+            const fetchAndSetWorkspaceId = async () => {
+                try {
+                    const workspaceItemId = await fetchWorkspaceItems(collectionId);
+                    if (!workspaceItemId) {
+                        console.error("Workspace ID is undefined.");
+                        return;
+                    }
+                    setWorkspaceId(workspaceItemId);
+                    searchParams.set('workspaceId', workspaceItemId);
+                    setSearchParams(searchParams);
+                } catch (error) {
+                    console.error("Error fetching workspace ID:", error);
+                }
+            };
+
+            fetchAndSetWorkspaceId();
+        }
+    }, [collectionId, workspaceId, searchParams, setSearchParams]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -29,6 +58,8 @@ const CreateItem: React.FC<CreateItemProps> = ({ collectionId }) => {
         }));
     };
 
+
+
     const handleDateChange = (type: "year" | "month" | "day", value: number) => {
         setDateParts((prevDateParts) => {
             const newDateParts = { ...prevDateParts, [type]: value };
@@ -36,7 +67,7 @@ const CreateItem: React.FC<CreateItemProps> = ({ collectionId }) => {
 
             setFormData((prevData) => ({
                 ...prevData,
-                "dc.date.created": selectedDate,
+                "dc.date.issued": selectedDate,
             }));
 
             return newDateParts;
@@ -63,7 +94,27 @@ const CreateItem: React.FC<CreateItemProps> = ({ collectionId }) => {
 
         try {
             setLoading(true);
-            await createItem(collectionId, formData);
+        
+            if (selectedFile && workspaceId) {
+                try {
+                    const uploadedFileUri = await InsertImage(workspaceId, selectedFile);
+                    setFileUri(uploadedFileUri);
+        
+                    if (!workspaceId) return; 
+                    await createItem(workspaceId, formData);
+        
+                    console.log('File URI:', uploadedFileUri);
+                    if (uploadedFileUri) {
+                        await createWorkflowItem(uploadedFileUri);
+                        showToast("Item and file submitted successfully!", "success");
+                        navigate('/adminSearch')
+                    }
+                } catch (fileError) {
+                    console.error("File upload error:", fileError);
+                }
+            } else {
+                console.error("File or workspace ID not available.");
+            }
         } catch (error) {
             alert("Failed to create item. Please try again.");
         } finally {
