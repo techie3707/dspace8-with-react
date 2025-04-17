@@ -7,11 +7,9 @@ import {
   Select,
   MenuItem,
   FormControl,
-  InputLabel,
   SelectChangeEvent,
   CircularProgress,
 } from "@mui/material";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { uploadBatchImport } from "../../api/batchImport";
 import { fetchCollections } from "../../api/collection";
 import { useNavigate } from "react-router-dom";
@@ -35,10 +33,15 @@ const BatchImport: React.FC = () => {
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files.length > 0) {
-      setSelectedFile(event.target.files[0]);
+    const file = event.target.files?.[0];
+    if (file && file.name.endsWith(".zip")) {
+      setSelectedFile(file);
+    } else {
+      showToast("Only .zip files are allowed.", "error");
+      setSelectedFile(null);
     }
   };
+
 
   const handleSubmit = async () => {
     if (!selectedCollection || !selectedFile) {
@@ -46,7 +49,7 @@ const BatchImport: React.FC = () => {
       return;
     }
 
-    setIsLoading(true); 
+    setIsLoading(true);
 
     try {
       const response = await uploadBatchImport(selectedCollection, selectedFile);
@@ -60,7 +63,7 @@ const BatchImport: React.FC = () => {
     } catch (error) {
       showToast("Upload failed. Please try again.", "error");
     } finally {
-      setIsLoading(false); 
+      setIsLoading(false);
     }
   };
 
@@ -74,28 +77,28 @@ const BatchImport: React.FC = () => {
       </Typography>
 
       <FormControl fullWidth sx={{ marginBottom: 2 }}>
-  <Select
-    value={selectedCollection}
-    onChange={handleCollectionChange}
-    displayEmpty
-    renderValue={
-      selectedCollection !== '' 
-        ? () => collections.find(col => col.id === selectedCollection)?.name 
-        : () => <span style={{ color: '#aaa' }}>Select Collection</span>
-    }
-  >
-    {collections.map((collection) => (
-      <MenuItem key={collection.id} value={collection.id}>
-        {collection.name}
-      </MenuItem>
-    ))}
-  </Select>
-</FormControl>
+        <Select
+          value={selectedCollection}
+          onChange={handleCollectionChange}
+          displayEmpty
+          renderValue={
+            selectedCollection !== ''
+              ? () => collections.find(col => col.id === selectedCollection)?.name
+              : () => <span style={{ color: '#aaa' }}>Select Collection</span>
+          }
+        >
+          {collections.map((collection) => (
+            <MenuItem key={collection.id} value={collection.id}>
+              {collection.name}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
 
 
       <input type="file" accept=".zip" style={{ display: "none" }} id="file-upload" onChange={handleFileChange} />
       <label htmlFor="file-upload" className="b_import_label">
-        <Box 
+      <Box 
   className="upload-container" 
   sx={{
     border: "2px dashed gray",
@@ -110,16 +113,18 @@ const BatchImport: React.FC = () => {
   <input 
     type="file" 
     id="fileInput" 
+    accept=".zip"
     hidden 
     onChange={handleFileChange} 
   />
   <Typography variant="body2" className="upload-text">
-    <span className="upload-icon">☁️</span> Upload a File
+    <span className="upload-icon">☁️</span> Upload a ZIP File
   </Typography>
   <Typography variant="caption" color="gray">
-    {selectedFile ? selectedFile.name : "Drag and drop files here"}
+    {selectedFile ? selectedFile.name : "Only .zip files are allowed"}
   </Typography>
 </Box>
+
       </label>
 
       <Box display="flex" justifyContent="space-between" alignItems="center" marginTop={3}>

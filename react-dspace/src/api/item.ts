@@ -4,6 +4,7 @@ import { showToast } from "../contexts/ToastProvider";
 import { ItemInfo, workspaceitemresponse, Workspaceresponse } from "../data/itemFormData";
 import { BookDetailsData } from "../data/bookDetail";
 import { PatchOperation } from "../data/itemFormData";
+import { fetchCsrfToken } from "./csrf";
 
 const authToken = localStorage.getItem("authToken") || "";
 const csrfToken = localStorage.getItem("csrfToken") || "";
@@ -90,6 +91,10 @@ export const createItem = async (
 
 
 export const fetchWorkspaceItems = async (collectionId: string) => {
+      const csrfToken = await fetchCsrfToken();
+        if (!csrfToken) {
+          throw new Error("CSRF token not available. Login aborted.");
+        }
     try {
         const response = await axios.post<Workspaceresponse>(`${siteConfig.apiEndpoint}/api/submission/workspaceitems?embed=item,sections,collection&owningCollection=${collectionId}`,
             {}, {

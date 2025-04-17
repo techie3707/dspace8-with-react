@@ -118,7 +118,10 @@ export const forgotPassword = async (email: string) => {
 
 export const register = async (email: string) => {
   try {
-
+    const csrfToken = await fetchCsrfToken();
+    if (!csrfToken) {
+      throw new Error("CSRF token not available. Login aborted.");
+    }
     const response = await axios.post(
       `${siteConfig.apiEndpoint}/api/eperson/registrations?accountRequestType=register`,
       { email },
