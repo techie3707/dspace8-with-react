@@ -44,7 +44,7 @@ export interface FilterSection {
   id: string;
   label: string;
   defaultExpanded: boolean;
-  fieldName: string; 
+  fieldName: string;
   filterType: 'checkbox' | 'range' | 'boolean';
 }
 
@@ -63,7 +63,7 @@ export const sortOptions: SortOption[] = [
   { value: 'title-desc', label: 'Title Descending', apiValue: 'dc.title,DESC' },
   { value: 'date-asc', label: 'Date Issued Ascending', apiValue: 'dc.date.issued,ASC' },
   { value: 'date-desc', label: 'Date Issued Descending', apiValue: 'dc.date.issued,DESC' },
-  { value: 'accessioned-asc', label: 'Accessioned Date Ascending', apiValue: 'dc.date.accessioned,ASC' }, 
+  { value: 'accessioned-asc', label: 'Accessioned Date Ascending', apiValue: 'dc.date.accessioned,ASC' },
   { value: 'accessioned-desc', label: 'Accessioned Date Descending', apiValue: 'dc.date.accessioned,DESC' }
 ];
 
@@ -76,38 +76,38 @@ export const resultsPerPageOptions: ResultsPerPageOption[] = [
 ];
 
 export const filterSections: FilterSection[] = [
-  { 
-    id: 'author', 
-    label: 'Author', 
-    defaultExpanded: true, 
+  {
+    id: 'author',
+    label: 'Author',
+    defaultExpanded: true,
     fieldName: 'author',
     filterType: 'checkbox'
   },
-  { 
-    id: 'subject', 
-    label: 'Subject', 
-    defaultExpanded: false, 
+  {
+    id: 'subject',
+    label: 'Subject',
+    defaultExpanded: false,
     fieldName: 'subject',
     filterType: 'checkbox'
   },
-  { 
-    id: 'itemType', 
-    label: 'Item Type', 
-    defaultExpanded: false, 
+  {
+    id: 'itemType',
+    label: 'Item Type',
+    defaultExpanded: false,
     fieldName: 'entityType',
     filterType: 'checkbox'
   },
-  { 
-    id: 'date', 
-    label: 'Date', 
-    defaultExpanded: false, 
+  {
+    id: 'date',
+    label: 'Date',
+    defaultExpanded: false,
     fieldName: 'dateIssued',
     filterType: 'range'
   },
-  { 
-    id: 'hasFiles', 
-    label: 'Has File', 
-    defaultExpanded: false, 
+  {
+    id: 'hasFiles',
+    label: 'Has File',
+    defaultExpanded: false,
     fieldName: 'has_content_in_original_bundle',
     filterType: 'boolean'
   }
@@ -133,12 +133,15 @@ export interface FacetResult {
   _embedded: {
     values: Array<{ label: string; count: number }>;
   };
+  page?: {
+    totalElements: number;
+  };
 }
 
 export interface Bundle {
   name: string;
   _embedded?: {
-      bitstreams?: Bitstream[];
+    bitstreams?: Bitstream[];
   };
 }
 
@@ -155,49 +158,43 @@ export interface SearchOperator {
   apiValue: string;
 }
 
+const commonOperators: SearchOperator[] = [
+  { id: 'equals', label: 'Equals', apiValue: 'equals' },
+  { id: 'notEquals', label: 'Not Equals', apiValue: 'notequals' },
+  { id: 'contains', label: 'Contains', apiValue: 'contains' },
+  { id: 'notContains', label: 'Not Contains', apiValue: 'notcontains' }
+]
+
 export const advancedSearchFields: AdvancedSearchField[] = [
   {
     id: 'title',
     label: 'Title',
     fieldName: 'title',
-    operators: [
-      { id: 'equals', label: 'Equals', apiValue: 'equals' },
-      { id: 'notEquals', label: 'Not Equals', apiValue: 'notequals' },
-      { id: 'contains', label: 'Contains', apiValue: 'contains' },
-      { id: 'notContains', label: 'Not Contains', apiValue: 'notcontains' }
-    ]
+    operators: commonOperators
   },
   {
     id: 'author',
     label: 'Author',
     fieldName: 'author',
-    operators: [
-      { id: 'equals', label: 'Equals', apiValue: 'equals' },
-      { id: 'notEquals', label: 'Not Equals', apiValue: 'notequals' },
-      { id: 'contains', label: 'Contains', apiValue: 'contains' },
-      { id: 'notContains', label: 'Not Contains', apiValue: 'notcontains' }
-    ]
+    operators: commonOperators
   },
   {
     id: 'subject',
     label: 'Subject',
     fieldName: 'subject',
-    operators: [
-      { id: 'equals', label: 'Equals', apiValue: 'equals' },
-      { id: 'notEquals', label: 'Not Equals', apiValue: 'notequals' },
-      { id: 'contains', label: 'Contains', apiValue: 'contains' },
-      { id: 'notContains', label: 'Not Contains', apiValue: 'notcontains' }
-    ]
+    operators: commonOperators
   },
   {
     id: 'itemType',
     label: 'Item Type',
     fieldName: 'entityType',
-    operators: [
-      { id: 'equals', label: 'Equals', apiValue: 'equals' },
-      { id: 'notEquals', label: 'Not Equals', apiValue: 'notequals' },
-      { id: 'contains', label: 'Contains', apiValue: 'contains' },
-      { id: 'notContains', label: 'Not Contains', apiValue: 'notcontains' }
-    ]
+    operators: commonOperators
   }
 ];
+
+export interface AdvancedFilter {
+  id?: string;
+  field: string;
+  operator: string;
+  value: string;
+}

@@ -19,6 +19,8 @@ import {
     FilterSection,
     SearchParams,
     FilterOption,
+    advancedSearchFields,
+    AdvancedFilter
 } from '../../data/searchData';
 import { useNavigate } from 'react-router-dom';
 import { Button, Grid, IconButton, TextField } from '@mui/material';
@@ -27,7 +29,7 @@ import { siteConfig } from '../../data/data';
 import { Bitstream } from '../../data/bookDetail';
 import Loader from '../loader/loader';
 
-const Search: React.FC = () => {
+const AdvanceSearch: React.FC = () => {
     const initialParams = parseSearchParamsFromUrl();
 
     const [inputValue, setInputValue] = useState<string>(initialParams.query || '');
@@ -56,14 +58,19 @@ const Search: React.FC = () => {
     const [originalBitstreams, setOriginalBitstreams] = useState<Bitstream[]>([]);
     const [thumbnailBitstreams, setThumbnailBitstreams] = useState<Bitstream[]>([]);
     const [thumbnailsByItem, setThumbnailsByItem] = useState<Record<string, Bitstream[]>>({});
+    const [advancedFilters, setAdvancedFilters] = useState<AdvancedFilter[]>([]);
+    const [currentAdvancedFilter, setCurrentAdvancedFilter] = useState<AdvancedFilter>({
+        field: 'title',
+        operator: 'equals',
+        value: ''
+    });
     const navigate = useNavigate();
-    const [facetPagination, setFacetPagination] = useState<Record<string, { page: number, size: number }>>(
-        filterSections.reduce((acc, section) => {
-            acc[section.id] = { page: 0, size: 5 }; 
-            return acc;
-        }, {} as Record<string, { page: number, size: number }>)
-    );
-
+     const [facetPagination, setFacetPagination] = useState<Record<string, { page: number, size: number }>>(
+            filterSections.reduce((acc, section) => {
+                acc[section.id] = { page: 0, size: 5 }; 
+                return acc;
+            }, {} as Record<string, { page: number, size: number }>)
+        );
 
     const getSortParam = (): string => {
         const option = sortOptions.find(opt => opt.value === sortOption);
@@ -71,68 +78,27 @@ const Search: React.FC = () => {
     };
 
     const fetchAllFacets = async (currentFilters: Record<string, any> = filters) => {
-        try {
-          const params: SearchParams = {
-            query: inputValue,
-            page: page - 1, 
-            size: size,     
-            filters: currentFilters,
-            sort: getSortParam(),
-            scope: scope,
-          };
-      
-          const [facetsResponse, hasFileResponse] = await Promise.all([
-            fetchFacets(params, 0, 5), 
-            fetchHasFileCounts(params, 0, 5)
-          ]);
-      
-          setFacets(facetsResponse);
-          setHasFileCounts(hasFileResponse);
-        } catch (error) {
-          console.error('Error fetching facets:', error);
-        }
-      };
-
-      const loadMoreFacetItems = async (sectionId: string) => {
-        const section = filterSections.find(s => s.id === sectionId);
-        if (!section) return;
-      
-        const currentPagination = facetPagination[sectionId];
-        const nextPage = currentPagination.page + 1;
-        
-        try {
-          const params: SearchParams = {
-            query: inputValue,
-            page: page - 1, 
-            size: size,     
-            filters: filters,
-            sort: getSortParam(),
-            scope: scope,
-          };
-      
-          const newValues = await fetchFacet(
-            section.fieldName, 
-            params, 
-            nextPage, 
-            currentPagination.size 
-          );
-      
-          setFacets(prev => ({
-            ...prev,
-            [sectionId]: [...(prev[sectionId] || []), ...newValues]
-          }));
-      
-          setFacetPagination(prev => ({
-            ...prev,
-            [sectionId]: {
-              ...prev[sectionId],
-              page: nextPage
-            }
-          }));
-        } catch (error) {
-          console.error('Error loading more facet items:', error);
-        }
-      };
+           try {
+             const params: SearchParams = {
+               query: inputValue,
+               page: page - 1, 
+               size: size,     
+               filters: currentFilters,
+               sort: getSortParam(),
+               scope: scope,
+             };
+         
+             const [facetsResponse, hasFileResponse] = await Promise.all([
+               fetchFacets(params, 0, 5), 
+               fetchHasFileCounts(params, 0, 5)
+             ]);
+         
+             setFacets(facetsResponse);
+             setHasFileCounts(hasFileResponse);
+           } catch (error) {
+             console.error('Error fetching facets:', error);
+           }
+         };
 
     const handleSearch = async (
         currentFilters: Record<string, any> = filters,
@@ -140,6 +106,7 @@ const Search: React.FC = () => {
         itemsPerPage: number = size,
         resetPage: boolean = false,
         sort: string = getSortParam(),
+        currentAdvancedFilters: AdvancedFilter[] = advancedFilters
     ) => {
         setIsLoading(true);
         try {
@@ -150,8 +117,9 @@ const Search: React.FC = () => {
                 size: itemsPerPage,
                 sort: sort,
                 filters: currentFilters,
+                advancedFilters: currentAdvancedFilters.length ? currentAdvancedFilters : undefined,
                 scope: scope
-            };
+            } as SearchParams;
 
             updateUrlWithSearchParams(params);
 
@@ -159,6 +127,8 @@ const Search: React.FC = () => {
 
             setSearchResults(data.results);
             setTotalData(data.totalElements);
+            setAdvancedFilters(currentAdvancedFilters);
+
             if (resetPage) {
                 setPage(1);
             }
@@ -249,6 +219,7 @@ const Search: React.FC = () => {
     const resetFilters = () => {
         const newFilters = {};
         setFilters(newFilters);
+        setAdvancedFilters([]);
         handleSearch(newFilters, 1, size, true);
     };
 
@@ -258,6 +229,130 @@ const Search: React.FC = () => {
             [sectionId]: !prev[sectionId]
         }));
     };
+
+    const handleAddFilter = async () => {
+        if (currentAdvancedFilter.value.trim()) {
+            const newFilter = {
+                ...currentAdvancedFilter,
+                id: Date.now().toString() 
+            };
+            
+            const newAdvancedFilters = [...advancedFilters, newFilter];
+            setAdvancedFilters(newAdvancedFilters);
+            setCurrentAdvancedFilter({
+                ...currentAdvancedFilter, 
+                value: '' 
+            });
+
+            const params: SearchParams = {
+                query: inputValue,
+                page: 1 - 1,
+                size: size,
+                sort: getSortParam(),
+                filters: filters,
+                advancedFilters: newAdvancedFilters,
+                scope: scope
+            };
+
+            setIsLoading(true);
+            try {
+                updateUrlWithSearchParams(params);
+                const data = await searchObjects(params);
+                setSearchResults(data.results);
+                setTotalData(data.totalElements);
+                setPage(1);
+
+                const [facetsResponse, hasFileResponse] = await Promise.all([
+                    fetchFacets(params),
+                    fetchHasFileCounts(params)
+                ]);
+                setFacets(facetsResponse);
+                setHasFileCounts(hasFileResponse);
+            } catch (error) {
+                console.error('Error:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+    };
+
+
+    const handleRemoveAdvancedFilter = async (id: string) => {
+        const newAdvancedFilters = advancedFilters.filter(filter => filter.id !== id);
+        setAdvancedFilters(newAdvancedFilters);
+    
+        const params: SearchParams = {
+            query: inputValue,
+            page: 0,
+            size: size,
+            sort: getSortParam(),
+            filters: filters,
+            advancedFilters: newAdvancedFilters.length ? newAdvancedFilters : undefined,
+            scope: scope
+        };
+    
+        setIsLoading(true);
+        try {
+            updateUrlWithSearchParams(params);
+            const data = await searchObjects(params);
+            setSearchResults(data.results);
+            setTotalData(data.totalElements);
+            setPage(1);
+    
+            const [facetsResponse, hasFileResponse] = await Promise.all([
+                fetchFacets(params),
+                fetchHasFileCounts(params)
+            ]);
+            setFacets(facetsResponse);
+            setHasFileCounts(hasFileResponse);
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+     const loadMoreFacetItems = async (sectionId: string) => {
+            const section = filterSections.find(s => s.id === sectionId);
+            if (!section) return;
+          
+            const currentPagination = facetPagination[sectionId];
+            const nextPage = currentPagination.page + 1;
+            
+            try {
+              const params: SearchParams = {
+                query: inputValue,
+                page: page - 1, 
+                size: size,     
+                filters: filters,
+                sort: getSortParam(),
+                scope: scope,
+              };
+          
+              const newValues = await fetchFacet(
+                section.fieldName, 
+                params, 
+                nextPage, 
+                currentPagination.size 
+              );
+          
+              setFacets(prev => ({
+                ...prev,
+                [sectionId]: [...(prev[sectionId] || []), ...newValues]
+              }));
+          
+              setFacetPagination(prev => ({
+                ...prev,
+                [sectionId]: {
+                  ...prev[sectionId],
+                  page: nextPage
+                }
+              }));
+            } catch (error) {
+              console.error('Error loading more facet items:', error);
+            }
+          };
+
 
     const renderFilterSection = (section: FilterSection) => {
         switch (section.filterType) {
@@ -282,25 +377,24 @@ const Search: React.FC = () => {
                                 </label>
                             </li>
                         ))}
-
                         {/* Show more button */}
                         {facets[section.id].length % facetPagination[section.id]?.size === 0 && (
-                            <li>
-                                <button
+                           
+                                <button className='show-more-button'
                                     onClick={() => loadMoreFacetItems(section.id)}
                                     style={{
                                         background: 'none',
                                         border: 'none',
                                         color: '#1a73e8',
                                         cursor: 'pointer',
-                                        padding: '5px 0',
+                                        padding: '10px ',
                                         textAlign: 'left',
                                         width: '100%'
                                     }}
                                 >
                                     Show more
                                 </button>
-                            </li>
+                           
                         )}
                     </ul>
                 );
@@ -367,7 +461,6 @@ const Search: React.FC = () => {
                                 </div>
                             )
                         })}
-
                     </div>
                     <div className='filter_reset'>
                         <button className='filter_reset_btn'
@@ -377,10 +470,95 @@ const Search: React.FC = () => {
                             Reset filters
                         </button>
                     </div>
+                    <div className="advanced-search-container">
+                        <h3 className="Zns0ac"><span className="I75YIf">Advanced Search</span></h3>
+                        {advancedFilters.length > 0 && (
+                            <div className="active-advanced-filters">
+                                {advancedFilters.map((filter, index) => {
+                                    const fieldConfig = advancedSearchFields.find(f => f.id === filter.field);
+                                    const operatorConfig = fieldConfig?.operators.find(o => o.apiValue === filter.operator);
+
+                                    return (
+                                        <div key={index} className="active-filter" style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            margin: '5px 0',
+                                            padding: '5px',
+                                            backgroundColor: '#f5f5f5',
+                                            borderRadius: '4px'
+                                        }}>
+                                            <span style={{ flex: 1 }}>
+                                                <strong>{fieldConfig?.label}</strong> {operatorConfig?.label} "{filter.value}"
+                                            </span>
+                                            <button
+                                                onClick={() => handleRemoveAdvancedFilter(filter.id ?? '')}
+                                                style={{
+                                                    background: 'none',
+                                                    border: 'none',
+                                                    cursor: 'pointer',
+                                                    color: '#666',
+                                                    marginLeft: '10px'
+                                                }}
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+
+                        <div className="advanced-search-row">
+                            <select
+                                value={currentAdvancedFilter.field}
+                                onChange={(e) => setCurrentAdvancedFilter({
+                                    ...currentAdvancedFilter,
+                                    field: e.target.value
+                                })}
+                            >
+                                {advancedSearchFields.map(field => (
+                                    <option key={field.id} value={field.id}>{field.label}</option>
+                                ))}
+                            </select>
+
+                            <select
+                                value={currentAdvancedFilter.operator}
+                                onChange={(e) => setCurrentAdvancedFilter({
+                                    ...currentAdvancedFilter,
+                                    operator: e.target.value
+                                })}
+                            >
+                                {advancedSearchFields.find(f => f.id === currentAdvancedFilter.field)?.operators.map(op => (
+                                    <option key={op.id} value={op.apiValue}>{op.label}</option>
+                                ))}
+                            </select>
+
+                            <input
+                                value={currentAdvancedFilter.value}
+                                onChange={(e) => setCurrentAdvancedFilter({
+                                    ...currentAdvancedFilter,
+                                    value: e.target.value
+                                })
+                            
+                            }
+                                placeholder="Enter value"
+                                onKeyPress={(e) => {
+                                    if (e.key === 'Enter') {
+                                        handleAddFilter();
+                                    }
+                                }}
+
+                            />
+
+                            <Button variant="contained" onClick={handleAddFilter}>
+                                Add
+                            </Button>
+                        </div>
+                    </div>
                     <div className="dropdown-container">
-                        <h1 className="Zns0ac"><span className="I75YIf">Setting</span></h1>
+                    <h1 className="Zns0ac"><span className="I75YIf">Setting</span></h1>
                         <div>
-                            <label htmlFor="sort">Sort By</label>
+                            <label htmlFor="sort" style={{ marginLeft: '10px' }}>Sort By</label>
                             <select
                                 id="sort"
                                 value={sortOption}
@@ -400,7 +578,7 @@ const Search: React.FC = () => {
                             </select>
                         </div>
                         <div>
-                            <label htmlFor="results-per-page">Results per page</label>
+                            <label htmlFor="results-per-page" style={{ marginLeft: '10px' }}>Results per page</label>
                             <select
                                 id="results-per-page"
                                 value={size}
@@ -452,6 +630,9 @@ const Search: React.FC = () => {
                                 </Button>
                             </Grid>
                         </Grid>
+
+
+
                     </div>
 
 
@@ -660,4 +841,4 @@ const Search: React.FC = () => {
     );
 };
 
-export default Search;
+export default AdvanceSearch;
