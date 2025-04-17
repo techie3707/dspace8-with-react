@@ -285,22 +285,21 @@ const Search: React.FC = () => {
 
                         {/* Show more button */}
                         {facets[section.id].length % facetPagination[section.id]?.size === 0 && (
-                            <li>
                                 <button
+                                className='show-more-button'
                                     onClick={() => loadMoreFacetItems(section.id)}
                                     style={{
                                         background: 'none',
                                         border: 'none',
                                         color: '#1a73e8',
                                         cursor: 'pointer',
-                                        padding: '5px 0',
+                                        padding: '10px',
                                         textAlign: 'left',
                                         width: '100%'
                                     }}
                                 >
                                     Show more
                                 </button>
-                            </li>
                         )}
                     </ul>
                 );
