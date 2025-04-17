@@ -16,6 +16,7 @@ import { useAuth } from "../contexts/AuthContext";
 import Forgot from "../pages/forgot/forgot";
 import Register from "../pages/Register/Register";
 import Search from "../pages/Search/Search";
+import AdvanceSearch from "../pages/Search/AdvanceSearch";
 import { ToastProvider } from "../contexts/ToastProvider";
 import CreateItem from "../pages/Item/createItem";
 import BookDetails from "../pages/book-detail/bookDetails";
@@ -70,6 +71,7 @@ const AppRoutes = () => {
         <Route path="/register/:token" element={<Register />} />
         <Route path="/signUp" element={<SignUp />} />
         <Route path="/adminSearch" element={<Search />} />
+        <Route path="/advanceSearch" element={<AdvanceSearch />} />
         <Route path="/items/:id" element={<BookDetails />} />
         <Route path="/error-400" element={<Error400 />} />
         <Route path="/error-401" element={<Error401 />} />

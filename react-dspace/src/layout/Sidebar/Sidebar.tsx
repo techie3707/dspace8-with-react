@@ -78,7 +78,7 @@ const Sidebar: React.FC = () => {
               submenu.splice(1, 0, {
                 id: (index + 1) * 10 + 2,
                 title: "Advanced Search",
-                path: `/adminSearch?page=0&size=10&sort=score%2CDESC&scope=${collection.id}`,
+                path: `/advanceSearch?page=0&size=10&sort=score%2CDESC&scope=${collection.id}`,
                 collectionId: collection.id,
               });
             }

@@ -177,13 +177,19 @@ export const searchObjects = async (
 
 export const fetchFacet = async (
   facetName: string,
-  params: SearchParams
+  params: SearchParams,
+  facetPage: number = 0,  
+  facetSize: number = 5    
 ): Promise<FilterOption[]> => {
-  let f_url = `${siteConfig.apiEndpoint}/api/discover/facets/${facetName}?${buildApiQueryParams(params)}&dsoType=item&scope=${params.scope}`;
+  const facetParams = {...params};
+  
+  facetParams.page = facetPage;
+  facetParams.size = facetSize;
 
+  let f_url = `${siteConfig.apiEndpoint}/api/discover/facets/${facetName}?${buildApiQueryParams(facetParams)}&dsoType=item&scope=${facetParams.scope}`;
 
-  if (params.query) {
-    f_url += `&query=${encodeURIComponent(params.query)}`;
+  if (facetParams.query) {
+    f_url += `&query=${encodeURIComponent(facetParams.query)}`;
   }
 
   const response = await axios.get<FacetResult>(f_url);
@@ -194,10 +200,10 @@ export const fetchFacet = async (
   })) || [];
 };
 
-export const fetchFacets = async (params: SearchParams) => {
+export const fetchFacets = async (params: SearchParams, facetPage: number = 0, facetSize: number = 5) => {
   const facetPromises = filterSections.map(section => {
     if (section.filterType === 'checkbox' || section.filterType === 'boolean') {
-      return fetchFacet(section.fieldName, params);
+      return fetchFacet(section.fieldName, params, facetPage, facetSize);
     }
     return Promise.resolve([]);
   });
@@ -212,8 +218,8 @@ export const fetchFacets = async (params: SearchParams) => {
   }, {} as Record<string, FilterOption[]>);
 };
 
-export const fetchHasFileCounts = async (params: SearchParams) => {
-  const options = await fetchFacet('has_content_in_original_bundle', params);
+export const fetchHasFileCounts = async (params: SearchParams, facetPage: number = 0, facetSize: number = 5) => {
+  const options = await fetchFacet('has_content_in_original_bundle', params, facetPage, facetSize);
   return {
     hasFileCount: options.find(o => o.id === 'true')?.count || 0,
     noFileCount: options.find(o => o.id === 'false')?.count || 0
