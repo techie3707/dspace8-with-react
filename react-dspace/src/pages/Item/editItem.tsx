@@ -14,7 +14,7 @@ import {
     TextField,
     IconButton,
     Box,
-    
+
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -27,6 +27,7 @@ import DownloadRoundedIcon from '@mui/icons-material/DownloadRounded';
 import { useNavigate } from "react-router-dom";
 import { ItemInfo } from "../../data/itemFormData";
 import AddIcon from '@mui/icons-material/Add';
+import { iconsImgs } from "../../utils/images";
 
 
 
@@ -224,7 +225,7 @@ const EditItem = () => {
                 path: `/bitstreams/${bitstreamId}`
             }));
 
-            await Promise.all(deleteOperations.map(op =>  removeBitstream([op])));
+            await Promise.all(deleteOperations.map(op => removeBitstream([op])));
 
             setPendingBitstreamDeletions([]);
             setDeletedBitstreams([]);
@@ -259,27 +260,38 @@ const EditItem = () => {
     return (
         <Container>
             <Container sx={{ marginBottom: "30px" }} >
-                <Typography variant="h4" gutterBottom>Edit Item: {itemInfo.name}</Typography>
+                <Box
+                    sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        marginBottom: "20px", // Optional, for spacing below the row
+                    }}
+                    className="header_epeople"
+                >
+                    <Typography variant="h4">
+                        <span className="label-text">Edit Item :</span> <span className="item-name">{itemInfo.name}</span>
+                    </Typography>
 
-                <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-                    <Button
-                        variant="contained"
-                        color="success"
-                        disabled={pendingUpdates.length === 0 || loading}
-                        onClick={handleSaveAll}
-                        sx={{ marginBottom: "20px" }}
-                    >
-                        {loading ? 'Saving...' : 'Save'}
-                    </Button>
-                    <Button
-                        variant="contained"
-                        color="error"
-                        onClick={handleDiscardAll}
-                        disabled={pendingUpdates.length === 0 || loading}
-                        sx={{ marginLeft: "10px", marginBottom: "20px" }}
-                    >
-                        Discard
-                    </Button>
+                    <Box sx={{ display: "flex" }}>
+                        <Button
+                            variant="contained"
+                            color="success"
+                            disabled={pendingUpdates.length === 0 || loading}
+                            onClick={handleSaveAll}
+                        >
+                            {loading ? 'Saving...' : 'Save'}
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="error"
+                            onClick={handleDiscardAll}
+                            disabled={pendingUpdates.length === 0 || loading}
+                            sx={{ marginLeft: "10px" }}
+                        >
+                            Discard
+                        </Button>
+                    </Box>
                 </Box>
 
                 <TableContainer component={Paper} sx={{
@@ -300,7 +312,10 @@ const EditItem = () => {
                             {Object.entries(itemInfo.metadata).map(([key, values], rowIndex) => (
                                 <TableRow
                                     key={key}
-                                    sx={{ backgroundColor: rowIndex % 2 === 0 ? '#f9f9f9' : '#ffffff', }}
+                                    sx={{
+                                        "&:hover": { backgroundColor: "#f0f0f0" },
+                                        cursor: "pointer",
+                                    }}
                                 >
                                     <TableCell>
                                         <strong>{key}</strong>
@@ -342,45 +357,45 @@ const EditItem = () => {
                                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                                             {values.map((value, i) => (
                                                 editingField?.key === key && editingField?.index === i ? (
-                                                    <Box key={`${key}-${i}-actions`} sx={{ display: 'flex', gap: 1 }}>
+                                                    <Box key={`${key}-${i}-actions`} sx={{ display: 'flex',}}>
                                                         <IconButton
+                                                            className="btn_table"
                                                             color="primary"
                                                             onClick={handleSaveClick}
                                                             disabled={loading}
                                                             title="Save"
-                                                            size="small"
                                                         >
-                                                            <SaveIcon fontSize="small" />
+                                                            <img className="table_icon" src={iconsImgs.save} alt="Save" />
                                                         </IconButton>
                                                         <IconButton
+                                                            className="btn_table_editi"
                                                             color="secondary"
                                                             onClick={handleCancelClick}
                                                             disabled={loading}
                                                             title="Cancel"
-                                                            size="small"
                                                         >
-                                                            <CancelIcon fontSize="small" />
+                                                            <img className="table_icon" src={iconsImgs.cancel} alt="Cancel" />
                                                         </IconButton>
                                                     </Box>
                                                 ) : (
                                                     <Box key={`${key}-${i}-actions`} sx={{ display: 'flex', gap: 1 }}>
                                                         <IconButton
+													        className="btn_table"
                                                             color="primary"
                                                             onClick={() => handleEditClick(key, i, value.value)}
                                                             disabled={loading}
                                                             title="Edit"
-                                                            size="small"
                                                         >
-                                                            <EditIcon fontSize="small" />
+                                                            <img className="table_icon" src={iconsImgs.edit} alt="Edit" />
                                                         </IconButton>
                                                         <IconButton
+													        className="btn_table_editi"
                                                             color="error"
                                                             onClick={() => handleDeleteClick(key, i)}
                                                             disabled={loading}
                                                             title="Delete"
-                                                            size="small"
                                                         >
-                                                            <DeleteIcon fontSize="small" />
+                                                            <img className="table_icon" src={iconsImgs.remove} alt="Remove" />
                                                         </IconButton>
                                                     </Box>
                                                 )
@@ -416,7 +431,7 @@ const EditItem = () => {
                 </Box>
                 <Table>
                     <TableHead>
-                        <TableRow sx={{ backgroundColor: "gray", color: "white" }}>
+                        <TableRow>
 
                             <TableCell><b>Name</b></TableCell>
                             <TableCell><b>Format</b></TableCell>
@@ -434,10 +449,10 @@ const EditItem = () => {
                                     <IconButton
                                         color="primary"
                                         onClick={() => Navigate(`/add-bitstream/${itemId}`)}
-                                        title="View"
+                                        title="Add"
                                         size="small"
                                     >
-                                        <AddIcon sx={{ color: "green",fontWeight: "bold" }}/>
+                                        <img className="table_icon_add" src={iconsImgs.add} alt="Add" />
                                     </IconButton>
                                 </Box>
                             </TableCell>
