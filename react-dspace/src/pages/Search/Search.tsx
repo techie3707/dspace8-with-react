@@ -604,7 +604,7 @@ const Search: React.FC = () => {
                                                                 className='thumbnail-img img-fluid'
                                                                 src={`${siteConfig.apiEndpoint}/api/core/bitstreams/${bitstream.uuid}/content`}
                                                                 alt='Thumbnail'
-                                                                style={{ margin: '16px', maxHeight: '100px' }}
+                                                                style={{ maxHeight: '300px' }}
                                                             />
                                                         ))}
                                                 </div>

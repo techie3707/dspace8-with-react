@@ -786,7 +786,7 @@ const AdvanceSearch: React.FC = () => {
                                                                 className='thumbnail-img img-fluid'
                                                                 src={`${siteConfig.apiEndpoint}/api/core/bitstreams/${bitstream.uuid}/content`}
                                                                 alt='Thumbnail'
-                                                                style={{ margin: '16px', maxHeight: '100px' }}
+                                                                style={{ margin: '16px', maxHeight: '300px' }}
                                                             />
                                                         ))}
                                                 </div>

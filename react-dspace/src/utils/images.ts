@@ -34,6 +34,10 @@ import registries from "../assets/icons/registries.png";
 import community from "../assets/icons/communities.png";
 import collection from "../assets/icons/collection.png";
 import collectionname from "../assets/icons/collectionname.png";
+import add from "../assets/icons/Add.png";
+import cancel from "../assets/icons/cancel.png";
+import save from "../assets/icons/save.png";
+
 
 
 
@@ -71,6 +75,9 @@ interface IconsImages {
     collection: string;
     community: string;
     collectionname: string;
+    add: string;
+    cancel:string;
+    save: string;
 }
 
 
@@ -82,7 +89,7 @@ interface PersonsImages {
 
 // Export typed objects
 export const iconsImgs: IconsImages = {
-    alert, bell, bills, budget, card, check, empty_check, gears, home, menu, plane, plus, report, search, searchLight, user, wallet, wealth, login, edit, remove, access, list, grid, arrow, back_btn, batchimport, group, epople, registries, collection, community , collectionname
+    alert, bell, bills, budget, card, check, empty_check, gears, home, menu, plane, plus, report, search, searchLight, user, wallet, wealth, login, edit, remove, access, list, grid, arrow, back_btn, batchimport, group, epople, registries, collection, community , collectionname, save, cancel, add 
 };
 
 export const personsImgs: PersonsImages = {

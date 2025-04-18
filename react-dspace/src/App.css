@@ -158,11 +158,21 @@ button {
   width: 1em;
   height: 1em;
 }
-
+.table_icon_add{
+  width: 1.2rem;
+  height: 1.2rem;
+  position: relative;
+  left: 12px;
+}
 
 .btn_table {
   border: 1px solid black !important;
   border-radius: 1px !important;
+}
+.btn_table_editi {
+  border: 1px solid black !important;
+  border-radius: 1px !important;
+  border-left: none !important;
 }
 
 .btn_table_dlt {
@@ -618,4 +628,16 @@ button {
 
 .profile_header{
   padding-top: 15px;
+}
+
+/* Edit item css */
+
+.label-text {
+  color: #555;
+  font-weight: bold;
+  margin-right: 8px;
+}
+
+.item-name {
+  color: rgb(129, 20, 246);
 }
