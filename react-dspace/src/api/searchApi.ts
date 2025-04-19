@@ -179,7 +179,8 @@ export const fetchFacet = async (
   facetName: string,
   params: SearchParams,
   facetPage: number = 0,  
-  facetSize: number = 5    
+  facetSize: number = 5,
+  prefix?: string    
 ): Promise<FilterOption[]> => {
   const facetParams = {...params};
   
@@ -190,6 +191,10 @@ export const fetchFacet = async (
 
   if (facetParams.query) {
     f_url += `&query=${encodeURIComponent(facetParams.query)}`;
+  }
+  
+  if (prefix) {
+    f_url += `&prefix=${encodeURIComponent(prefix)}`;
   }
 
   const response = await axios.get<FacetResult>(f_url);
@@ -225,6 +230,7 @@ export const fetchHasFileCounts = async (params: SearchParams, facetPage: number
     noFileCount: options.find(o => o.id === 'false')?.count || 0
   };
 };
+
 
 
 

@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import {
     searchObjects,
@@ -65,40 +66,41 @@ const AdvanceSearch: React.FC = () => {
         value: ''
     });
     const navigate = useNavigate();
-     const [facetPagination, setFacetPagination] = useState<Record<string, { page: number, size: number }>>(
-            filterSections.reduce((acc, section) => {
-                acc[section.id] = { page: 0, size: 5 }; 
-                return acc;
-            }, {} as Record<string, { page: number, size: number }>)
-        );
-
+    const [facetPagination, setFacetPagination] = useState<Record<string, { page: number, size: number }>>(
+        filterSections.reduce((acc, section) => {
+            acc[section.id] = { page: 0, size: 5 };
+            return acc;
+        }, {} as Record<string, { page: number, size: number }>)
+    );
+    const [suggestions, setSuggestions] = useState<{ field: string, values: string[] }>({ field: '', values: [] });
+    const [showSuggestions, setShowSuggestions] = useState(false);
     const getSortParam = (): string => {
         const option = sortOptions.find(opt => opt.value === sortOption);
         return option ? option.apiValue : 'score,DESC';
     };
 
     const fetchAllFacets = async (currentFilters: Record<string, any> = filters) => {
-           try {
-             const params: SearchParams = {
-               query: inputValue,
-               page: page - 1, 
-               size: size,     
-               filters: currentFilters,
-               sort: getSortParam(),
-               scope: scope,
-             };
-         
-             const [facetsResponse, hasFileResponse] = await Promise.all([
-               fetchFacets(params, 0, 5), 
-               fetchHasFileCounts(params, 0, 5)
-             ]);
-         
-             setFacets(facetsResponse);
-             setHasFileCounts(hasFileResponse);
-           } catch (error) {
-             console.error('Error fetching facets:', error);
-           }
-         };
+        try {
+            const params: SearchParams = {
+                query: inputValue,
+                page: page - 1,
+                size: size,
+                filters: currentFilters,
+                sort: getSortParam(),
+                scope: scope,
+            };
+
+            const [facetsResponse, hasFileResponse] = await Promise.all([
+                fetchFacets(params, 0, 5),
+                fetchHasFileCounts(params, 0, 5)
+            ]);
+
+            setFacets(facetsResponse);
+            setHasFileCounts(hasFileResponse);
+        } catch (error) {
+            console.error('Error fetching facets:', error);
+        }
+    };
 
     const handleSearch = async (
         currentFilters: Record<string, any> = filters,
@@ -234,14 +236,14 @@ const AdvanceSearch: React.FC = () => {
         if (currentAdvancedFilter.value.trim()) {
             const newFilter = {
                 ...currentAdvancedFilter,
-                id: Date.now().toString() 
+                id: Date.now().toString()
             };
-            
+
             const newAdvancedFilters = [...advancedFilters, newFilter];
             setAdvancedFilters(newAdvancedFilters);
             setCurrentAdvancedFilter({
-                ...currentAdvancedFilter, 
-                value: '' 
+                ...currentAdvancedFilter,
+                value: ''
             });
 
             const params: SearchParams = {
@@ -280,7 +282,7 @@ const AdvanceSearch: React.FC = () => {
     const handleRemoveAdvancedFilter = async (id: string) => {
         const newAdvancedFilters = advancedFilters.filter(filter => filter.id !== id);
         setAdvancedFilters(newAdvancedFilters);
-    
+
         const params: SearchParams = {
             query: inputValue,
             page: 0,
@@ -290,7 +292,7 @@ const AdvanceSearch: React.FC = () => {
             advancedFilters: newAdvancedFilters.length ? newAdvancedFilters : undefined,
             scope: scope
         };
-    
+
         setIsLoading(true);
         try {
             updateUrlWithSearchParams(params);
@@ -298,7 +300,7 @@ const AdvanceSearch: React.FC = () => {
             setSearchResults(data.results);
             setTotalData(data.totalElements);
             setPage(1);
-    
+
             const [facetsResponse, hasFileResponse] = await Promise.all([
                 fetchFacets(params),
                 fetchHasFileCounts(params)
@@ -312,47 +314,81 @@ const AdvanceSearch: React.FC = () => {
         }
     };
 
-     const loadMoreFacetItems = async (sectionId: string) => {
-            const section = filterSections.find(s => s.id === sectionId);
-            if (!section) return;
-          
-            const currentPagination = facetPagination[sectionId];
-            const nextPage = currentPagination.page + 1;
-            
-            try {
-              const params: SearchParams = {
+    const loadMoreFacetItems = async (sectionId: string) => {
+        const section = filterSections.find(s => s.id === sectionId);
+        if (!section) return;
+
+        const currentPagination = facetPagination[sectionId];
+        const nextPage = currentPagination.page + 1;
+
+        try {
+            const params: SearchParams = {
                 query: inputValue,
-                page: page - 1, 
-                size: size,     
+                page: page - 1,
+                size: size,
                 filters: filters,
                 sort: getSortParam(),
                 scope: scope,
-              };
-          
-              const newValues = await fetchFacet(
-                section.fieldName, 
-                params, 
-                nextPage, 
-                currentPagination.size 
-              );
-          
-              setFacets(prev => ({
+            };
+
+            const newValues = await fetchFacet(
+                section.fieldName,
+                params,
+                nextPage,
+                currentPagination.size
+            );
+
+            setFacets(prev => ({
                 ...prev,
                 [sectionId]: [...(prev[sectionId] || []), ...newValues]
-              }));
-          
-              setFacetPagination(prev => ({
+            }));
+
+            setFacetPagination(prev => ({
                 ...prev,
                 [sectionId]: {
-                  ...prev[sectionId],
-                  page: nextPage
+                    ...prev[sectionId],
+                    page: nextPage
                 }
-              }));
-            } catch (error) {
-              console.error('Error loading more facet items:', error);
-            }
-          };
+            }));
+        } catch (error) {
+            console.error('Error loading more facet items:', error);
+        }
+    };
 
+    const fetchSuggestions = async (field: string, query: string) => {
+        if (!query || query.length < 2) { // Don't search for very short queries
+            setSuggestions({ field: '', values: [] });
+            return;
+        }
+
+        try {
+            const params: SearchParams = {
+                query: '',
+                page: 0,
+                size: 5,
+                filters: filters,
+                scope: scope
+            };
+
+            const facetName = advancedSearchFields.find(f => f.id === field)?.fieldName || field;
+            const suggestions = await fetchFacet(
+                facetName,
+                params,
+                0,
+                5,
+                query
+            );
+
+            setSuggestions({
+                field: field,
+                values: suggestions.map(s => s.label)
+            });
+            setShowSuggestions(true);
+        } catch (error) {
+            console.error('Error fetching suggestions:', error);
+            setSuggestions({ field: '', values: [] });
+        }
+    };
 
     const renderFilterSection = (section: FilterSection) => {
         switch (section.filterType) {
@@ -379,22 +415,22 @@ const AdvanceSearch: React.FC = () => {
                         ))}
                         {/* Show more button */}
                         {facets[section.id].length % facetPagination[section.id]?.size === 0 && (
-                           
-                                <button className='show-more-button'
-                                    onClick={() => loadMoreFacetItems(section.id)}
-                                    style={{
-                                        background: 'none',
-                                        border: 'none',
-                                        color: '#1a73e8',
-                                        cursor: 'pointer',
-                                        padding: '10px ',
-                                        textAlign: 'left',
-                                        width: '100%'
-                                    }}
-                                >
-                                    Show more
-                                </button>
-                           
+
+                            <button className='show-more-button'
+                                onClick={() => loadMoreFacetItems(section.id)}
+                                style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    color: '#1a73e8',
+                                    cursor: 'pointer',
+                                    padding: '10px ',
+                                    textAlign: 'left',
+                                    width: '100%'
+                                }}
+                            >
+                                Show more
+                            </button>
+
                         )}
                     </ul>
                 );
@@ -532,23 +568,80 @@ const AdvanceSearch: React.FC = () => {
                                     <option key={op.id} value={op.apiValue}>{op.label}</option>
                                 ))}
                             </select>
-
-                            <input
+                            <div className='input-suggetion-container' style={{position: 'relative'}}>
+                            <input className=''
                                 value={currentAdvancedFilter.value}
-                                onChange={(e) => setCurrentAdvancedFilter({
-                                    ...currentAdvancedFilter,
-                                    value: e.target.value
-                                })
-                            
-                            }
+                                onChange={(e) => {
+                                    setCurrentAdvancedFilter({
+                                        ...currentAdvancedFilter,
+                                        value: e.target.value
+                                    });
+
+                                    if (currentAdvancedFilter.field === 'author' ||
+                                        currentAdvancedFilter.field === 'entityType' ||
+                                        currentAdvancedFilter.field === 'subject') {
+                                        fetchSuggestions(currentAdvancedFilter.field, e.target.value);
+                                    }
+                                }}
+                                onFocus={() => {
+                                    if (currentAdvancedFilter.value.length > 1 &&
+                                        (currentAdvancedFilter.field === 'author' ||
+                                            currentAdvancedFilter.field === 'entityType' ||
+                                            currentAdvancedFilter.field === 'subject')) {
+                                        setShowSuggestions(true);
+                                    }
+                                }}
+                                onBlur={() => {
+                                    setTimeout(() => setShowSuggestions(false), 200);
+                                }}
                                 placeholder="Enter value"
                                 onKeyPress={(e) => {
                                     if (e.key === 'Enter') {
+                                        setShowSuggestions(false);
                                         handleAddFilter();
                                     }
                                 }}
-
                             />
+                            {showSuggestions && suggestions.field === currentAdvancedFilter.field &&
+                                suggestions.values.length > 0 && (
+                                    <ul className="suggestions-list" style={{
+                                        position: 'absolute',
+                                        top: '100%',
+                                        left: 0,
+                                        right: 0,
+                                        backgroundColor: 'white',
+                                        border: '1px solid #ddd',
+                                        borderRadius: '4px',
+                                        zIndex: 1000,
+                                        maxHeight: '200px',
+                                        overflowY: 'auto',
+                                        margin: 0,
+                                        padding: 0,
+                                        listStyle: 'none'
+                                    }}>
+                                        {suggestions.values.map((suggestion, index) => (
+                                            <li
+                                                key={index}
+                                                style={{
+                                                    padding: '8px 12px',
+                                                    cursor: 'pointer',
+                                                    borderBottom: '1px solid #eee'
+                                                }}
+                                                onMouseDown={(e) => {
+                                                    e.preventDefault();
+                                                    setCurrentAdvancedFilter({
+                                                        ...currentAdvancedFilter,
+                                                        value: suggestion
+                                                    });
+                                                    setShowSuggestions(false);
+                                                }}
+                                            >
+                                                {suggestion}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                                </div>
 
                             <Button variant="contained" onClick={handleAddFilter}>
                                 Add
@@ -556,7 +649,7 @@ const AdvanceSearch: React.FC = () => {
                         </div>
                     </div>
                     <div className="dropdown-container">
-                    <h1 className="Zns0ac"><span className="I75YIf">Setting</span></h1>
+                        <h1 className="Zns0ac"><span className="I75YIf">Setting</span></h1>
                         <div>
                             <label htmlFor="sort" style={{ marginLeft: '10px' }}>Sort By</label>
                             <select
