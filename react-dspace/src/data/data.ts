@@ -25,7 +25,7 @@ export const generateNavigationLinks = (
     collections: { id: string; name: string }[]
   ): NavigationLink[] => {
     return collections.map((collection, index) => ({
-      id: index + 9,
+      id: index + 10,
       title: collection.name.charAt(0).toUpperCase() + collection.name.slice(1),
       image: iconsImgs.collectionname,
       path: `/collections/${collection.name.toLowerCase()}`,
@@ -62,7 +62,6 @@ export const generateNavigationLinks = (
     { id: 6, title: "Admin Search", image: iconsImgs.searchLight, path: "/adminSearch" },
     { id: 7, title: "Create Community", image: iconsImgs.community, path: "/create-community" },
     { id: 8, title: "Create Collection", image: iconsImgs.collection, path: "/select-Community" },
-    { id: 9, title: "Edit Community", image: iconsImgs.whiteEditIcon, path: "/edit-Community-Collection" },
   ];
 
 
