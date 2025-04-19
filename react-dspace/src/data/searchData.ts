@@ -162,7 +162,10 @@ const commonOperators: SearchOperator[] = [
   { id: 'equals', label: 'Equals', apiValue: 'equals' },
   { id: 'notEquals', label: 'Not Equals', apiValue: 'notequals' },
   { id: 'contains', label: 'Contains', apiValue: 'contains' },
-  { id: 'notContains', label: 'Not Contains', apiValue: 'notcontains' }
+  { id: 'notContains', label: 'Not Contains', apiValue: 'notcontains' },
+  {id: 'authority', label: 'Authority', apiValue: 'authority'},
+  {id: 'notauthority', label: 'Not Authority', apiValue: 'notauthority'},
+  {id: 'query', label: 'Query', apiValue: 'query'}
 ]
 
 export const advancedSearchFields: AdvancedSearchField[] = [

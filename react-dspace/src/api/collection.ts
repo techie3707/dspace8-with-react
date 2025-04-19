@@ -87,3 +87,41 @@ export const AddCollection = async (parentId: string, title: string, description
     }
   }
 }
+
+export const deleteCollection = async (uuid:string) =>{
+  try{
+    const response = await axios.delete(`${siteConfig.apiEndpoint}/api/core/collections/${uuid}`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        "X-XSRF-TOKEN": csrfToken,
+        "Authorization": authToken
+      },
+      withCredentials: true
+    });
+    if(response.status === 204){
+      showToast('Collection deleted successfully!', 'success');
+  }
+  return response.data
+}catch(error){
+  console.error('Failed to delete collection',error)
+};
+}
+
+export const editCollection = async (uuid:string,title:string) =>{
+  try{
+    const response = await axios.patch(`${siteConfig.apiEndpoint}/api/core/collections/${uuid}`,
+      [{op: "replace", path: "/metadata/dc.title", value: {value: `${title}`, language: null}}],
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "X-XSRF-TOKEN": csrfToken,
+          "Authorization": authToken
+        },
+        withCredentials: true,
+      }
+    )
+  }catch(error){
+    console.error('Failed to update collection',error);
+  }
+}
