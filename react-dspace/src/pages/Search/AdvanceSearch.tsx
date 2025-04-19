@@ -568,7 +568,7 @@ const AdvanceSearch: React.FC = () => {
                                     <option key={op.id} value={op.apiValue}>{op.label}</option>
                                 ))}
                             </select>
-                            <div className='input-suggetion-container' style={{position: 'relative'}}>
+                            <div className='input-suggetion-container'>
                             <input className=''
                                 value={currentAdvancedFilter.value}
                                 onChange={(e) => {
@@ -604,29 +604,15 @@ const AdvanceSearch: React.FC = () => {
                             />
                             {showSuggestions && suggestions.field === currentAdvancedFilter.field &&
                                 suggestions.values.length > 0 && (
-                                    <ul className="suggestions-list" style={{
-                                        position: 'absolute',
-                                        top: '100%',
-                                        left: 0,
-                                        right: 0,
-                                        backgroundColor: 'white',
-                                        border: '1px solid #ddd',
-                                        borderRadius: '4px',
-                                        zIndex: 1000,
-                                        maxHeight: '200px',
-                                        overflowY: 'auto',
-                                        margin: 0,
-                                        padding: 0,
-                                        listStyle: 'none'
-                                    }}>
+                                    <ul className="suggestions-list" >
                                         {suggestions.values.map((suggestion, index) => (
                                             <li
                                                 key={index}
-                                                style={{
-                                                    padding: '8px 12px',
-                                                    cursor: 'pointer',
-                                                    borderBottom: '1px solid #eee'
-                                                }}
+                                                // style={{
+                                                //     padding: '8px 12px',
+                                                //     cursor: 'pointer',
+                                                //     borderBottom: '1px solid #eee'
+                                                // }}
                                                 onMouseDown={(e) => {
                                                     e.preventDefault();
                                                     setCurrentAdvancedFilter({

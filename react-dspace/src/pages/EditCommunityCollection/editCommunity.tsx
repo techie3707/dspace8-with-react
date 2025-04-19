@@ -303,10 +303,11 @@ const EditCommunity = () => {
                                             )}
                                         </TableCell>
                                         <TableCell>
-                                            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
+                                            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                                                 {community.isEditing ? (
-                                                    <Box sx={{border: '1px solid #ddd'}}>
+                                                    <Box >
                                                         <IconButton
+                                                            className='btn_table'
                                                             color="primary"
                                                             onClick={() => handleSaveClick(community.uuid)}
                                                             title="Save"
@@ -314,6 +315,7 @@ const EditCommunity = () => {
                                                             <img className="table_icon" src={iconsImgs.save} alt="Save" />
                                                         </IconButton>
                                                         <IconButton
+                                                            className='btn_table'
                                                             color="secondary"
                                                             onClick={() => handleCancelClick(community.uuid)}
                                                             title="Cancel"
@@ -322,8 +324,9 @@ const EditCommunity = () => {
                                                         </IconButton>
                                                     </Box>
                                                 ) : (
-                                                    <Box sx={{border: '1px solid #ddd'}}>
+                                                    <Box >
                                                         <IconButton
+                                                            className='btn_table'
                                                             color="primary"
                                                             onClick={() => handleEditClick(community.uuid)}
                                                             title="Edit"
@@ -331,6 +334,7 @@ const EditCommunity = () => {
                                                             <img className="table_icon" src={iconsImgs.edit} alt="Edit" />
                                                         </IconButton>
                                                         <IconButton
+                                                            className='btn_table_dlt'
                                                             color="error"
                                                             onClick={() => handleDeleteClick(community.uuid)}
                                                             title="Delete"
@@ -338,10 +342,10 @@ const EditCommunity = () => {
                                                             <img className="table_icon" src={iconsImgs.remove} alt="Remove" />
                                                         </IconButton>
                                                         <IconButton
+                                                            className='btn_table'
                                                             color="primary"
                                                             onClick={() => handleShowCollection(community.uuid)}
                                                             title="View Collections"
-                                                            sx={{ ml: 3 }}
                                                         >
                                                             {expandedCommunity === community.uuid ? <img className="table_icon" src={iconsImgs.minus} alt="Minus" /> : <img className="table_icon" src={iconsImgs.add} alt="Add" />}
                                                         </IconButton>
@@ -384,10 +388,11 @@ const EditCommunity = () => {
                                                                         )}
                                                                     </TableCell>
                                                                     <TableCell>
-                                                                        <Box sx={{ display: 'flex', gap: 1 }}>
+                                                                        <Box>
                                                                             {collection.isEditing ? (
                                                                                 <>
                                                                                     <IconButton
+                                                                                    className='btn_table'
                                                                                         color="primary"
                                                                                         onClick={() => handleCollectionSaveClick(community.uuid, collection.uuid)}
                                                                                         title="Save"
@@ -395,6 +400,7 @@ const EditCommunity = () => {
                                                                                         <img className="table_icon" src={iconsImgs.save} alt="Save" />
                                                                                     </IconButton>
                                                                                     <IconButton
+                                                                                    className='btn_table'
                                                                                         color="secondary"
                                                                                         onClick={() => handleCollectionCancelClick(community.uuid, collection.uuid)}
                                                                                         title="Cancel"
@@ -405,6 +411,7 @@ const EditCommunity = () => {
                                                                             ) : (
                                                                                 <Box >
                                                                                     <IconButton
+                                                                                    className='btn_table'
                                                                                         color="primary"
                                                                                         onClick={() => handleCollectionEditClick(community.uuid, collection.uuid)}
                                                                                         title="Edit"
@@ -412,6 +419,7 @@ const EditCommunity = () => {
                                                                                         <img className="table_icon" src={iconsImgs.edit} alt="Edit" />
                                                                                     </IconButton>
                                                                                     <IconButton
+                                                                                    className='btn_table'
                                                                                         color="error"
                                                                                         onClick={() => handleCollectionDeleteClick(community.uuid, collection.uuid)}
                                                                                         title="Delete"
