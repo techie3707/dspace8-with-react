@@ -10,6 +10,7 @@ import {
 } from '@mui/material';
 import { Person, Email } from '@mui/icons-material';
 import { getUserById } from '../../api/usermanagement';
+import ChangePassword from './changePassword';
 
 type UserProfileProps = {
   userId: string;
@@ -22,6 +23,7 @@ type UserDetails = {
 };
 
 const UserProfile: React.FC<UserProfileProps> = ({ userId }) => {
+  
   const [userData, setUserData] = useState<UserDetails>({
     firstName: '',
     lastName: '',
@@ -34,6 +36,8 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId }) => {
   });
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+    const [editUserModalOpen, setEditUserModalOpen] = useState<boolean>(false);
+  
 
   useEffect(() => {
     if (userId) {
@@ -75,7 +79,8 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId }) => {
   };
 
   const handleResetPassword = () => {
-    alert('Reset password functionality goes here.');
+    setEditUserModalOpen(true);
+    // alert('Reset password functionality goes here.');
   };
 
   if (loading) {
@@ -190,7 +195,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId }) => {
             color="error"
             sx={{ textTransform: 'none', borderRadius: 3, mb: 2 }}
           >
-            Reset Password
+            Change Password
           </Button>
           <br />
           {isEditing && (
@@ -218,6 +223,11 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId }) => {
           )}
         </Box>
       </Box>
+      <ChangePassword
+              open={editUserModalOpen}
+              onClose={() => setEditUserModalOpen(false)}
+              userId={userId || ""}
+            />
     </Paper>
   );
 };

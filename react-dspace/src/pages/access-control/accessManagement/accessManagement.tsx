@@ -199,7 +199,9 @@ const AccessManagement: React.FC<AccessManagementProps> = ({ open, onClose, user
 
     return (
         <Modal open={open} onClose={onClose}>
-            <Paper className="modal-paper">
+            <Paper 
+            sx={{ maxWidth: "90%", maxHeight: "90%", overflow: "auto" }}
+            className="modal-paper">
                 <div className="modal-header-container">
                     <Typography className="modal-header">Edit Access Management</Typography>
                     <IconButton onClick={onClose} className="close-icon">
