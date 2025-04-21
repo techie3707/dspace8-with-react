@@ -343,7 +343,7 @@ const EditItem = () => {
                                                         value={editedValue}
                                                         onChange={handleValueChange}
                                                         disabled={loading}
-                                                        sx={{ minWidth: 200 }}
+                                                        sx={{ minWidth: 200,marginBottom: '0 !important' }}
                                                     />
                                                 ) : (
                                                     <Typography
