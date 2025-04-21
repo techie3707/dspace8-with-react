@@ -47,7 +47,6 @@ const AddUser: React.FC<AddUserProps> = ({ open, onClose, fetchUsers }) => {
         try {
             setLoading(true);
             await addUser(userData);
-            toast.success("User added successfully!");
             fetchUsers();
             onClose();
         } catch (error) {

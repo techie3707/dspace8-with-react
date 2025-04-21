@@ -121,6 +121,9 @@ export const editCollection = async (uuid:string,title:string) =>{
         withCredentials: true,
       }
     )
+    if(response.status === 200){
+      showToast('Collection updated successfully!', 'success');
+    }
   }catch(error){
     console.error('Failed to update collection',error);
   }
