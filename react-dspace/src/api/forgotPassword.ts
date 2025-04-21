@@ -8,6 +8,8 @@ interface RegistrationResponse {
     type: string;
 }
 const csrfToken = localStorage.getItem("csrfToken") || "";
+const authToken = localStorage.getItem("authToken") || "";
+
 export const fetchUserByEmail = async (token: string) => {
     try {
         const response = await axios.get<RegistrationResponse>(
@@ -133,3 +135,26 @@ export const userRegister = async (
 
     }
 };
+
+
+// http://localhost:8080/server/api/eperson/epersons/791863d2-a1ee-4441-bd4d-71bb289dd762
+
+export const changePassword = async (epersonId: string, currentPassword: string, newPassword: string) => {
+    const apiUrl = `${siteConfig.apiEndpoint}/api/eperson/epersons/${epersonId}`;
+    try{
+        const response = await axios.patch(apiUrl,
+            [{op: "add", path: "/password", value: {new_password: `${newPassword}`, current_password: `${currentPassword}`}}],
+            {
+                headers:{
+                    "Content-Type": "application/json",
+                    "X-XSRF-TOKEN": csrfToken,
+                    Authorization: authToken,
+                },
+                withCredentials:true,
+            }
+        )
+            return response;
+    }catch(error){
+        console.error('Failed to reset Password',error);
+    }
+}

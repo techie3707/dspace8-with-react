@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { fetchItemDetails } from '../../api/item';
-import {fetchBitstreams, fetchItemBundles} from '../../api/bitstream';
+import { fetchBitstreams, fetchItemBundles } from '../../api/bitstream';
 import { useNavigate, useParams } from 'react-router-dom';
 import './bookDetail.css';
 import { Bitstream, BookDetailsData } from '../../data/bookDetail';
@@ -132,38 +132,84 @@ const BookDetails: React.FC = () => {
                                     <th>Date</th>
                                     <td>{dateIssued}</td>
                                 </tr>
-                                {originalBitstreams.length > 0 && (
-                                    <tr>
-                                        <th>Action</th>
-                                        <td>
-                                            <ul className='list-unstyled'>
-                                                {originalBitstreams
-                                                    .filter(bitstream => /.pdf$/i.test(bitstream.name))
-                                                    .map(bitstream => (
-                                                        <li key={bitstream.uuid} className='mb-2'>
+                                {originalBitstreams.length > 0 && (() => {
+                                    const pdfBitstreams = originalBitstreams.filter(bitstream => /.pdf$/i.test(bitstream.name));
+
+                                    //  If only one PDF, show simple list format
+                                    if (pdfBitstreams.length === 1) {
+                                        return (
+                                            <tr>
+                                                <th>Action</th>
+                                                <td>
+                                                    <ul className='list-unstyled'>
+                                                        {pdfBitstreams.map(bitstream => (
+                                                            <li key={bitstream.uuid} className='mb-2'>
+                                                                <button className='custom-btn' onClick={() => window.open(`/pdf-viewer?uuid=${bitstream.uuid}`, '_blank')}>
+                                                                    View PDF
+                                                                </button>
+                                                                <button className='custom-btn' onClick={() => window.open(`/flip-book-viewer?uuid=${bitstream.uuid}`, '_blank')}>
+                                                                    View In Flip PDF
+                                                                </button>
+                                                                {!isAuthenticated && (
+                                                                    <>
+                                                                        <button className='custom-btn' onClick={() => downloadPDF(bitstream.uuid, bitstream.name)}>
+                                                                            Download PDF
+                                                                        </button>
+                                                                        <button className='custom-btn'
+                                                                            onClick={() => navigate(`/edit-item/${id}`)}>
+                                                                            Edit Item
+                                                                        </button>
+                                                                    </>
+                                                                )}
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </td>
+                                            </tr>
+                                        );
+                                    }
+                                    // If multiple PDFs, show table format
+                                    return (
+                                        <>
+                                            <tr>
+                                                <th>PDF Files</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                            {pdfBitstreams.map(bitstream => (
+                                                <tr key={bitstream.uuid}>
+                                                    <td className="pdf-name-cell">
+                                                        {bitstream.name}
+                                                    </td>
+                                                    <td className="action-buttons-cell">
+                                                        <div className="d-flex flex-wrap gap-2">
                                                             <button className='custom-btn' onClick={() => window.open(`/pdf-viewer?uuid=${bitstream.uuid}`, '_blank')}>
                                                                 View PDF
                                                             </button>
                                                             <button className='custom-btn' onClick={() => window.open(`/flip-book-viewer?uuid=${bitstream.uuid}`, '_blank')}>
-                                                                View In Flip PDF
+                                                                Flip PDF
                                                             </button>
-                                                            {isAuthenticated && (
-                                                                <>
-                                                                    <button className='custom-btn' onClick={() => downloadPDF(bitstream.uuid, bitstream.name)}>
-                                                                        Download PDF
-                                                                    </button>
-                                                                    <button className='custom-btn'
-                                                                        onClick={() => navigate(`/edit-item/${id}`)}>
-                                                                        Edit Item
-                                                                    </button>
-                                                                </>
+                                                            {!isAuthenticated && (
+                                                                <button className='custom-btn' onClick={() => downloadPDF(bitstream.uuid, bitstream.name)}>
+                                                                    Download
+                                                                </button>
                                                             )}
-                                                        </li>
-                                                    ))}
-                                            </ul>
-                                        </td>
-                                    </tr>
-                                )}
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))}
+
+                                            {!isAuthenticated && (
+                                                <tr>
+                                                    <td colSpan={2} className="text-end">
+                                                        <button className='custom-btn' style={{ width: '100%' }} onClick={() => navigate(`/edit-item/${id}`)}>
+                                                            Edit Item
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            )}
+                                        </>
+                                    );
+                                })()}
                             </tbody>
                         </table>
                     </div>

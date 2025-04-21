@@ -2,7 +2,16 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { fetchItemInfo, patchItemMetadata } from "../../api/item";
 import Loader from "../loader/loader";
-import { Button, Container, Typography } from "@mui/material";
+import {
+    Button,
+    Container,
+    Typography,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogContentText,
+    DialogActions
+} from "@mui/material";
 import {
     Table,
     TableBody,
@@ -16,21 +25,14 @@ import {
     Box,
 
 } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import SaveIcon from '@mui/icons-material/Save';
-import CancelIcon from '@mui/icons-material/Cancel';
 import { Bitstream, PatchOperation } from "../../data/bookDetail";
 import { fetchBitstreams, fetchItemBundles, removeBitstream } from "../../api/bitstream";
-import GetAppRoundedIcon from '@mui/icons-material/GetAppRounded';
 import DownloadRoundedIcon from '@mui/icons-material/DownloadRounded';
 import { useNavigate } from "react-router-dom";
 import { ItemInfo } from "../../data/itemFormData";
-import AddIcon from '@mui/icons-material/Add';
 import { iconsImgs } from "../../utils/images";
-
-
-
+ 
 
 const EditItem = () => {
     const { itemId } = useParams<{ itemId: string }>();
@@ -49,7 +51,8 @@ const EditItem = () => {
     const [pendingBitstreamDeletions, setPendingBitstreamDeletions] = useState<string[]>([]);
     const [deletedBitstreams, setDeletedBitstreams] = useState<Bitstream[]>([]);
     const Navigate = useNavigate();
-
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [bitstreamToDelete, setBitstreamToDelete] = useState<Bitstream | null>(null);
     useEffect(() => {
         const fetchItemData = async () => {
             if (!itemId) return;
@@ -179,9 +182,6 @@ const EditItem = () => {
         const fetchThumbnails = async () => {
             try {
                 setLoading(true);
-
-
-
                 if (!itemId) return;
 
                 const bundles = await fetchItemBundles(itemId);
@@ -208,11 +208,18 @@ const EditItem = () => {
         const bitstreamToDelete = originalBitstreams.find(bs => bs.uuid === bitstreamId);
         if (!bitstreamToDelete) return;
 
-        setPendingBitstreamDeletions([...pendingBitstreamDeletions, bitstreamId]);
+        setBitstreamToDelete(bitstreamToDelete);
+        setDeleteModalOpen(true);
+    };
 
-        setOriginalBitstreams(originalBitstreams.filter(bs => bs.uuid !== bitstreamId));
+    const handleConfirmDelete = () => {
+        if (!bitstreamToDelete) return;
 
+        setPendingBitstreamDeletions([...pendingBitstreamDeletions, bitstreamToDelete.uuid]);
+        setOriginalBitstreams(originalBitstreams.filter(bs => bs.uuid !== bitstreamToDelete.uuid));
         setDeletedBitstreams([...deletedBitstreams, bitstreamToDelete]);
+        setDeleteModalOpen(false);
+        setBitstreamToDelete(null);
     };
     const handleBitstreamSave = async () => {
         if (pendingBitstreamDeletions.length === 0) return;
@@ -241,6 +248,10 @@ const EditItem = () => {
         } finally {
             setLoading(false);
         }
+    };
+    const handleCancelDelete = () => {
+        setDeleteModalOpen(false);
+        setBitstreamToDelete(null);
     };
 
     const handleDiscardBitstreamChanges = () => {
@@ -357,7 +368,7 @@ const EditItem = () => {
                                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                                             {values.map((value, i) => (
                                                 editingField?.key === key && editingField?.index === i ? (
-                                                    <Box key={`${key}-${i}-actions`} sx={{ display: 'flex',}}>
+                                                    <Box key={`${key}-${i}-actions`} sx={{ display: 'flex', }}>
                                                         <IconButton
                                                             className="btn_table"
                                                             color="primary"
@@ -380,7 +391,7 @@ const EditItem = () => {
                                                 ) : (
                                                     <Box key={`${key}-${i}-actions`} sx={{ display: 'flex', gap: 1 }}>
                                                         <IconButton
-													        className="btn_table"
+                                                            className="btn_table"
                                                             color="primary"
                                                             onClick={() => handleEditClick(key, i, value.value)}
                                                             disabled={loading}
@@ -389,7 +400,7 @@ const EditItem = () => {
                                                             <img className="table_icon" src={iconsImgs.edit} alt="Edit" />
                                                         </IconButton>
                                                         <IconButton
-													        className="btn_table_editi"
+                                                            className="btn_table_editi"
                                                             color="error"
                                                             onClick={() => handleDeleteClick(key, i)}
                                                             disabled={loading}
@@ -495,9 +506,28 @@ const EditItem = () => {
                         ))}
                     </TableBody>
                 </Table>
+                <Dialog
+                open={deleteModalOpen}
+                onClose={handleCancelDelete}
+            >
+                <DialogTitle>Confirm Delete</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Are you sure you want to delete the bitstream {" "}
+                        <strong>{bitstreamToDelete?.name}</strong>?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCancelDelete} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleConfirmDelete} color="error">
+                        Delete
+                    </Button>
+                </DialogActions>
+            </Dialog>
             </Container>
         </Container>
-
     );
 };
 

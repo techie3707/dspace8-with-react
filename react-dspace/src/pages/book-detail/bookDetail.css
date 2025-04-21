@@ -9,24 +9,6 @@
     transition: transform 0.3s ease-in-out;
 }
 
-
-    .custom-btn {
-        background-color: white;
-        color: rgb(129, 20, 246);
-        border: 2px solid rgb(129, 20, 246);
-        padding: 5px 6px;
-        font-size: 12px;
-        cursor: pointer;
-        margin-right: 5px;
-        border-radius: 4px;
-        transition: background-color 0.3s, color 0.3s;
-    }
-    
-    .custom-btn:hover {
-        background-color: rgb(129, 20, 246);
-        color: white;
-    }
-    
 .back_btn{
     position: relative;
     bottom: 4px;
@@ -98,6 +80,30 @@
     border-radius: 4px;
     transition: background-color 0.3s, color 0.3s;
 }
+.list-unstyled {
+    padding-left: 0;
+    list-style: none;
+}
+
+.list-unstyled li {
+    margin-bottom: 1rem;
+}
+
+.pdf-name-cell {
+    width: 40%;
+    vertical-align: middle;
+}
+
+.action-buttons-cell {
+    width: 60%;
+}
+
+.custom-btn:hover {
+    background-color: rgb(129, 20, 246);
+    color: white;
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
 @media (max-width: 768px) {
     .modern-table th, .modern-table td {
         font-size: 14px;
@@ -119,5 +125,17 @@
     .back_icon {
         width: 2rem;
         height: 2rem;
+    }
+}
+
+
+@media (max-width: 768px) {
+    .pdf-name-cell, .action-buttons-cell {
+        width: 100%;
+        display: block;
+    }
+    
+    .action-buttons-cell {
+        padding-top: 0;
     }
 }
