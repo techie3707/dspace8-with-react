@@ -116,8 +116,9 @@ const AddBitstream: React.FC = () => {
         id="file-upload" 
         onChange={handleFileChange} 
       />
-      <label htmlFor="file-upload">
+     <label htmlFor="file-upload" className="b_import_label">
         <Box 
+		 className="upload-container" 
           sx={{
             border: "2px dashed gray",
             padding: 3,
@@ -127,15 +128,15 @@ const AddBitstream: React.FC = () => {
             backgroundColor: "#f9f9f9",
           }}
         >
-          <Typography variant="body2">
-            <CloudUploadIcon  sx={{ verticalAlign: 'middle', mr: 1 }} />
-            Upload a File
+          <Typography variant="body2" className="upload-text">
+           <span className="upload-icon">☁️</span> Upload a ZIP File
           </Typography>
           <Typography variant="caption" color="gray">
             {selectedFile ? selectedFile.name : "Drag and drop files here"}
           </Typography>
+		 
         </Box>
-      </label>
+</label>
 
       <Box display="flex" justifyContent="space-between" alignItems="center" marginTop={3}>
         <Button 

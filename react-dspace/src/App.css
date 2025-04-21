@@ -423,7 +423,17 @@ button {
   bottom: 15px;
 
 }
-
+.dropdown-header{
+  display: flex !important;
+  justify-content: space-between !important;
+  padding: 0px 7px 0px 7px !important;
+}
+.css-1i27l4i{
+  gap: 0px !important;
+}
+.permissions-container{
+  padding: 0px 7px 0px 7px !important;
+}
 .close-icon {
   cursor: pointer;
 }
