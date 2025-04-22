@@ -58,7 +58,7 @@ const Sidebar: React.FC = () => {
   
             if (canRead || isCollectionAdmin || canUpload) {
               submenu.push({
-                id: (index + 1) * 10 + 1,
+                id: ((100+index) + 1) * 10 + 1,
                 title: "Metadata Search",
                 path: `/adminSearch?page=0&size=10&sort=score%2CDESC&scope=${collection.id}`,
                 collectionId: collection.id,
@@ -67,7 +67,7 @@ const Sidebar: React.FC = () => {
   
             if (canUpload || isCollectionAdmin) {
               submenu.push({
-                id: (index + 1) * 10 + 3,
+                id: ((100+index) + 1) * 10 + 3,
                 title: "Create Item",
                 path: `/collections/${collection.id}/create-item`,
                 collectionId: collection.id,
@@ -76,7 +76,7 @@ const Sidebar: React.FC = () => {
   
             if (isCollectionAdmin || isAdminUser) {
               submenu.splice(1, 0, {
-                id: (index + 1) * 10 + 2,
+                id: ((100+index) + 1) * 10 + 2,
                 title: "Advanced Search",
                 path: `/advanceSearch?page=0&size=10&sort=score%2CDESC&scope=${collection.id}`,
                 collectionId: collection.id,
@@ -84,7 +84,7 @@ const Sidebar: React.FC = () => {
             }
   
             dynamicLinks.push({
-              id: index + 9,
+              id: (100+index) + 9,
               title: name.charAt(0).toUpperCase() + name.slice(1),
               image: iconsImgs.collectionname,
               path: basePath,

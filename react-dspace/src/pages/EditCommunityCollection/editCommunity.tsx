@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { fetchCommunities, fetchCollectionsItem, deleteCommunity, editCommunity } from '../../api/communities';
-import { Box, Container, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, TextField, Collapse } from '@mui/material';
+import { Box, Container, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, TextField, Collapse, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material';
 import { iconsImgs } from '../../utils/images';
 import { deleteCollection, editCollection } from '../../api/collection';
 import { Collection, Community, CommunityResponse, EmbeddedCollections } from '../../data/communityData';
@@ -13,6 +13,14 @@ const EditCommunity = () => {
     const [collections, setCollections] = useState<Record<string, Collection[]>>({});
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [itemToDelete, setItemToDelete] = useState<{
+        type: 'community' | 'collection';
+        uuid: string;
+        communityUuid?: string; // Only for collections
+        name: string;
+    } | null>(null);
+
 
 
     const fetchCommunityData = async () => {
@@ -118,13 +126,16 @@ const EditCommunity = () => {
         }));
     };
 
-    const handleDeleteClick = async (uuid: string) => {
-        try {
-            await deleteCommunity(uuid);
-            setCommunities(communities.filter(community => community.uuid !== uuid));
-        } catch (err) {
-            console.error('Failed to delete community', err);
-        }
+    const handleDeleteClick = (uuid: string) => {
+        const community = communities.find(c => c.uuid === uuid);
+        if (!community) return;
+
+        setItemToDelete({
+            type: 'community',
+            uuid,
+            name: community.metadata["dc.title"]?.[0]?.value || 'this community'
+        });
+        setDeleteModalOpen(true);
     };
 
     const handleShowCollection = async (uuid: string) => {
@@ -247,19 +258,47 @@ const EditCommunity = () => {
         });
     };
 
-    const handleCollectionDeleteClick = async (communityUuid: string, collectionUuid: string) => {
-        try {
-            await deleteCollection(collectionUuid);
+    const handleCollectionDeleteClick = (communityUuid: string, collectionUuid: string) => {
+        const collection = collections[communityUuid]?.find(c => c.uuid === collectionUuid);
+        if (!collection) return;
 
-            setCollections(prev => {
-                const updatedCollections = { ...prev };
-                updatedCollections[communityUuid] = updatedCollections[communityUuid].filter(
-                    collection => collection.uuid !== collectionUuid
-                );
-                return updatedCollections;
-            });
+        setItemToDelete({
+            type: 'collection',
+            uuid: collectionUuid,
+            communityUuid,
+            name: collection.metadata["dc.title"]?.[0]?.value || 'this collection'
+        });
+        setDeleteModalOpen(true);
+    };
+
+    const handleCancelDelete = () => {
+        setDeleteModalOpen(false);
+        setItemToDelete(null);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!itemToDelete) return;
+
+        try {
+            if (itemToDelete.type === 'community') {
+                await deleteCommunity(itemToDelete.uuid);
+                setCommunities(communities.filter(community => community.uuid !== itemToDelete.uuid));
+            } else if (itemToDelete.type === 'collection' && itemToDelete.communityUuid) {
+                await deleteCollection(itemToDelete.uuid);
+                setCollections(prev => {
+                    const updatedCollections = { ...prev };
+                    updatedCollections[itemToDelete.communityUuid!] =
+                        updatedCollections[itemToDelete.communityUuid!].filter(
+                            collection => collection.uuid !== itemToDelete.uuid
+                        );
+                    return updatedCollections;
+                });
+            }
         } catch (err) {
-            console.error('Failed to delete collection', err);
+            console.error('Failed to delete', err);
+        } finally {
+            setDeleteModalOpen(false);
+            setItemToDelete(null);
         }
     };
 
@@ -392,7 +431,7 @@ const EditCommunity = () => {
                                                                             {collection.isEditing ? (
                                                                                 <>
                                                                                     <IconButton
-                                                                                    className='btn_table'
+                                                                                        className='btn_table'
                                                                                         color="primary"
                                                                                         onClick={() => handleCollectionSaveClick(community.uuid, collection.uuid)}
                                                                                         title="Save"
@@ -400,7 +439,7 @@ const EditCommunity = () => {
                                                                                         <img className="table_icon" src={iconsImgs.save} alt="Save" />
                                                                                     </IconButton>
                                                                                     <IconButton
-                                                                                    className='btn_table'
+                                                                                        className='btn_table'
                                                                                         color="secondary"
                                                                                         onClick={() => handleCollectionCancelClick(community.uuid, collection.uuid)}
                                                                                         title="Cancel"
@@ -411,7 +450,7 @@ const EditCommunity = () => {
                                                                             ) : (
                                                                                 <Box >
                                                                                     <IconButton
-                                                                                    className='btn_table'
+                                                                                        className='btn_table'
                                                                                         color="primary"
                                                                                         onClick={() => handleCollectionEditClick(community.uuid, collection.uuid)}
                                                                                         title="Edit"
@@ -419,7 +458,7 @@ const EditCommunity = () => {
                                                                                         <img className="table_icon" src={iconsImgs.edit} alt="Edit" />
                                                                                     </IconButton>
                                                                                     <IconButton
-                                                                                    className='btn_table'
+                                                                                        className='btn_table'
                                                                                         color="error"
                                                                                         onClick={() => handleCollectionDeleteClick(community.uuid, collection.uuid)}
                                                                                         title="Delete"
@@ -444,6 +483,27 @@ const EditCommunity = () => {
                     </Table>
                 </TableContainer>
             )}
+            <Dialog
+                open={deleteModalOpen}
+                onClose={handleCancelDelete}
+            >
+                <DialogTitle>Confirm Delete</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Are you sure you want to delete {itemToDelete?.type} {itemToDelete?.name}?
+                        <br />
+                        This action cannot be undo.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCancelDelete} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleConfirmDelete} color="error">
+                        Delete
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Container>
     );
 }

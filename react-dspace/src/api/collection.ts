@@ -104,7 +104,7 @@ export const deleteCollection = async (uuid:string) =>{
   }
   return response.data
 }catch(error){
-  console.error('Failed to delete collection',error)
+  showToast('Failed to delete collection','error')
 };
 }
 

@@ -15,8 +15,13 @@ import {
     IconButton,
     CircularProgress,
     Pagination,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogContentText,
+    DialogActions,
 } from "@mui/material";
-import { fetchGroups, Group } from "../../api/group";
+import { deleteGroup, fetchGroups, Group } from "../../api/group";
 import AddGroup from "./AddGroup";
 import { useNavigate } from "react-router-dom";
 import { iconsImgs } from "../../utils/images";
@@ -32,6 +37,8 @@ const Groups = () => {
     const [totalPages, setTotalPages] = useState<number>(1);
     const pageSize = 10;
     const navigate = useNavigate();
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [groupId, setGroupId] = useState<string>('');
 
     const loadGroups = async (page: number, query: string) => {
         setLoading(true);
@@ -68,6 +75,22 @@ const Groups = () => {
             },
         });
     };
+
+    const handleDeleteClick = (group: Group) => {
+        setDeleteModalOpen(true);
+        setGroupId(group.id);
+    }
+
+    const handleCancelDelete = () =>{
+        setDeleteModalOpen(false);
+    }
+
+    const handleConfirmDelete = async () =>{
+        await deleteGroup(groupId);
+        setGroups(groups.filter(group => group.id !== groupId));
+        setDeleteModalOpen(false);
+        navigate("/groups");
+    }
 
     return (
         <Container>
@@ -127,6 +150,9 @@ const Groups = () => {
                                             <IconButton color="primary" className="btn_table" onClick={() => handleEditClick(group)} title="Edit">
                                                 <img className="table_icon" src={iconsImgs.edit} alt="Edit" />
                                             </IconButton>
+                                            <IconButton color="primary" className="btn_table" onClick={() => handleDeleteClick(group)} title="Edit">
+                                                <img className="table_icon" src={iconsImgs.remove} alt="Edit" />
+                                            </IconButton>
 
                                         </TableCell>
                                     </TableRow>
@@ -144,6 +170,26 @@ const Groups = () => {
                 onClose={() => setOpenAddGroup(false)}
                 onGroupAdded={() => loadGroups(page, searchQuery)}
             />
+            <Dialog
+                open={deleteModalOpen}
+                onClose={handleCancelDelete}
+            >
+                <DialogTitle>Confirm Delete</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Are you sure you want to delete the group {" "}
+                        <strong>{groups.find(group => group.id === groupId)?.name}</strong>?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCancelDelete} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleConfirmDelete} color="error">
+                        Delete
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Container>
     );
 };

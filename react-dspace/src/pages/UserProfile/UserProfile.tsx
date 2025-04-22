@@ -9,8 +9,9 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { Person, Email } from '@mui/icons-material';
-import { getUserById } from '../../api/usermanagement';
+import { getUserById, updateUser } from '../../api/usermanagement';
 import ChangePassword from './changePassword';
+import { showToast } from '../../contexts/ToastProvider';
 
 type UserProfileProps = {
   userId: string;
@@ -23,7 +24,7 @@ type UserDetails = {
 };
 
 const UserProfile: React.FC<UserProfileProps> = ({ userId }) => {
-  
+
   const [userData, setUserData] = useState<UserDetails>({
     firstName: '',
     lastName: '',
@@ -36,8 +37,8 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId }) => {
   });
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-    const [editUserModalOpen, setEditUserModalOpen] = useState<boolean>(false);
-  
+  const [editUserModalOpen, setEditUserModalOpen] = useState<boolean>(false);
+  const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
     if (userId) {
@@ -73,14 +74,35 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId }) => {
     setIsEditing(false);
   };
 
-  const handleSave = () => {
-    setOriginalData(userData);
-    setIsEditing(false);
+  const handleSave = async () => {
+    const hasChanges =
+      userData.firstName !== originalData.firstName ||
+      userData.lastName !== originalData.lastName ||
+      userData.email !== originalData.email;
+
+    if (!hasChanges) {
+      setIsEditing(false);
+      return;
+    }
+    setUpdating(true);
+    try {
+      await updateUser(userId, {
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        email: userData.email
+      });
+
+      setOriginalData(userData);
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Failed to update user:', error);
+    } finally {
+      setUpdating(false);
+    }
   };
 
   const handleResetPassword = () => {
     setEditUserModalOpen(true);
-    // alert('Reset password functionality goes here.');
   };
 
   if (loading) {
@@ -224,10 +246,10 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId }) => {
         </Box>
       </Box>
       <ChangePassword
-              open={editUserModalOpen}
-              onClose={() => setEditUserModalOpen(false)}
-              userId={userId || ""}
-            />
+        open={editUserModalOpen}
+        onClose={() => setEditUserModalOpen(false)}
+        userId={userId || ""}
+      />
     </Paper>
   );
 };
