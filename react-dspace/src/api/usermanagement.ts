@@ -32,8 +32,6 @@ const authToken = localStorage.getItem("authToken");
 
 export const userList = async (page: number = 0, size: number = 10, query: string = "") => {
   try {
-    const authToken = localStorage.getItem("authToken");
-    const csrfToken = localStorage.getItem("csrfToken");
     const response = await axios.get<UserListResponse>(
       `${siteConfig.apiEndpoint}/api/eperson/epersons/search/byMetadata?page=${page}&size=${size}&query=${encodeURIComponent(query)}`,
       {
@@ -114,7 +112,7 @@ export const addUser = async (userData: object) => {
   }
 };
 export const getUserById = async (userId: string, authToken: string) => {
-  try {
+  try { 
     const csrfToken = getCsrfToken() ?? ""; 
     const response = await fetch(`${siteConfig.apiEndpoint}/api/eperson/epersons/${userId}`, {
       method: "GET",
@@ -134,10 +132,8 @@ export const getUserById = async (userId: string, authToken: string) => {
     throw error;
   }
 };
-export const updateUser = async (userId: string, userData: Record<string, any>, authToken: string) => {
+export const updateUser = async (userId: string, userData: Record<string, any>) => {
   try {
-    const csrfToken = localStorage.getItem("csrfToken");
-    
     if (!authToken || !csrfToken) {
       throw new Error("Missing authentication tokens");
     }
@@ -181,9 +177,6 @@ export const updateUser = async (userId: string, userData: Record<string, any>, 
     throw error;
   }
 };
-
-
-
 
 
 

@@ -67,8 +67,7 @@ const EditUser: React.FC<EditUserProps> = ({ open, onClose, userId, fetchUsers }
 
         setUpdating(true);
         try {
-            const authToken = localStorage.getItem("authToken") || "";
-            await updateUser(userId, updatedFields, authToken);
+            await updateUser(userId, updatedFields);
             fetchUsers();
             onClose();
         } catch (error) {

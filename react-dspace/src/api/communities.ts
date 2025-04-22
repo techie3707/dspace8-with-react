@@ -51,7 +51,7 @@ export const deleteCommunity = async (uuid: string) => {
             showToast('Community deleted successfully!', 'success');
         }
     }catch(error){
-        console.error('Failed to delete community',error)
+        showToast('Failed to delete community',"error")
     }
 }
 
