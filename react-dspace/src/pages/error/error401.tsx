@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import './animate.css';
 
 interface ParticlePosition {
   x: number;
@@ -18,47 +18,28 @@ interface ParticleData {
   color: string;
 }
 
-const Particle: React.FC<ParticleProps> = ({ id, color }) => {
+const Particle: React.FC<ParticleProps> = ({ color }) => {
   const [position, setPosition] = useState<ParticlePosition>({
     x: Math.random() * 100,
     y: Math.random() * 100,
     vx: Math.random() * 0.3 - 0.15,
-    vy: Math.random() * 0.3 - 0.15
+    vy: Math.random() * 0.3 - 0.15,
   });
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setPosition(prev => {
-        let newX = prev.x + prev.vx;
-        let newY = prev.y + prev.vy;
-        
-        // Bounce off edges
-        if (newX < 0 || newX > 100) {
-          newX = Math.max(0, Math.min(100, newX));
-          return {
-            ...prev,
-            x: newX,
-            vx: -prev.vx
-          };
-        }
-        
-        if (newY < 0 || newY > 100) {
-          newY = Math.max(0, Math.min(100, newY));
-          return {
-            ...prev,
-            y: newY,
-            vy: -prev.vy
-          };
-        }
-        
-        return {
-          ...prev,
-          x: newX,
-          y: newY
-        };
+      setPosition((prev) => {
+        let { x, y, vx, vy } = prev;
+        x += vx;
+        y += vy;
+
+        if (x < 0 || x > 100) vx *= -1;
+        if (y < 0 || y > 100) vy *= -1;
+
+        return { x, y, vx, vy };
       });
     }, 50);
-    
+
     return () => clearInterval(interval);
   }, []);
 
@@ -73,7 +54,7 @@ const Particle: React.FC<ParticleProps> = ({ id, color }) => {
         height: '6px',
         borderRadius: '50%',
         backgroundColor: color,
-        opacity: 0.7
+        opacity: 0.7,
       }}
     />
   );
@@ -81,58 +62,54 @@ const Particle: React.FC<ParticleProps> = ({ id, color }) => {
 
 const Error401: React.FC = () => {
   const [particles, setParticles] = useState<ParticleData[]>([]);
-  const colors: string[] = ['#ff6b6b', '#48dbfb', '#1dd1a1', '#feca57', '#5f27cd'];
-  
-  useEffect(() => {
+  const [show, setShow] = useState(false);
+  const colors = ['#ff6b6b', '#48dbfb', '#1dd1a1', '#feca57', '#5f27cd'];
 
-    const newParticles: ParticleData[] = Array.from({ length: 50 }, (_, i) => ({
-      id: i,
-      color: colors[Math.floor(Math.random() * colors.length)]
-    }));
-    
-    setParticles(newParticles);
+  useEffect(() => {
+    setParticles(
+      Array.from({ length: 40 }, (_, i) => ({
+        id: i,
+        color: colors[Math.floor(Math.random() * colors.length)],
+      }))
+    );
+
+    const timer = setTimeout(() => setShow(true), 300);
+    return () => clearTimeout(timer);
   }, []);
 
-  const handleGoBack = (): void => {
-    window.history.back();
-  };
-
-  const handleGoHome = (): void => {
-    window.location.href = '/';
-  };
-
-  const handleGoToLogin = (): void => {
-    window.location.href = '/login';
-  };
-
   return (
-    <div className="min-vh-100 d-flex align-items-center justify-content-center position-relative overflow-hidden bg-dark">
-      {particles.map(particle => (
-        <Particle key={particle.id} id={particle.id} color={particle.color} />
+    <div className="error-container">
+      <div className="stars" />
+      <div className="twinkling" />
+      <div className="clouds" />
+      <div className="meteors" />
+      {particles.map((p) => (
+        <Particle key={p.id} id={p.id} color={p.color} />
       ))}
-      
-      <div className="container text-center position-relative">
-        <div className="row justify-content-center">
-          <div className="col-md-8 bg-dark p-5 rounded shadow" style={{ backgroundColor: 'rgba(33, 37, 41, 0.8)' }}>
-            <h1 className="display-1 fw-bold text-danger mb-4 animate__animated animate__pulse animate__infinite">401</h1>
-            <h2 className="text-white mb-4">Unauthorized Access</h2>
-            <p className="text-light mb-4">
-              Sorry, you don't have permission to access this page. Please check your credentials and try again.
-            </p>
-            <div className="d-flex justify-content-center gap-3">
-              <button className="btn btn-outline-light" onClick={handleGoBack}>
-                Go Back
-              </button>
-              <button className="btn btn-primary" onClick={handleGoHome}>
-                Return Home
-              </button>
-              <button className="btn btn-success" onClick={handleGoToLogin}>
-                Login
-              </button>
-            </div>
-          </div>
+
+      <div className={`error-card ${show ? 'fade-in' : ''}`}>
+        <h1 className="glow-text animate__animated animate__rubberBand">401</h1>
+        <h2 className="text-glow animate__animated animate__fadeInUp animate__delay-1s">
+          Unauthorized Access
+        </h2>
+        <p className="animate__animated animate__fadeIn animate__delay-2s">
+          You do not have the necessary permissions to access this resource.
+        </p>
+
+        <ul className="reason-list animate__animated animate__fadeInUp animate__delay-3s">
+          <li>• Invalid credentials</li>
+          <li>• Access token expired</li>
+          <li>• Restricted access area</li>
+        </ul>
+
+        <div className="btn-group animate__animated animate__fadeInUp animate__delay-4s">
+          <a href="/" className="space-btn">🏠 Home</a>
+          <button className="space-btn secondary" onClick={() => window.history.back()}>🔙 Go Back</button>
+          <a href="/login" className="space-btn">🔐 Login</a>
         </div>
       </div>
+
+      <div className="spaceship animate__animated animate__zoomInDown"></div>
     </div>
   );
 };
