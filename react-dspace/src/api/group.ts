@@ -107,7 +107,6 @@ export const addMemberToGroup = async (groupId: string, epersonId: string) => {
 };
 
 export const fetchGroups = async (
-    authToken: string,
     page: number = 0,
     size: number = 10,
     query: string = ""

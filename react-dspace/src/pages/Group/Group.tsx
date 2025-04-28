@@ -28,7 +28,6 @@ import { iconsImgs } from "../../utils/images";
 import { showToast } from "../../contexts/ToastProvider";
 
 const Groups = () => {
-    const authToken = localStorage.getItem("authToken") || "";
     const [groups, setGroups] = useState<Group[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [openAddGroup, setOpenAddGroup] = useState<boolean>(false);
@@ -43,7 +42,7 @@ const Groups = () => {
     const loadGroups = async (page: number, query: string) => {
         setLoading(true);
         try {
-            const data = await fetchGroups(authToken, page - 1, pageSize, query);
+            const data = await fetchGroups(page - 1, pageSize, query);
             setGroups(data.groups);
             setTotalPages(data.totalPages);
         } catch (error) {

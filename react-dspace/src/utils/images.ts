@@ -40,6 +40,7 @@ import cancel from "../assets/icons/cancel.png";
 import save from "../assets/icons/save.png";
 import minus from "../assets/icons/minus.png";
 import whiteEditIcon from "../assets/icons/white_edit_icon.png";
+import group_icon_black from "../assets/icons/group_icon_black.png";
 
 
 
@@ -83,6 +84,7 @@ interface IconsImages {
     save: string;
     minus:string;
     whiteEditIcon: string;
+    group_icon_black:string;
 }
 
 
@@ -95,7 +97,7 @@ interface PersonsImages {
 
 // Export typed objects
 export const iconsImgs: IconsImages = {
-    alert, bell, bills, budget, card, check, empty_check, gears, home, menu, plane, plus, report, search, searchLight, user, wallet, wealth, login, edit, remove, access, list, grid, arrow, back_btn, batchimport, group, epople, registries, collection, community , collectionname, save, cancel, add ,minus,whiteEditIcon
+    alert, bell, bills, budget, card, check, empty_check, gears, home, menu, plane, plus, report, search, searchLight, user, wallet, wealth, login, edit, remove, access, list, grid, arrow, back_btn, batchimport, group, epople, registries, collection, community , collectionname, save, cancel, add ,minus,whiteEditIcon,group_icon_black
 };
 
 export const personsImgs: PersonsImages = {

@@ -138,7 +138,7 @@ const Sidebar: React.FC = () => {
 
   const handleNavigation = (id: number, path: string) => {
     setActiveLinkIdx(id);
-    navigate(path);
+    window.location.href = path;
     toggleSidebar();
   };
 

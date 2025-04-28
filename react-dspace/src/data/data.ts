@@ -63,6 +63,7 @@ export const generateNavigationLinks = (
     { id: 7, title: "Create Community", image: iconsImgs.community, path: "/create-community" },
     { id: 8, title: "Create Collection", image: iconsImgs.collection, path: "/select-Community" },
     { id: 9, title: "Edit Community", image: iconsImgs.whiteEditIcon, path: "/edit-Community-Collection" },
+    { id: 10, title: "Workflow", image: iconsImgs.group, path: "/workflowSearch" },
   ];
 
 
