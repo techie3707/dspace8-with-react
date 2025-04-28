@@ -35,6 +35,11 @@ import UserProfile from "../pages/UserProfile/UserProfile";
 import EditItem from "../pages/Item/editItem";
 import AddBitstream from "../pages/addBitstream/addBitstream";
 import EditCommunity from "../pages/EditCommunityCollection/editCommunity";
+import Workflow from "../pages/workflow/workflow";
+import RemoveItem from "../pages/workflow/removeItem";
+import ResourcePolicy from "../pages/workflow/resourcePolicy";
+import SupervisionSelecter from "../pages/workflow/supervisionSelecter";
+import CreateResourcePolicy from "../pages/workflow/createResourcePolicy";
 
 
 
@@ -87,6 +92,11 @@ const AppRoutes = () => {
         <Route path="/edit-Community-Collection" element={<EditCommunity />} />
         <Route path="/edit-item/:itemId" element={<EditItem />} />
         <Route path="/add-bitstream/:itemId" element={<AddBitstream />} />
+        <Route path="/workflowSearch" element={<Workflow />} />
+        <Route path="/removeWorkflowItem/:id" element={<RemoveItem />} />
+        <Route path="/resourcePolicy/:id" element={<ResourcePolicy />} />
+        <Route path="/supervisionSelecter/:uuid" element={<SupervisionSelecter />} />
+        <Route path="/createResourcePolicy/:uuid" element={<CreateResourcePolicy />} />
         <Route path="/create-collection/:communityId/:titleText" element={<CreateCollection />} />
         <Route path="/usermanagement" element={<ProtectedRoute element={<UserManagement />} />} />
         <Route path="/userProfile/:userId" element={<ProtectedRoute element={<UserProfileWrapper />} />}/>

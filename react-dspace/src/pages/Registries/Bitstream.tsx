@@ -3,9 +3,10 @@ import { useParams } from "react-router-dom";
 import { addMetadataField, deleteBitstream, fetchMetadataFields, MetadataField } from "../../api/metadata";
 import {
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,
-    Checkbox, CircularProgress, Typography, Pagination, TextField, Button, Box
+    Checkbox, CircularProgress, Typography, Pagination, TextField, Button, Box,
+    Grid
 } from "@mui/material";
-import { showToast } from "../../contexts/ToastProvider";
+import Loader from "../loader/loader";
 
 const Bitstream: React.FC = () => {
     const { schemaId, schemaName } = useParams<{ schemaId: string; schemaName: string }>();
@@ -20,14 +21,18 @@ const Bitstream: React.FC = () => {
     const [element, setElement] = useState("");
     const [qualifier, setQualifier] = useState("");
     const [scopeNote, setScopeNote] = useState("");
+    const [query,setQuery] = useState("");
+    const [totalElements, setTotalElements] = useState(0);
 
     useEffect(() => {
         if (!schemaName) return;
 
         const loadMetadataFields = async () => {
             try {
-                const fields = await fetchMetadataFields(schemaName, authToken, page, rowsPerPage);
-                setMetadataFields(fields);
+                const fields = await fetchMetadataFields(schemaName, authToken, page-1, rowsPerPage,query);
+                setMetadataFields(fields.metadatafields);
+                setTotalElements(fields.totalPages);
+
             } catch (err) {
                 setError("Failed to fetch metadata fields.");
             } finally {
@@ -59,8 +64,9 @@ const Bitstream: React.FC = () => {
             setQualifier("");
             setScopeNote("");
             setError(null);
-            const fields = await fetchMetadataFields(schemaName ?? "", authToken, page, rowsPerPage);
-            setMetadataFields(fields);
+            const fields = await fetchMetadataFields(schemaName ?? "", authToken, page-1, rowsPerPage,query);
+            setMetadataFields(fields.metadatafields);
+            setTotalElements(fields.totalPages);
         } catch (err) {
             setError("Failed to add metadata field.");
         } finally {
@@ -78,12 +84,28 @@ const Bitstream: React.FC = () => {
             setLoading(true);
             await Promise.all(selected.map((id) => deleteBitstream(id)));
             setSelected([]);
-            const fields = await fetchMetadataFields(schemaName ?? "", authToken, page, rowsPerPage);
-            setMetadataFields(fields);
+            const fields = await fetchMetadataFields(schemaName ?? "", authToken, page-1, rowsPerPage,query);
+            setMetadataFields(fields.metadatafields);
+            setTotalElements(fields.totalPages);
         } catch (error) {
             console.error("Failed to delete metadata fields:", error);
         }
         finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSearch = async () => {
+        try {
+            setLoading(true);
+            const fields = await fetchMetadataFields(schemaName ?? "", authToken, 0, rowsPerPage, query);
+            setMetadataFields(fields.metadatafields);
+            setTotalElements(fields.totalPages);
+            setPage(1); 
+            setError(null);
+        } catch (err) {
+            setError("Failed to fetch metadata fields.");
+        } finally {
             setLoading(false);
         }
     };
@@ -122,12 +144,42 @@ const Bitstream: React.FC = () => {
             </Box>
 
             {loading ? (
-                <CircularProgress style={{ marginTop: "20px" }} />
+                <Loader />
             ) : error ? (
                 <Typography color="error">{error}</Typography>
             ) : (
                 <>
                     <TableContainer component={Paper} sx={{ marginTop: 2, overflowX: "auto" }}>
+                    <Grid container alignItems="center" className="search-container">
+                    <Grid item xs={8.5} sm={10} md={11}>
+                        <TextField
+                            label="Search the metadata field"
+                            variant="outlined"
+                            fullWidth
+                            value={query}
+                            onChange={(e) => setQuery(e.target.value)}
+                            className="search-field"
+                            InputLabelProps={{ className: "custom-label" }}
+                            onKeyPress={(e) => {
+                                if (e.key === 'Enter') {
+                                    handleSearch();
+                                }
+                            }}
+                        />
+                    </Grid>
+
+                    <Grid item xs={2} sm={2} md={1} style={{ paddingLeft: 0 }}>
+                        <Button
+                            className="button_search"
+                            variant="contained"
+                            onClick={() => handleSearch()}
+                            disabled={loading}
+                            fullWidth
+                        >
+                            Search
+                        </Button>
+                    </Grid>
+                </Grid>
                         <Table>
                             <TableHead>
                                 <TableRow>
@@ -171,7 +223,7 @@ const Bitstream: React.FC = () => {
                         </Button>
                     </Box>
                     <Pagination
-                        count={5}
+                        count={totalElements}
                         page={page}
                         onChange={handleChangePage}
                         sx={{ display: "flex", justifyContent: "center", mt: 2 }}

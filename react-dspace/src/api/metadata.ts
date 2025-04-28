@@ -21,17 +21,31 @@ export interface ApiResponse {
     _embedded?: {
         metadatafields?: MetadataField[];
     };
+    page:{
+        size: number;
+        totalElements: number;
+        totalPages: number;
+        number: number;
+    }
 }
+type MetadataFieldsResponse = {
+    metadatafields: MetadataField[];
+    totalPages: number;
+};
+
+const authToken = localStorage.getItem("authToken") || "";
+const csrfToken = localStorage.getItem("csrfToken") || "";
 
 export const fetchMetadataFields = async (
     schemaName: string,
     authToken: string,
     page: number,
-    size: number
-): Promise<MetadataField[]> => {
+    size: number,
+    query: string
+): Promise<MetadataFieldsResponse> => {
     try {
         const response = await axios.get<ApiResponse>(
-            `${siteConfig.apiEndpoint}/api/core/metadatafields/search/bySchema?page=${page}&size=${size}&schema=${schemaName}`,
+            `${siteConfig.apiEndpoint}/api/core/metadatafields/search/bySchema?page=${page}&size=${size}&schema=${schemaName}&query=${encodeURIComponent(query)}`,
             {
                 headers: {
                     "Content-Type": "application/json",
@@ -40,7 +54,10 @@ export const fetchMetadataFields = async (
                 withCredentials: true,
             }
         );
-        return response.data._embedded?.metadatafields || [];
+        return {
+            metadatafields: response.data._embedded?.metadatafields || [],
+            totalPages: response.data.page?.totalPages || 1,
+        };
     } catch (error: any) {
         const errorStatus = error.response?.status || 500;
         if (errorStatus === 400) {
@@ -67,8 +84,6 @@ export const addMetadataField = async (
     scopeNote: string | null
 ): Promise<MetadataField> => {
     try {
-        const authToken = localStorage.getItem("authToken") || "";
-        const csrfToken = localStorage.getItem("csrfToken") || "";
         const response = await axios.post<MetadataField>(
             `${siteConfig.apiEndpoint}/api/core/metadatafields?schemaId=${schemaId}`,
             {
@@ -119,9 +134,9 @@ export const deleteBitstream = async (id: number) => {
             },
             withCredentials: true,
         });
-        
-            showToast("Metadata field deleted successfully!", "success");
-        
+
+        showToast("Metadata field deleted successfully!", "success");
+
     } catch (error) {
         showToast("Failed to delete metadata field.", "error");
         throw error;
