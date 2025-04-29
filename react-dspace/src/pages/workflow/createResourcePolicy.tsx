@@ -23,7 +23,7 @@ const CreateResourcePolicy = () => {
     });
     const [selectedEperson, setSelectedEperson] = useState<string>("");
     const [users, setUsers] = useState<EPerson[]>([]);
-    const [loading, setLoading] = useState<boolean>(true); 
+    const [loading, setLoading] = useState<boolean>(true);
     const [page, setPage] = useState<number>(1);
     const [size] = useState<number>(10);
     const [totalPages, setTotalPages] = useState<number>(1);
@@ -80,7 +80,7 @@ const CreateResourcePolicy = () => {
         try {
             const response = await AddResourcePolicy(uuid, selectedEperson, JSON.stringify(formData));
             navigate(-1);
-            
+
         } catch (error) {
             console.error("Error creating resource policy:", error);
             alert("Failed to create resource policy");
@@ -88,16 +88,15 @@ const CreateResourcePolicy = () => {
     };
 
     const handleCancel = () => {
-        navigate(-1); 
+        navigate(-1);
     };
 
     return (
-        <Container>
-            <Typography variant="h4">
+        <Container sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 3 }}>
+            <Typography variant="h4" className='header_epeople' sx={{ mb: 2 }}>
                 {`Create new resource policy`}
             </Typography>
             <Grid item xs={8.5} sm={10.5} lg={11} >
-                <InputLabel>Name</InputLabel>
                 <TextField
                     name="name"
                     label="Enter Name"
@@ -110,10 +109,9 @@ const CreateResourcePolicy = () => {
                 />
             </Grid>
             <Grid item xs={8.5} sm={10.5} lg={11} >
-                <InputLabel>Description</InputLabel>
                 <TextField
                     name="description"
-                    label="Enter description"
+                    label="Description"
                     variant="outlined"
                     fullWidth
                     value={formData.description || ""}
@@ -121,13 +119,13 @@ const CreateResourcePolicy = () => {
                 />
             </Grid>
             <Box>
-                <FormControl fullWidth sx={{ marginTop: 2 }}>
-                    <InputLabel id="policy-type">Select the policy type *</InputLabel>
+                <FormControl fullWidth >
                     <Select
                         labelId='policy-type'
                         name="policyType"
                         value={formData.policyType}
-                        label="policy-type"
+                        displayEmpty
+                        renderValue={(value) => (value ? value : 'Select the policy type *')}
                         onChange={handleSelectChange}
                     >
                         {policies && policies.map((policy) => (
@@ -137,13 +135,13 @@ const CreateResourcePolicy = () => {
                 </FormControl>
             </Box>
             <Box>
-                <FormControl fullWidth sx={{ marginTop: 2 }}>
-                    <InputLabel id="action-type">Select the action *</InputLabel>
+                <FormControl fullWidth>
                     <Select
                         labelId='action-type'
                         name="action"
                         value={formData.action}
-                        label="action-type"
+                        displayEmpty
+                        renderValue={(value) => (value ? value : 'Select the action *')}
                         onChange={handleSelectChange}
                     >
                         {actionType && actionType.map((action) => (
@@ -152,10 +150,9 @@ const CreateResourcePolicy = () => {
                     </Select>
                 </FormControl>
             </Box>
-            <Grid item xs={8.5} sm={10.5} lg={11} sx={{ mt: 2 }}>
-                <InputLabel>The eperson or group that will be granted the permission</InputLabel>
+            <Grid item xs={8.5} sm={10.5} lg={11} >
                 <TextField
-                    label="Selected eperson"
+                    label="The eperson or group that will be granted the permission"
                     variant="outlined"
                     fullWidth
                     value={selectedEperson}
@@ -175,7 +172,7 @@ const CreateResourcePolicy = () => {
                 <Grid container alignItems="center" className="search-container" sx={{ p: 2 }}>
                     <Grid item xs={8.5} sm={10} md={11}>
                         <TextField
-                            label="Search the repository..."
+                            label="Search The eperson or group"
                             variant="outlined"
                             fullWidth
                             value={searchQuery}
@@ -226,7 +223,7 @@ const CreateResourcePolicy = () => {
                                     {user.metadata?.["eperson.firstname"]?.[0]?.value + " " + user.metadata?.["eperson.lastname"]?.[0]?.value}
                                 </TableCell>
                                 <TableCell>
-                                    <Button 
+                                    <Button
                                         variant="outlined"
                                         onClick={() => handleSelectEperson(user.id)}
                                     >
@@ -248,8 +245,8 @@ const CreateResourcePolicy = () => {
                 <Button variant="outlined" onClick={handleCancel}>
                     Cancel
                 </Button>
-                <Button 
-                    variant="contained" 
+                <Button
+                    variant="contained"
                     onClick={handleSubmit}
                     disabled={!formData.name || !formData.policyType || !formData.action || !selectedEperson}
                 >

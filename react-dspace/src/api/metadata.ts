@@ -21,7 +21,7 @@ export interface ApiResponse {
     _embedded?: {
         metadatafields?: MetadataField[];
     };
-    page:{
+    page: {
         size: number;
         totalElements: number;
         totalPages: number;
@@ -45,7 +45,7 @@ export const fetchMetadataFields = async (
 ): Promise<MetadataFieldsResponse> => {
     try {
         const response = await axios.get<ApiResponse>(
-            `${siteConfig.apiEndpoint}/api/core/metadatafields/search/bySchema?page=${page}&size=${size}&schema=${schemaName}&query=${encodeURIComponent(query)}`,
+            `${siteConfig.apiEndpoint}/api/core/metadatafields/search/byFieldName?page=${page}&size=${size}&schema=${schemaName}&query=${encodeURIComponent(query)}`,
             {
                 headers: {
                     "Content-Type": "application/json",
