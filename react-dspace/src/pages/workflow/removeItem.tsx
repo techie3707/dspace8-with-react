@@ -1,19 +1,19 @@
-import { 
-    Box, 
-    Button, 
-    Container, 
-    Dialog, 
-    DialogActions, 
-    DialogContent, 
-    DialogContentText, 
-    DialogTitle, 
-    Paper, 
-    Table, 
-    TableBody, 
-    TableCell, 
-    TableContainer, 
-    TableHead, 
-    TableRow, 
+import {
+    Box,
+    Button,
+    Container,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
     Typography,
     Stack
 } from '@mui/material'
@@ -21,6 +21,7 @@ import React, { useEffect, useState } from 'react'
 import { getWorkspaceItem, removeWorkspaceItem } from '../../api/workflow'
 import { useParams, useNavigate } from 'react-router-dom'
 import { WorkspaceMetedata } from '../../data/workflowdata'
+import Loader from '../loader/loader'
 
 const RemoveItem = () => {
     const [workspace, setWorkspace] = useState<WorkspaceMetedata | null>(null)
@@ -49,7 +50,7 @@ const RemoveItem = () => {
     }, [id])
 
     const handleCancel = () => {
-        navigate(-1) 
+        navigate(-1)
     }
 
     const handleDelete = async () => {
@@ -59,7 +60,7 @@ const RemoveItem = () => {
             setLoading(true)
             if (!id) return;
             await removeWorkspaceItem(id)
-            navigate('/workflowSearch') 
+            navigate('/workflowSearch')
         } catch (error) {
             console.error('Error deleting workspace item:', error)
         } finally {
@@ -74,7 +75,7 @@ const RemoveItem = () => {
             <Typography variant='h4' sx={{ marginBottom: 3 }}>Workspace Item Details</Typography>
 
             {loading ? (
-                <Typography>Loading...</Typography>
+                <Loader />
             ) : (
                 <>
                     <TableContainer component={Paper} sx={{ mb: 3 }}>
@@ -86,7 +87,7 @@ const RemoveItem = () => {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                           
+
 
                                 {/* Metadata */}
                                 {Object.entries(workspace.metadata).map(([field, values]) => (
@@ -94,7 +95,7 @@ const RemoveItem = () => {
                                         <TableRow key={`${field}-${index}`}>
                                             <TableCell sx={{ fontWeight: 'bold' }}>{field}</TableCell>
                                             <TableCell>
-                                            <Typography>{valueObj.value}</Typography>
+                                                <Typography>{valueObj.value}</Typography>
                                             </TableCell>
                                         </TableRow>
                                     ))
@@ -104,16 +105,16 @@ const RemoveItem = () => {
                     </TableContainer>
 
                     <Stack direction="row" spacing={2} justifyContent="flex-end" sx={{ mt: 2 }}>
-                        <Button 
-                            variant="outlined" 
+                        <Button
+                            variant="outlined"
                             onClick={handleCancel}
                             disabled={loading}
                         >
                             Cancel
                         </Button>
-                        <Button 
-                            variant="contained" 
-                            color="error" 
+                        <Button
+                            variant="contained"
+                            color="error"
                             onClick={() => setDeleteModalOpen(true)}
                             disabled={loading}
                         >
@@ -133,15 +134,15 @@ const RemoveItem = () => {
                             </DialogContentText>
                         </DialogContent>
                         <DialogActions>
-                            <Button 
-                                onClick={() => setDeleteModalOpen(false)} 
+                            <Button
+                                onClick={() => setDeleteModalOpen(false)}
                                 disabled={loading}
                             >
                                 Cancel
                             </Button>
-                            <Button 
-                                onClick={handleDelete} 
-                                color="error" 
+                            <Button
+                                onClick={handleDelete}
+                                color="error"
                                 autoFocus
                                 disabled={loading}
                             >
