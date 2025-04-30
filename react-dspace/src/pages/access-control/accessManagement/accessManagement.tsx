@@ -14,14 +14,13 @@ import {
     Typography,
     FormControlLabel,
     Checkbox,
-    Button,
+    FormControl,
+    RadioGroup,
+    Radio,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import AddIcon from "@mui/icons-material/Add";
-import RemoveIcon from "@mui/icons-material/Remove";
 import { Collection } from "../../../data/accessAPI";
 import { addMemberToGroup, Group, removeMemberToGroup } from "../../../api/group";
-import { showToast } from "../../../contexts/ToastProvider";
 
 interface AccessManagementProps {
     open: boolean;
@@ -31,7 +30,6 @@ interface AccessManagementProps {
 
 const AccessManagement: React.FC<AccessManagementProps> = ({ open, onClose, userId }) => {
     const [collections, setCollections] = useState<Collection[]>([]);
-    const [expandedCollections, setExpandedCollections] = useState<Set<string>>(new Set());
     const [collectionPermissions, setCollectionPermissions] = useState<{
         [key: string]: { permission: string; groupName: string; uuid: string }[]
     }>({});
@@ -40,6 +38,7 @@ const AccessManagement: React.FC<AccessManagementProps> = ({ open, onClose, user
     const [selectedGroups, setSelectedGroups] = useState<{ uuid: string; groupName: string }[]>([]);
     const [initialUserGroups, setInitialUserGroups] = useState<{ uuid: string; groupName: string }[]>([]);
     const [groupsList, setGroupsList] = useState<Group[]>([]);
+    const [selectedPermissionLevel, setSelectedPermissionLevel] = useState<string>("");
 
     useEffect(() => {
         const fetchData = async () => {
@@ -117,6 +116,12 @@ const AccessManagement: React.FC<AccessManagementProps> = ({ open, onClose, user
                     }
                 });
                 setSelectedPermissions(updatedPermissions);
+
+                // Set the initial permission level if user has groups
+                if (userGroups.length > 0) {
+                    const firstPermission = userGroups[0].name.split('_')[1].toLowerCase();
+                    setSelectedPermissionLevel(firstPermission);
+                }
             } catch (error) {
                 console.error("Error fetching user groups:", error);
             }
@@ -124,18 +129,19 @@ const AccessManagement: React.FC<AccessManagementProps> = ({ open, onClose, user
         fetchUserAssignedGroups();
     }, [userId]);
 
-    const handleCollectionToggle = (collectionId: string) => {
-        setExpandedCollections(prev => {
-            const newSet = new Set(prev);
-            newSet.has(collectionId) ? newSet.delete(collectionId) : newSet.add(collectionId);
-            return newSet;
-        });
+
+
+    const handlePermissionLevelChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSelectedPermissionLevel(event.target.value);
     };
 
-    const handleCheckboxChange = (collectionTitle: string, permission: string) => {
-        const group = collectionPermissions[collectionTitle]?.find(g => g.permission === permission);
-        if (!group) {
-            console.warn(`Group not found for collection: ${collectionTitle}, permission: ${permission}`);
+    const handleCollectionCheckboxChange = (collectionTitle: string, isChecked: boolean) => {
+        const permissionGroups = collectionPermissions[collectionTitle]?.filter(
+            g => g.permission === selectedPermissionLevel
+        );
+
+        if (!permissionGroups || permissionGroups.length === 0) {
+            console.warn(`No groups found for collection: ${collectionTitle} with permission: ${selectedPermissionLevel}`);
             return;
         }
 
@@ -146,97 +152,126 @@ const AccessManagement: React.FC<AccessManagementProps> = ({ open, onClose, user
             }
 
             const updatedSet = new Set(newPermissions[collectionTitle]);
-            if (updatedSet.has(permission)) {
-                updatedSet.delete(permission);
+            if (isChecked) {
+                updatedSet.add(selectedPermissionLevel);
             } else {
-                updatedSet.add(permission);
+                updatedSet.delete(selectedPermissionLevel);
             }
 
             return { ...newPermissions, [collectionTitle]: updatedSet };
         });
 
         setSelectedGroups(prevGroups => {
-            const groupExists = prevGroups.some(g => g.uuid === group.uuid);
-            if (groupExists) {
-                return prevGroups.filter(g => g.uuid !== group.uuid);
+            if (isChecked) {
+                // Add all groups for this permission level
+                const groupsToAdd = permissionGroups.map(g => ({ uuid: g.uuid, groupName: g.groupName }));
+                return [...prevGroups, ...groupsToAdd];
             } else {
-                return [...prevGroups, { uuid: group.uuid, groupName: group.groupName }];
+                // Remove all groups for this permission level
+                const groupUuidsToRemove = new Set(permissionGroups.map(g => g.uuid));
+                return prevGroups.filter(g => !groupUuidsToRemove.has(g.uuid));
             }
         });
     };
+
     const handleGroupChanges = async (): Promise<void> => {
         const prevGroupsSet = new Set(initialUserGroups.map(g => g.groupName));
         const newGroupsSet = new Set(selectedGroups.map(g => g.groupName));
-    
+
         const addedGroups = selectedGroups.filter(g => !prevGroupsSet.has(g.groupName));
         const removedGroups = initialUserGroups.filter(g => !newGroupsSet.has(g.groupName));
-    
+
         if (addedGroups.length === 0 && removedGroups.length === 0) {
             onClose();
             return;
         }
-    
+
         try {
             for (const group of addedGroups) {
                 await addMemberToGroup(group.uuid, userId);
                 await new Promise(res => setTimeout(res, 300));
             }
-    
+
             for (const group of removedGroups) {
                 await removeMemberToGroup(group.uuid, userId);
                 await new Promise(res => setTimeout(res, 300));
             }
-    
+
             onClose();
         } catch (error) {
             console.error("Error updating user groups:", error);
         }
     };
-    
-    
-    
-    
+
+    const permissionTypes = Array.from(
+        new Set(
+            Object.values(collectionPermissions)
+                .flatMap(perms => perms.map(p => p.permission))
+        )
+    );
+
+    // Filter collections to show only those that have the selected permission level
+    const filteredCollections = collections.filter(collection => {
+        const collectionTitle = collection.metadata?.["dc.title"]?.[0]?.value || "Unnamed Collection";
+        return collectionPermissions[collectionTitle]?.some(p => p.permission === selectedPermissionLevel);
+    });
 
     return (
         <Modal open={open} onClose={onClose}>
-            <Paper 
-            sx={{ maxWidth: "90%", maxHeight: "90%", overflow: "auto" }}
-            className="modal-paper">
+            <Paper
+                sx={{ maxWidth: "90%", maxHeight: "90%", overflow: "auto" }}
+                className="modal-paper">
                 <div className="modal-header-container">
                     <Typography className="modal-header">Edit Access Management</Typography>
                     <IconButton onClick={onClose} className="close-icon">
                         <CloseIcon />
                     </IconButton>
                 </div>
+
+                <Box sx={{ marginBottom: 2 }}>
+                    <Typography variant="subtitle1" sx={{ marginBottom: 1 }}>Permission Level:</Typography>
+                    <FormControl>
+                        <RadioGroup
+                            row
+                            aria-labelledby="permission-level-radio-buttons"
+                            name="permission-level"
+                            value={selectedPermissionLevel}
+                            onChange={handlePermissionLevelChange}
+                        >
+                            {permissionTypes.map(permission => (
+                                <FormControlLabel
+                                    key={permission}
+                                    value={permission}
+                                    control={<Radio />}
+                                    label={permission.charAt(0).toUpperCase() + permission.slice(1)}
+                                />
+                            ))}
+                        </RadioGroup>
+                    </FormControl>
+                </Box>
+
                 <Box component="form" className="modal-form">
-                    {collections.map(collection => {
+                    {selectedPermissionLevel && filteredCollections.map(collection => {
                         const collectionTitle = collection.metadata?.["dc.title"]?.[0]?.value || "Unnamed Collection";
-                        const permissions = collectionPermissions[collectionTitle] || [];
+                        const isChecked = selectedPermissions[collectionTitle]?.has(selectedPermissionLevel) || false;
 
                         return (
                             <Box key={collection.id} className="collection-container">
-                                <Box className="dropdown-header" onClick={() => handleCollectionToggle(collection.id)}>
-                                    <Typography className="collection-title">{collectionTitle}</Typography>
-                                    <IconButton size="small">
-                                        {expandedCollections.has(collection.id) ? <RemoveIcon /> : <AddIcon />}
-                                    </IconButton>
-                                </Box>
-                                {expandedCollections.has(collection.id) && (
-                                    <Box className="permissions-container">
-                                        {permissions.map(permissionObj => (
-                                            <FormControlLabel
-                                                key={permissionObj.permission}
-                                                control={
-                                                    <Checkbox
-                                                        checked={selectedPermissions[collectionTitle]?.has(permissionObj.permission) || false}
-                                                        onChange={() => handleCheckboxChange(collectionTitle, permissionObj.permission)}
-                                                    />
-                                                }
-                                                label={permissionObj.permission.charAt(0).toUpperCase() + permissionObj.permission.slice(1)}
+                                <Box className="dropdown-header">
+                                    <FormControlLabel
+                                        control={
+                                            <Checkbox
+                                                checked={isChecked}
+                                                onChange={(e) => handleCollectionCheckboxChange(collectionTitle, e.target.checked)}
                                             />
-                                        ))}
-                                    </Box>
-                                )}
+                                        }
+                                        label={
+                                            <Typography className="collection-title">
+                                                {collectionTitle}
+                                            </Typography>
+                                        }
+                                    />
+                                </Box>
                             </Box>
                         );
                     })}
@@ -247,9 +282,6 @@ const AccessManagement: React.FC<AccessManagementProps> = ({ open, onClose, user
                         </button>
                     </Box>
                 </Box>
-
-
-
             </Paper>
         </Modal>
     );
