@@ -87,8 +87,6 @@ const AppRoutes = () => {
         <Route path="/error-500" element={<Error500 />} />
         <Route path="/pdf-viewer" element={<PDFViewer />} />
         <Route path="/flip-book-viewer" element={<PDFFlipBook />} />
-        <Route path="/create-community" element={<TopCommunity />} />
-        <Route path="/select-Community" element={<SelectCommunity />} />
         <Route path="/edit-Community-Collection" element={<EditCommunity />} />
         <Route path="/edit-item/:itemId" element={<EditItem />} />
         <Route path="/add-bitstream/:itemId" element={<AddBitstream />} />
@@ -97,7 +95,6 @@ const AppRoutes = () => {
         <Route path="/resourcePolicy/:id" element={<ResourcePolicy />} />
         <Route path="/supervisionSelecter/:uuid" element={<SupervisionSelecter />} />
         <Route path="/createResourcePolicy/:uuid" element={<CreateResourcePolicy />} />
-        <Route path="/create-collection/:communityId/:titleText" element={<CreateCollection />} />
         <Route path="/usermanagement" element={<ProtectedRoute element={<UserManagement />} />} />
         <Route path="/userProfile/:userId" element={<ProtectedRoute element={<UserProfileWrapper />} />}/>
         <Route path="/metadataSchemas" element={<ProtectedRoute element={<MetadataSchemas />} />} />

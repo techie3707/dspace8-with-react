@@ -149,7 +149,12 @@ button {
     font-size: 14px !important;
   }
 }
-
+.collection_icon{
+  width: 1.3em;
+  height: 1.3em;
+  position: relative;
+  right: 5px;
+}
 .table_icon {
   width: 0.5em;
   height: 0.5em;
