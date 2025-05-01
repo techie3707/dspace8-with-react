@@ -27,8 +27,24 @@
 .content-top-btn img {
   width: 24px;
 }
+.content-top-btn img {
+  transition: transform 0.3s ease;
+}
+
 .content-top-btn img:hover {
-  filter: brightness(0) invert(1);
+  animation: pop 0.3s ease forwards;
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1.2);
+  }
 }
 .content-top-left {
   display: flex;

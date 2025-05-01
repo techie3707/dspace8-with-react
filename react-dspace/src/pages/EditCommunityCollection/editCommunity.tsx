@@ -5,6 +5,9 @@ import { iconsImgs } from '../../utils/images';
 import { deleteCollection, editCollection } from '../../api/collection';
 import { Collection, Community, CommunityResponse, EmbeddedCollections } from '../../data/communityData';
 import Loader from '../loader/loader';
+import { useNavigate } from 'react-router-dom';
+import TopCommunity from "../community/topCommunity";
+import SelectCommunityModal from '../collection/selectCommunity';
 
 
 const EditCommunity = () => {
@@ -21,6 +24,18 @@ const EditCommunity = () => {
         name: string;
     } | null>(null);
 
+    const navigate = useNavigate();
+
+    const [modalOpen, setModalOpen] = useState(false);
+
+    const handleButtonClick = () => {
+        setModalOpen(true);
+    };
+    const [openCommunityModal, setOpenCommunityModal] = useState(false);
+
+    const handleButtonCommunity = () => {
+        setOpenCommunityModal(true);
+    };
 
 
     const fetchCommunityData = async () => {
@@ -66,9 +81,7 @@ const EditCommunity = () => {
 
             const originalTitle = community.metadata["dc.title"]?.[0]?.value || '';
 
-            // Compare with edited title
             if (community.editedTitle === originalTitle) {
-                // If no changes, just cancel editing mode
                 setCommunities(communities.map(value => {
                     if (value.uuid === uuid) {
                         return {
@@ -304,7 +317,28 @@ const EditCommunity = () => {
 
     return (
         <Container className=''>
-            <Typography variant="h4">Edit Community</Typography>
+            <Box display="flex" justifyContent="space-between" className="header_epeople" alignItems="center" mb={2}>
+                <Typography variant="h4">Edit Community</Typography>
+
+                <Box display="flex" gap={2}>
+                    <div>
+                        <Button variant="contained" color="secondary" onClick={handleButtonCommunity}>
+                            <img className="collection_icon" src={iconsImgs.community} alt="community" />
+                            Create Community
+                        </Button>
+
+                        {/* Modal */}
+                        <TopCommunity open={openCommunityModal} handleClose={() => setOpenCommunityModal(false)} />
+                    </div>
+                    <div>
+                        <Button variant="contained" color="success" onClick={handleButtonClick}>
+                        <img className="collection_icon" src={iconsImgs.collection} alt="collection" />
+                            Create Collection
+                        </Button>
+                        <SelectCommunityModal open={modalOpen} onClose={() => setModalOpen(false)} />
+                    </div>
+                </Box>
+            </Box>
             {isLoading && <Loader />}
             {error && <p style={{ color: 'red' }}>{error}</p>}
             {!isLoading && !error && (
