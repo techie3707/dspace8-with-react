@@ -1,0 +1,20 @@
+.about-card{
+    transition: transform 0.3s ease;
+}
+
+.about-card:hover{
+    transform: scale(1.05);
+}
+
+.about-image {
+    width: 100%;
+    height: auto;
+    max-height: 500px;
+    object-fit: cover;
+    border-radius: 8px;
+    transition: transform 0.3s ease;
+  }
+  
+  .about-image:hover {
+    transform: scale(1.05);
+  }
