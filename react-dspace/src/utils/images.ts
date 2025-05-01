@@ -40,6 +40,9 @@ import save from "../assets/icons/save.png";
 import minus from "../assets/icons/minus.png";
 import whiteEditIcon from "../assets/icons/white_edit_icon.png";
 import group_icon_black from "../assets/icons/group_icon_black.png";
+import preview from "../assets/images/about1.webp";
+import person from "../assets/images/person.png";
+import business_person from "../assets/images/business_person.png";
 
 
 
@@ -92,6 +95,11 @@ interface PersonsImages {
     brand_one: string;
     home_main: string;
 }
+interface About_US{
+    preview: string;
+    person: string;
+    business_person: string;
+}
 
 // Export typed objects
 export const iconsImgs: IconsImages = {
@@ -100,4 +108,8 @@ export const iconsImgs: IconsImages = {
 
 export const personsImgs: PersonsImages = {
     person_one, brand_one, home_main
+};
+
+export const about_us: About_US = {
+    preview, person, business_person
 };
