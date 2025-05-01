@@ -1,25 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import {
-    searchObjects,
-    fetchFacets,
-    fetchHasFileCounts,
-    parseSearchParamsFromUrl,
-    updateUrlWithSearchParams,
-    fetchFacet,
-} from '../../api/searchApi';
+import {searchObjects,fetchFacets,fetchHasFileCounts,parseSearchParamsFromUrl,updateUrlWithSearchParams,fetchFacet,} from '../../api/searchApi';
 import { fetchItemBundles, fetchBitstreams } from '../../api/bitstream';
 import './Search.css';
 import PaginationComponent from '../../components/Pagination/PaginationComponent';
 import YearRangeSlider from '../Search/YearRangeSlider';
-import {
-    sortOptions,
-    resultsPerPageOptions,
-    filterSections,
-    metadataFields,
-    FilterSection,
-    SearchParams,
-    FilterOption,
-} from '../../data/searchData';
+import {sortOptions,resultsPerPageOptions,filterSections,metadataFields,FilterSection,SearchParams,FilterOption,} from '../../data/searchData';
 import { useNavigate } from 'react-router-dom';
 import { Button, Grid, IconButton, TextField } from '@mui/material';
 import { iconsImgs } from '../../utils/images';

@@ -60,10 +60,8 @@ export const generateNavigationLinks = (
     { id: 4, title: "Groups", image: iconsImgs.group, path: "/groups" },
     { id: 5, title: "Batch Import", image: iconsImgs.batchimport, path: "/batchImport" },
     { id: 6, title: "Admin Search", image: iconsImgs.searchLight, path: "/adminSearch" },
-    { id: 7, title: "Create Community", image: iconsImgs.community, path: "/create-community" },
-    { id: 8, title: "Create Collection", image: iconsImgs.collection, path: "/select-Community" },
-    { id: 9, title: "Edit Community", image: iconsImgs.whiteEditIcon, path: "/edit-Community-Collection" },
-    { id: 10, title: "Workflow", image: iconsImgs.group, path: "/workflowSearch" },
+    { id: 7, title: "Edit Community", image: iconsImgs.whiteEditIcon, path: "/edit-Community-Collection" },
+    { id: 8, title: "Workflow", image: iconsImgs.group, path: "/workflowSearch" },
   ];
 
 
