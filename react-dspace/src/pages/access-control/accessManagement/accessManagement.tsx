@@ -17,10 +17,18 @@ import {
     FormControl,
     RadioGroup,
     Radio,
+    Collapse,
+    List,
+    ListItem,
+    ListItemButton,
+    ListItemIcon,
+    ListItemText,
+    Button,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { Collection } from "../../../data/accessAPI";
+import { Collection, Community } from "../../../data/accessAPI";
 import { addMemberToGroup, Group, removeMemberToGroup } from "../../../api/group";
+import { iconsImgs } from "../../../utils/images";
 
 interface AccessManagementProps {
     open: boolean;
@@ -28,8 +36,13 @@ interface AccessManagementProps {
     userId: string;
 }
 
+interface CommunityWithCollections extends Community {
+    collections: Collection[];
+    expanded: boolean;
+}
+
 const AccessManagement: React.FC<AccessManagementProps> = ({ open, onClose, userId }) => {
-    const [collections, setCollections] = useState<Collection[]>([]);
+    const [communities, setCommunities] = useState<CommunityWithCollections[]>([]);
     const [collectionPermissions, setCollectionPermissions] = useState<{
         [key: string]: { permission: string; groupName: string; uuid: string }[]
     }>({});
@@ -44,14 +57,19 @@ const AccessManagement: React.FC<AccessManagementProps> = ({ open, onClose, user
         const fetchData = async () => {
             try {
                 const communityData = await fetchCommunities();
-                let allCollections: Collection[] = [];
-                for (const community of communityData) {
-                    const collections = await fetchCollections(community.id);
-                    allCollections = [...allCollections, ...collections];
-                }
-                setCollections(allCollections);
+                const communitiesWithCollections: CommunityWithCollections[] = await Promise.all(
+                    communityData.map(async (community) => {
+                        const collections = await fetchCollections(community.id);
+                        return {
+                            ...community,
+                            collections,
+                            expanded: false
+                        };
+                    })
+                );
+                setCommunities(communitiesWithCollections);
             } catch (error) {
-                console.error("Error fetching collections:", error);
+                console.error("Error fetching communities and collections:", error);
             }
         };
         fetchData();
@@ -117,7 +135,6 @@ const AccessManagement: React.FC<AccessManagementProps> = ({ open, onClose, user
                 });
                 setSelectedPermissions(updatedPermissions);
 
-                // Set the initial permission level if user has groups
                 if (userGroups.length > 0) {
                     const firstPermission = userGroups[0].name.split('_')[1].toLowerCase();
                     setSelectedPermissionLevel(firstPermission);
@@ -129,7 +146,15 @@ const AccessManagement: React.FC<AccessManagementProps> = ({ open, onClose, user
         fetchUserAssignedGroups();
     }, [userId]);
 
-
+    const toggleCommunityExpand = (communityId: string) => {
+        setCommunities(prevCommunities =>
+            prevCommunities.map(community =>
+                community.id === communityId
+                    ? { ...community, expanded: !community.expanded }
+                    : community
+            )
+        );
+    };
 
     const handlePermissionLevelChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSelectedPermissionLevel(event.target.value);
@@ -139,64 +164,102 @@ const AccessManagement: React.FC<AccessManagementProps> = ({ open, onClose, user
         const permissionGroups = collectionPermissions[collectionTitle]?.filter(
             g => g.permission === selectedPermissionLevel
         );
-
+    
         if (!permissionGroups || permissionGroups.length === 0) {
             console.warn(`No groups found for collection: ${collectionTitle} with permission: ${selectedPermissionLevel}`);
             return;
         }
-
-        setSelectedPermissions(prevPermissions => {
-            const newPermissions = { ...prevPermissions };
+    
+        setSelectedPermissions(prev => {
+            const newPermissions = { ...prev };
             if (!newPermissions[collectionTitle]) {
                 newPermissions[collectionTitle] = new Set();
             }
-
+    
             const updatedSet = new Set(newPermissions[collectionTitle]);
             if (isChecked) {
                 updatedSet.add(selectedPermissionLevel);
             } else {
                 updatedSet.delete(selectedPermissionLevel);
             }
-
+    
             return { ...newPermissions, [collectionTitle]: updatedSet };
         });
-
-        setSelectedGroups(prevGroups => {
+    
+        setSelectedGroups(prev => {
+            const groupUuidsToModify = new Set(permissionGroups.map(g => g.uuid));
             if (isChecked) {
-                // Add all groups for this permission level
-                const groupsToAdd = permissionGroups.map(g => ({ uuid: g.uuid, groupName: g.groupName }));
-                return [...prevGroups, ...groupsToAdd];
+                const groupsToAdd = permissionGroups.filter(g => 
+                    !prev.some(existing => existing.uuid === g.uuid)
+                );
+                return [...prev, ...groupsToAdd];
             } else {
-                // Remove all groups for this permission level
-                const groupUuidsToRemove = new Set(permissionGroups.map(g => g.uuid));
-                return prevGroups.filter(g => !groupUuidsToRemove.has(g.uuid));
+                return prev.filter(g => !groupUuidsToModify.has(g.uuid));
             }
         });
     };
 
+    const handleSelectAll = (community: CommunityWithCollections) => {
+        // Filter collections that have the selected permission level
+        const filteredCollections = community.collections.filter(collection => {
+            const collectionTitle = collection.metadata?.["dc.title"]?.[0]?.value || "Unnamed Collection";
+            return collectionPermissions[collectionTitle]?.some(p => p.permission === selectedPermissionLevel);
+        });
+
+        // Check if all collections are already selected
+        const allSelected = filteredCollections.every(collection => {
+            const collectionTitle = collection.metadata?.["dc.title"]?.[0]?.value || "Unnamed Collection";
+            return selectedPermissions[collectionTitle]?.has(selectedPermissionLevel);
+        });
+
+        // Update selected permissions and groups for all collections in the community
+        filteredCollections.forEach(collection => {
+            const collectionTitle = collection.metadata?.["dc.title"]?.[0]?.value || "Unnamed Collection";
+            handleCollectionCheckboxChange(collectionTitle, !allSelected);
+        });
+    };
+
+    const isAllSelected = (community: CommunityWithCollections): boolean => {
+        const filteredCollections = community.collections.filter(collection => {
+            const collectionTitle = collection.metadata?.["dc.title"]?.[0]?.value || "Unnamed Collection";
+            return collectionPermissions[collectionTitle]?.some(p => p.permission === selectedPermissionLevel);
+        });
+
+        return filteredCollections.length > 0 && filteredCollections.every(collection => {
+            const collectionTitle = collection.metadata?.["dc.title"]?.[0]?.value || "Unnamed Collection";
+            return selectedPermissions[collectionTitle]?.has(selectedPermissionLevel);
+        });
+    };
+
     const handleGroupChanges = async (): Promise<void> => {
-        const prevGroupsSet = new Set(initialUserGroups.map(g => g.groupName));
-        const newGroupsSet = new Set(selectedGroups.map(g => g.groupName));
-
-        const addedGroups = selectedGroups.filter(g => !prevGroupsSet.has(g.groupName));
-        const removedGroups = initialUserGroups.filter(g => !newGroupsSet.has(g.groupName));
-
+        const prevGroupsSet = new Set(initialUserGroups.map(g => g.uuid));
+        const newGroupsSet = new Set(selectedGroups.map(g => g.uuid));
+    
+        const addedGroups = selectedGroups.filter(g => !prevGroupsSet.has(g.uuid));
+        const removedGroups = initialUserGroups.filter(g => !newGroupsSet.has(g.uuid));
+    
         if (addedGroups.length === 0 && removedGroups.length === 0) {
             onClose();
             return;
         }
-
+    
         try {
-            for (const group of addedGroups) {
-                await addMemberToGroup(group.uuid, userId);
-                await new Promise(res => setTimeout(res, 300));
-            }
-
-            for (const group of removedGroups) {
-                await removeMemberToGroup(group.uuid, userId);
-                await new Promise(res => setTimeout(res, 300));
-            }
-
+            await Promise.all(addedGroups.map(async (group) => {
+                try {
+                    await addMemberToGroup(group.uuid, userId);
+                } catch (error) {
+                    console.error(`Failed to add user to group ${group.groupName}:`, error);
+                }
+            }));
+    
+            await Promise.all(removedGroups.map(async (group) => {
+                try {
+                    await removeMemberToGroup(group.uuid, userId);
+                } catch (error) {
+                    console.error(`Failed to remove user from group ${group.groupName}:`, error);
+                }
+            }));
+    
             onClose();
         } catch (error) {
             console.error("Error updating user groups:", error);
@@ -207,14 +270,7 @@ const AccessManagement: React.FC<AccessManagementProps> = ({ open, onClose, user
         new Set(
             Object.values(collectionPermissions)
                 .flatMap(perms => perms.map(p => p.permission))
-        )
-    );
-
-    // Filter collections to show only those that have the selected permission level
-    const filteredCollections = collections.filter(collection => {
-        const collectionTitle = collection.metadata?.["dc.title"]?.[0]?.value || "Unnamed Collection";
-        return collectionPermissions[collectionTitle]?.some(p => p.permission === selectedPermissionLevel);
-    });
+    ));
 
     return (
         <Modal open={open} onClose={onClose}>
@@ -251,30 +307,64 @@ const AccessManagement: React.FC<AccessManagementProps> = ({ open, onClose, user
                 </Box>
 
                 <Box component="form" className="modal-form">
-                    {selectedPermissionLevel && filteredCollections.map(collection => {
-                        const collectionTitle = collection.metadata?.["dc.title"]?.[0]?.value || "Unnamed Collection";
-                        const isChecked = selectedPermissions[collectionTitle]?.has(selectedPermissionLevel) || false;
+                    <List>
+                        {communities.map(community => {
+                            const filteredCollections = community.collections.filter(collection => {
+                                const collectionTitle = collection.metadata?.["dc.title"]?.[0]?.value || "Unnamed Collection";
+                                return collectionPermissions[collectionTitle]?.some(p => p.permission === selectedPermissionLevel);
+                            });
 
-                        return (
-                            <Box key={collection.id} className="collection-container">
-                                <Box className="dropdown-header">
-                                    <FormControlLabel
-                                        control={
-                                            <Checkbox
-                                                checked={isChecked}
-                                                onChange={(e) => handleCollectionCheckboxChange(collectionTitle, e.target.checked)}
-                                            />
-                                        }
-                                        label={
-                                            <Typography className="collection-title">
-                                                {collectionTitle}
-                                            </Typography>
-                                        }
-                                    />
-                                </Box>
-                            </Box>
-                        );
-                    })}
+                            if (filteredCollections.length === 0) return null;
+
+                            const allSelected = isAllSelected(community);
+
+                            return (
+                                <React.Fragment key={community.id}>
+                                    <ListItem>
+                                        <ListItemButton onClick={() => toggleCommunityExpand(community.id)}>
+                                            <ListItemText primary={community.metadata["dc.title"]?.[0]?.value} />
+                                            <ListItemIcon>
+                                                {community.expanded ? <img className="table_icon" src={iconsImgs.minus} alt="Minus" /> : <img className="table_icon" src={iconsImgs.add} alt="Add" />}
+                                            </ListItemIcon>
+                                        </ListItemButton>
+                                    </ListItem>
+                                    <Collapse in={community.expanded} timeout="auto" unmountOnExit>
+                                        <List component="div" disablePadding>
+                                            <ListItem sx={{ pl: 4 }}>
+                                            <FormControlLabel
+                                            control={
+                                                <Checkbox
+                                                    checked={allSelected}
+                                                    onClick={() => handleSelectAll(community)}
+                                                />
+                                            }
+                                            label= 'Select All'
+                                        />
+                                            </ListItem>
+                                            {filteredCollections.map(collection => {
+                                                const collectionTitle = collection.metadata?.["dc.title"]?.[0]?.value || "Unnamed Collection";
+                                                const isCollectionChecked = selectedPermissions[collectionTitle]?.has(selectedPermissionLevel) || false;
+
+                                                return (
+                                                    <ListItem key={collection.id} sx={{ pl: 8 }}>
+                                                        <FormControlLabel
+                                                            control={
+                                                                <Checkbox
+                                                                    checked={isCollectionChecked}
+                                                                    onChange={(e) => handleCollectionCheckboxChange(collectionTitle, e.target.checked)}
+                                                                />
+                                                            }
+                                                            label={collectionTitle}
+                                                        />
+                                                    </ListItem>
+                                                );
+                                            })}
+                                        </List>
+                                    </Collapse>
+                                </React.Fragment>
+                            );
+                        })}
+                    </List>
                     <Box className="modal-footer">
                         <button type="submit" className="add-user-btn" onClick={handleGroupChanges}>
                             <span className="btn-text">Give Access</span>
