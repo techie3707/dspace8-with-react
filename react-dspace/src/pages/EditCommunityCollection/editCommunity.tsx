@@ -315,6 +315,10 @@ const EditCommunity = () => {
         }
     };
 
+    const handleCollectionPolicyClick = (communityUuid: string, collectionUuid: string) => {
+        navigate(`/Policies/${collectionUuid}`);
+    };
+
     return (
         <Container className=''>
             <Box display="flex" justifyContent="space-between" className="header_epeople" alignItems="center" mb={2}>
@@ -498,6 +502,14 @@ const EditCommunity = () => {
                                                                                         title="Delete"
                                                                                     >
                                                                                         <img className="table_icon" src={iconsImgs.remove} alt="Remove" />
+                                                                                    </IconButton>
+                                                                                    <IconButton
+                                                                                        className='btn_table'
+                                                                                        color="secondary"
+                                                                                        onClick={() => handleCollectionPolicyClick(community.uuid, collection.uuid)}
+                                                                                        title="Policy"
+                                                                                    >
+                                                                                        <img className="table_icon" src={iconsImgs.access} alt="Remove" />
                                                                                     </IconButton>
                                                                                 </Box>
                                                                             )}

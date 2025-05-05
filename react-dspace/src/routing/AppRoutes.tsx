@@ -40,6 +40,8 @@ import RemoveItem from "../pages/workflow/removeItem";
 import ResourcePolicy from "../pages/workflow/resourcePolicy";
 import SupervisionSelecter from "../pages/workflow/supervisionSelecter";
 import CreateResourcePolicy from "../pages/workflow/createResourcePolicy";
+import Policies from "../pages/collection/policy";
+import CreatePolicy from "../pages/collection/createPolicy";
 
 
 
@@ -88,6 +90,8 @@ const AppRoutes = () => {
         <Route path="/pdf-viewer" element={<PDFViewer />} />
         <Route path="/flip-book-viewer" element={<PDFFlipBook />} />
         <Route path="/edit-Community-Collection" element={<EditCommunity />} />
+        <Route path="/createPolicies/:uuid" element={<CreatePolicy />} />
+        <Route path="/policies/:id" element={<Policies />} />
         <Route path="/edit-item/:itemId" element={<EditItem />} />
         <Route path="/add-bitstream/:itemId" element={<AddBitstream />} />
         <Route path="/workflowSearch" element={<Workflow />} />
