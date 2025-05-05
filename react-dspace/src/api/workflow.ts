@@ -254,6 +254,60 @@ export const getResourcePolicies = async (id: string) => {
   }
 }
 
+export const updateResourcePolicyGroup = async (policyId: string, groupId: string) => {
+  await axios.put(
+      `${siteConfig.apiEndpoint}/api/authz/resourcepolicies/${policyId}/group`,
+      `${siteConfig.apiEndpoint}/api/eperson/groups/${groupId}`,
+      {
+          headers: {
+              'Content-Type': 'text/uri-list',
+              'X-XSRF-TOKEN': csrfToken,
+              Authorization: authToken,
+          },
+      withCredentials: true,
+      }
+  );
+};
+interface ResourcePolicyData {
+  policyType: string;
+  action: string;
+  type: {
+      value: string;
+  };
+}
+export const updateResourcePolicyMetadata = async (policyId: string, data: ResourcePolicyData) => {
+  const patchOperations = [];
+  
+  if (data.policyType) {
+      patchOperations.push({
+          op: "add",
+          path: "/policyType",
+          value: data.policyType
+      });
+  }
+  
+  if (data.action) {
+      patchOperations.push({
+          op: "replace",
+          path: "/action",
+          value: data.action
+      });
+  }
+
+  await axios.patch(
+      `${siteConfig.apiEndpoint}/api/authz/resourcepolicies/${policyId}`,
+      patchOperations,
+      {
+          headers: {
+              'Content-Type': 'application/json',
+              'X-XSRF-TOKEN': csrfToken,
+              Authorization: authToken,
+          },
+          withCredentials: true,
+      }
+  );
+};
+
 // https://demo.dspace.org/server/api/authz/resourcepolicies/30435
 export const removeResourcePolicy = async (id: string) => {
   try {
@@ -302,10 +356,34 @@ export const createSupervisionOrder = async (uuid: string, group: string, type: 
 
 //https://demo.dspace.org/server/api/authz/resourcepolicies?resource=f94f88de-63ff-4f7a-a259-100dd585621a&eperson=eadda9c3-a982-43ab-b532-2667f2c47932
 
-export const AddResourcePolicy = async (uuid:string, selectedId:string , formData:string) => {
+export const AddResourcePolicyForEperson = async (uuid:string, selectedId:string , formData:string) => {
   try{
     const response = await axios.post(
                     `${siteConfig.apiEndpoint}/api/authz/resourcepolicies?resource=${uuid}&eperson=${selectedId}`,
+                    formData,
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-XSRF-TOKEN': csrfToken,
+                            Authorization: authToken
+                        },
+                        withCredentials: true
+                    }
+                );
+                if (response.status === 201) {
+                  showToast("Resource policy created successfully!", "success");
+                }
+  }catch(error){
+    console.error("Error creating resource policy:", error);
+  }
+}
+
+//https://demo.dspace.org/server/api/authz/resourcepolicies?resource=282164f5-d325-4740-8dd1-fa4d6d3e7200&group=f2c7eb75-aec0-4604-ab7f-6676723818ad
+
+export const AddResourcePolicyForGroup = async (uuid:string, selectedId:string , formData:string) => {
+  try{
+    const response = await axios.post(
+                    `${siteConfig.apiEndpoint}/api/authz/resourcepolicies?resource=${uuid}&group=${selectedId}`,
                     formData,
                     {
                         headers: {
