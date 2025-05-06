@@ -320,7 +320,7 @@ const EditCommunity = () => {
     };
 
     return (
-        <Container className=''>
+        <Container className="top_padding">
             <Box display="flex" justifyContent="space-between" className="header_epeople" alignItems="center" mb={2}>
                 <Typography variant="h4">Edit Community</Typography>
 
