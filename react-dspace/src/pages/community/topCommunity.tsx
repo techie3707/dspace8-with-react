@@ -1,5 +1,5 @@
 import { TextField, Button, Box, Typography, Paper, Modal, IconButton } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close"; // <-- Import Close Icon
+import CloseIcon from "@mui/icons-material/Close"; 
 import { ToastContainer, toast } from "react-toastify";
 import { useState } from 'react';
 import { CreateCommunity } from '../../api/topCommunity';
@@ -10,7 +10,7 @@ const TopCommunity = ({ open, handleClose }: { open: boolean, handleClose: () =>
     const [description, setDescription] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
 
-    const isFormValid = title.trim() !== ""; // Only Title is required now
+    const isFormValid = title.trim() !== ""; 
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

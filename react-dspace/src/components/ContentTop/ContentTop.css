@@ -21,8 +21,18 @@
   font-size: 20px;
   font-weight: 600;
 }
+.main-content-top {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 999 !important; 
+  background-color: #fff; 
+  padding: 10px 20px; 
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+}
 .content-top-btn {
-  margin-left: 18px;
+  margin-left: 9px;
 }
 .content-top-btn img {
   width: 24px;

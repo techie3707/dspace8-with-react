@@ -93,8 +93,8 @@ const MetadataSchemas = () => {
 
 
     return (
-        <Paper className="metadata-container">
-            <div className="header_shema_div">
+        <Paper className="metadata-container ">
+            <div className="header_shema_div top_padding">
                 <h1 className="header_shema">
                     Metadata Registry
                 </h1>

@@ -5,7 +5,9 @@
   margin: 0;
   box-sizing: border-box;
 }
-
+.top_padding{
+  padding-top: 2rem;
+}
 :root {
   --clr-primary: rgb(19.2541401274, 34.9261146497, 51.0458598726);
   --clr-primar-light: #473b33;
@@ -655,4 +657,7 @@ button {
 
 .item-name {
   color: rgb(129, 20, 246);
+}
+.main-content-holder{
+  margin-top: 45px;
 }

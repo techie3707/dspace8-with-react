@@ -92,7 +92,7 @@ const Groups = () => {
     }
 
     return (
-        <Container>
+        <Container className="top_padding">
             <Grid container justifyContent="space-between" alignItems="center" className="header_groups header_epeople">
                 <Typography variant="h4" sx={{ mb: 1 }}>
                     Groups
