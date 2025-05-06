@@ -19,6 +19,8 @@ import {
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
+import { getAuthStatus } from "../../api/authApi";
+import { updateUserCart } from "../../api/cart";
 
 const parsePages = (input: string): number[] => {
     const pages: number[] = [];
@@ -123,16 +125,31 @@ const PDFViewer: React.FC = () => {
                     <Button
                         fullWidth
                         variant="contained"
-                        onClick={() => {
+                        onClick={async () => {
                             const pages = parsePages(pageInput);
-                            console.log("Bitstream UUID:", uuid);
-                            console.log("Pages to add:", pages);
-                            setShowForm(false);
-                            setPageInput("");
+                            if (!pages || pages.length === 0) {
+                                console.error("No valid pages entered.");
+                                return;
+                            }
+
+                            try {
+                                const userID = await getAuthStatus();
+                                if (!userID) {
+                                    console.error("User not authenticated or no user ID found.");
+                                    return;
+                                }
+                                await updateUserCart(userID, uuid!);
+                                setShowForm(false);
+                                setPageInput("");
+                            } catch (error) {
+                                console.error("Error in Add to List operation:", error);
+                            }
                         }}
                     >
                         Add to List
                     </Button>
+
+
                 </Paper>
             </Slide>
         </Box>

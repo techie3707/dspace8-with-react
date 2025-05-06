@@ -1,6 +1,7 @@
 import axios from "axios";
 import { siteConfig } from "../data/data";
 import { showToast } from "../contexts/ToastProvider";
+import { addGroup, GroupPayload } from "./group";
 
 export interface Collection {
   id: string;
@@ -62,12 +63,35 @@ export const AddCollection = async (parentId: string, title: string, description
         headers: {
           "Content-Type": "application/json",
           "X-XSRF-TOKEN": csrfToken,
-          "Authorization": authToken 
+          "Authorization": authToken
         },
         withCredentials: true
       }
     );
     if (response.status === 201) {
+      setTimeout(async () => {
+        const groupBaseName = title;
+        const groupNames = [`${groupBaseName}_Read`, `${groupBaseName}_Admin`, `${groupBaseName}_Upload`];
+
+        for (const groupName of groupNames) {
+          const payload: GroupPayload = {
+            name: groupName,
+            metadata: {
+              "dc.description": [{ value: description }],
+            },
+          };
+
+          try {
+            const success = await addGroup(payload);
+            if (success) {
+              showToast(`Group '${groupName}' created successfully!`, "success");
+            }
+          } catch (groupError: any) {
+            console.error(`Failed to create group '${groupName}':`, groupError);
+            showToast(`Failed to create group '${groupName}'`, "error");
+          }
+        }
+      }, 1000);
       showToast("Collection created successfully!", "success");
     }
   } catch (error: any) {
@@ -88,30 +112,30 @@ export const AddCollection = async (parentId: string, title: string, description
   }
 }
 
-export const deleteCollection = async (uuid:string) =>{
-  try{
+export const deleteCollection = async (uuid: string) => {
+  try {
     const response = await axios.delete(`${siteConfig.apiEndpoint}/api/core/collections/${uuid}`,
-    {
-      headers: {
-        "Content-Type": "application/json",
-        "X-XSRF-TOKEN": csrfToken,
-        "Authorization": authToken
-      },
-      withCredentials: true
-    });
-    if(response.status === 204){
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "X-XSRF-TOKEN": csrfToken,
+          "Authorization": authToken
+        },
+        withCredentials: true
+      });
+    if (response.status === 204) {
       showToast('Collection deleted successfully!', 'success');
-  }
-  return response.data
-}catch(error){
-  showToast('Failed to delete collection','error')
-};
+    }
+    return response.data
+  } catch (error) {
+    showToast('Failed to delete collection', 'error')
+  };
 }
 
-export const editCollection = async (uuid:string,title:string) =>{
-  try{
+export const editCollection = async (uuid: string, title: string) => {
+  try {
     const response = await axios.patch(`${siteConfig.apiEndpoint}/api/core/collections/${uuid}`,
-      [{op: "replace", path: "/metadata/dc.title", value: {value: `${title}`, language: null}}],
+      [{ op: "replace", path: "/metadata/dc.title", value: { value: `${title}`, language: null } }],
       {
         headers: {
           "Content-Type": "application/json",
@@ -121,10 +145,10 @@ export const editCollection = async (uuid:string,title:string) =>{
         withCredentials: true,
       }
     )
-    if(response.status === 200){
+    if (response.status === 200) {
       showToast('Collection updated successfully!', 'success');
     }
-  }catch(error){
-    console.error('Failed to update collection',error);
+  } catch (error) {
+    console.error('Failed to update collection', error);
   }
 }
