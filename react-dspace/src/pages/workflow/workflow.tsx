@@ -480,6 +480,7 @@ const Workflow = () => {
                                                         padding: '5px',
                                                         background: 'none',
                                                     }}
+                                                    title='Edit'
                                                 >
                                                     <img className="itemh_icon" src={iconsImgs.edit} alt="Edit" />
                                                 </IconButton>
@@ -493,6 +494,7 @@ const Workflow = () => {
                                                         padding: '5px',
                                                         background: 'none',
                                                     }}
+                                                    title='Delete'
                                                 >
                                                     <img className="itemh_icon" src={iconsImgs.remove} alt="Delete" />
                                                 </IconButton>
@@ -506,6 +508,7 @@ const Workflow = () => {
                                                         padding: '5px',
                                                         background: 'none',
                                                     }}
+                                                    title='Supervision'
                                                 >
                                                     <img className="itemh_icon" src={iconsImgs.group_icon_black} alt="Supervision" />
                                                 </IconButton>
@@ -603,6 +606,7 @@ const Workflow = () => {
                                                         padding: '5px',
                                                         background: 'none',
                                                     }}
+                                                    title='Edit'
                                                 >
                                                     <img className="itemh_icon" src={iconsImgs.edit} alt="Edit" />
                                                 </IconButton>
@@ -616,6 +620,7 @@ const Workflow = () => {
                                                         padding: '5px',
                                                         background: 'none',
                                                     }}
+                                                    title='Delete'
                                                 >
                                                     <img className="itemh_icon" src={iconsImgs.remove} alt="Delete" />
                                                 </IconButton>
@@ -629,6 +634,7 @@ const Workflow = () => {
                                                         padding: '5px',
                                                         background: 'none',
                                                     }}
+                                                    title="Supervision"
                                                 >
                                                     <img className="itemh_icon" src={iconsImgs.group_icon_black} alt="Supervision" />
                                                 </IconButton>

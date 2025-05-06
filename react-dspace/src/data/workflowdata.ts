@@ -206,7 +206,7 @@ export interface Policy {
 
 
 export interface ResourcePolicyData {
-    name: string;
+    name: string | null;
     description: string | null;
     policyType: string;
     action: string;
