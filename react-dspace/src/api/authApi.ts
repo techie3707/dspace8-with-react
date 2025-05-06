@@ -185,7 +185,6 @@ const parseJwt = (token: string): { exp?: number } | null => {
     const decodedPayload = JSON.parse(atob(base64));
     return decodedPayload;
   } catch (error) {
-    // console.error("Error decoding JWT:", error);
     return null;
   }
 };

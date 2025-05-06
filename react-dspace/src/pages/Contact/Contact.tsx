@@ -1,188 +1,75 @@
-import React, { useEffect, useState } from 'react';
-import {
-  Box,
-  TextField,
-  Button,
-  Typography,
-  Container,
-  Grid
-} from '@mui/material';
+import React from "react";
+import "../../styles/contact.css";
 
 const Contact = () => {
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    mobile: '',
-    subject: '',
-    message: ''
-  });
-  const [displayText, setDisplayText] = useState('');
-  const [currentTextIndex, setCurrentTextIndex] = useState(0);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [typingSpeed, setTypingSpeed] = useState(150); // milliseconds per character
-
-  const texts = [
-    "Have Any Questions?",
-    "Need Help With Something?",
-    "Want To Know More?",
-    "How Can We Help You?"
-  ];
-
-  useEffect(() => {
-    const currentText = texts[currentTextIndex];
-
-    if (!isDeleting && displayText.length === currentText.length) {
-      setTimeout(() => setIsDeleting(true), 2000);
-      return;
-    }
-
-    if (isDeleting && displayText === '') {
-      setIsDeleting(false);
-      setCurrentTextIndex((prevIndex) => (prevIndex + 1) % texts.length);
-      setTypingSpeed(isDeleting ? 5 : 5);
-      return;
-    }
-
-    const timeout = setTimeout(() => {
-      if (isDeleting) {
-        setDisplayText(currentText.substring(0, displayText.length - 1));
-        setTypingSpeed(isDeleting ? 5 : 5);
-      } else {
-        setDisplayText(currentText.substring(0, displayText.length + 1));
-      }
-    }, typingSpeed);
-
-    return () => clearTimeout(timeout);
-  }, [displayText, currentTextIndex, isDeleting, texts, typingSpeed]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('Form submitted:', formData);
-  };
-
   return (
-    <Container maxWidth="md"
-      className='container'
-      sx={{ mt: 4, mb: 4 }}>
-      <Typography
-        variant="h4"
-        sx={{
-          fontWeight: "bold",
-          backgroundColor: "#f9f9f9",
-          borderRadius: "5px",
-          textAlign: "center",
-          width: '100%',
-          padding: 2,
-          marginTop: 0
-        }}
-        className="about-title"
-      >
-        Contact Us
-      </Typography>
-      <Typography variant='h4' sx={{
-        fontSize: '30px',
-        fontWeight: 500,
-        mt: 2,
-        minHeight: '1.5em',
-        display: 'inline-block',
-        whiteSpace: 'nowrap',
-        overflow: 'hidden'
-      }}>
-        {displayText}
-      </Typography>
-      <Typography variant='body1' sx={{ fontSize: '20px', mt: 2, fontFamily: 'serif' }}>if you have any questions, please fill out the below form our team will get back to you as soon as possible.</Typography>
-      <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
-              required
-              label="First Name"
-              name="firstName"
-              value={formData.firstName}
-              onChange={handleChange}
-              variant="outlined"
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
-              required
-              label="Last Name"
-              name="lastName"
-              value={formData.lastName}
-              onChange={handleChange}
-              variant="outlined"
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              required
-              label="Email Address"
-              name="email"
-              type="email"
-              value={formData.email}
-              onChange={handleChange}
-              variant="outlined"
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              required
-              label="Mobile"
-              name="mobile"
-              value={formData.mobile}
-              onChange={handleChange}
-              variant="outlined"
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              required
-              fullWidth
-              label="Subject"
-              name="subject"
-              value={formData.subject}
-              onChange={handleChange}
-              variant="outlined"
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              required
-              label="Your Message"
-              name="message"
-              value={formData.message}
-              onChange={handleChange}
-              variant="outlined"
-              multiline
-              rows={4}
-            />
-          </Grid>
-        </Grid>
+    <div className="contact-wrapper">
+      <div className="contact-container">
+        {/* Left Side: Map + Info */}
+        <div className="contact-info-box">
+          {/* Map Section */}
+          <div className="contact-map-wrapper">
+            <h2 className="form-title map-title">Contact Us</h2>
+            <div className="contact-map">
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d28027.806321009335!2d77.313586!3d28.585500000000003!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390cfba1e9001e9b%3A0x6129e4f609e83867!2sTechbets%20Infotech!5e0!3m2!1sen!2sus!4v1746185872822!5m2!1sen!2sus"
+                width="600"
+                height="450"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
 
-        <Button
-          type="submit"
-          // fullWidth
-          variant="contained"
-          sx={{ mt: 3, mb: 2, py: 1.5, px: 4, backgroundColor: '#007bff', color: '#fff', '&:hover': { backgroundColor: '#0056b3' } }}
-        >
-          Submit Form
-        </Button>
-      </Box>
-    </Container>
+
+            </div>
+          </div>
+
+          {/* Info Section */}
+          <div className="company-info">
+            <h2 className="company-title">Techbets Infotech Pvt. Ltd.</h2>
+            <p className="company-address">
+              📍 B-8, B Block, Sector 2<br />
+              Noida, Uttar Pradesh 201301<br />
+              (Near to Noida Sector - 15,)
+            </p>
+            <div className="company-contact">
+              <p>📞 +91 9999026602</p>
+              <p>📱 +91 7717754871</p>
+              <p>📧 <a href="mailto:info@techbets.in">info@techbets.in</a></p>
+            </div>
+
+          </div>
+        </div>
+
+        {/* Right Side: Contact Form */}
+        <div className="contact-form-box">
+          <h2 className="form-title">Send Us a Message</h2>
+          <form className="contact-form">
+            <div className="form-group">
+              <label>Full Name <span>*</span></label>
+              <input type="text" required placeholder="Enter your name" />
+            </div>
+            <div className="form-group">
+              <label>Email Address <span>*</span></label>
+              <input type="email" required placeholder="example@mail.com" />
+            </div>
+            <div className="form-row">
+              <div className="form-phone">
+                <label>Contact Number <span>*</span></label>
+                <input type="tel" required placeholder="Your phone number" />
+              </div>
+            </div>
+            <div className="form-group">
+              <label>Comments</label>
+              <textarea rows={4} placeholder="Your message..."></textarea>
+            </div>
+            <button type="submit">SEND MESSAGE</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
   );
 };
 

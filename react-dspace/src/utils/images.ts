@@ -44,6 +44,7 @@ import group_icon_black from "../assets/icons/group_icon_black.png";
 import preview from "../assets/images/about1.webp";
 import person from "../assets/images/person.png";
 import business_person from "../assets/images/business_person.png";
+import aboutBack from "../assets/images/aboutBack.avif";
 
 
 
@@ -88,6 +89,7 @@ interface IconsImages {
     minus:string;
     whiteEditIcon: string;
     group_icon_black:string;
+    aboutBack: string
 }
 
 
@@ -105,7 +107,7 @@ interface About_US{
 
 // Export typed objects
 export const iconsImgs: IconsImages = {
-    alert, bell, bills, budget, card, check, empty_check, gears, home, menu, plane, plus, report, search, searchLight, user, wallet, wealth, login, edit, remove, access, list, grid, arrow, back_btn, batchimport, group, epople, registries, collection, community , collectionname, save, cancel, add ,minus,whiteEditIcon,group_icon_black
+    alert, bell, bills, budget, card, check, empty_check, gears, home, menu, plane, plus, report, search, searchLight, user, wallet, wealth, login, edit, remove, access, list, grid, arrow, back_btn, batchimport, group, epople, registries, collection, community , collectionname, save, cancel, add ,minus,whiteEditIcon,group_icon_black,aboutBack
 };
 
 export const personsImgs: PersonsImages = {
