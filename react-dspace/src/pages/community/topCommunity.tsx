@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { CreateCommunity } from '../../api/topCommunity';
 import Loader from "../loader/loader";
 
-const TopCommunity = ({ open, handleClose }: { open: boolean, handleClose: () => void }) => {
+const TopCommunity = ({ open, handleClose, onCommunityCreated }: { open: boolean, handleClose: () => void, onCommunityCreated?: () => void }) => {
     const [title, setTitle] = useState<string>('');
     const [description, setDescription] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
@@ -16,19 +16,19 @@ const TopCommunity = ({ open, handleClose }: { open: boolean, handleClose: () =>
         e.preventDefault();
         if (!isFormValid) return;
         try {
-            setLoading(true);
-            await CreateCommunity(title, description);
-            setTitle('');
-            setDescription('');
-            toast.success("Community created successfully!");
-            handleClose(); 
+          setLoading(true);
+          await CreateCommunity(title, description);
+          setTitle('');
+          setDescription('');
+          toast.success("Community created successfully!");
+          handleClose();
+          onCommunityCreated?.(); 
         } catch (error) {
-            console.error("Error creating community:", error);
-            toast.error("Failed to create community");
+          // ... error handling ...
         } finally {
-            setLoading(false);
+          setLoading(false);
         }
-    }
+      }
 
     return (
         <Modal open={open} onClose={handleClose}>

@@ -147,7 +147,7 @@ const CreatePolicy = () => {
     };
 
     return (
-        <Container sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 3 }}>
+        <Container sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 3,mt: 2,mb: 2 }}>
             <Typography variant="h4" className='header_epeople' sx={{ mb: 2 }}>
                 {isEditMode ? "Edit Resource Policy" : "Create New Resource Policy"}
             </Typography>
@@ -265,15 +265,7 @@ const CreatePolicy = () => {
                     </TableBody>
                 </Table>
             </TableContainer>
-            
-            <Pagination
-                count={totalPages}
-                page={page}
-                onChange={handleChangePage}
-                sx={{ display: "flex", justifyContent: "center", mt: 2, mb: 3 }}
-            />
-            
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 3 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 1 }}>
                 <Button variant="outlined" onClick={handleCancel}>
                     Cancel
                 </Button>
@@ -285,6 +277,12 @@ const CreatePolicy = () => {
                     {isEditMode ? "Update" : "Save"}
                 </Button>
             </Box>
+            <Pagination
+                count={totalPages}
+                page={page}
+                onChange={handleChangePage}
+                sx={{ display: "flex", justifyContent: "center", mt: 1,mb: 1 }}
+            />
         </Container>
     );
 };

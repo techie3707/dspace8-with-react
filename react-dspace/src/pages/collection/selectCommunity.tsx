@@ -76,6 +76,7 @@ const SelectCommunityModal: React.FC<SelectCommunityModalProps> = ({ open, onClo
   const handleCollectionModalClose = () => {
     setModalOpen(false);
     setSelectedCommunity(null);
+    onClose();
   };
 
   return (

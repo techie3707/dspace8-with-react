@@ -332,11 +332,15 @@ const EditCommunity = () => {
                         </Button>
 
                         {/* Modal */}
-                        <TopCommunity open={openCommunityModal} handleClose={() => setOpenCommunityModal(false)} />
+                        <TopCommunity
+                            open={openCommunityModal}
+                            handleClose={() => setOpenCommunityModal(false)}
+                            onCommunityCreated={fetchCommunityData} 
+                        />
                     </div>
                     <div>
                         <Button variant="contained" color="success" onClick={handleButtonClick}>
-                        <img className="collection_icon" src={iconsImgs.collection} alt="collection" />
+                            <img className="collection_icon" src={iconsImgs.collection} alt="collection" />
                             Create Collection
                         </Button>
                         <SelectCommunityModal open={modalOpen} onClose={() => setModalOpen(false)} />

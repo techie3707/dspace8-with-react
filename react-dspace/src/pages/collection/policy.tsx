@@ -81,7 +81,7 @@ const Policies = () => {
     return (
         <Container>
             <TableContainer>
-                <Box sx={{ display: "flex", justifyContent: "end", mb: 2, gap: 2 }}>
+                <Box sx={{ display: "flex", justifyContent: "end", mb: 2, gap: 2,mt: 2 }}>
                     <Button
                         variant="contained"
                         color="secondary"
