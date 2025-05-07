@@ -24,6 +24,8 @@ import {
     ListItemIcon,
     ListItemText,
     Button,
+    Divider,
+    Grid,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { Collection, Community } from "../../../data/accessAPI";
@@ -52,6 +54,7 @@ const AccessManagement: React.FC<AccessManagementProps> = ({ open, onClose, user
     const [initialUserGroups, setInitialUserGroups] = useState<{ uuid: string; groupName: string }[]>([]);
     const [groupsList, setGroupsList] = useState<Group[]>([]);
     const [selectedPermissionLevel, setSelectedPermissionLevel] = useState<string>("");
+    const [selectedCommunity, setSelectedCommunity] = useState<CommunityWithCollections | null>(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -141,7 +144,7 @@ const AccessManagement: React.FC<AccessManagementProps> = ({ open, onClose, user
                 }
             } catch (error) {
                 console.error("Error fetching user groups:", error);
-            }
+            } 
         };
         fetchUserAssignedGroups();
     }, [userId]);
@@ -274,106 +277,144 @@ const AccessManagement: React.FC<AccessManagementProps> = ({ open, onClose, user
 
     return (
         <Modal open={open} onClose={onClose}>
-            <Paper
-                sx={{ maxWidth: "90%", maxHeight: "90%", overflow: "auto" }}
-                className="modal-paper">
-                <div className="modal-header-container">
-                    <Typography className="modal-header">Edit Access Management</Typography>
-                    <IconButton onClick={onClose} className="close-icon">
-                        <CloseIcon />
-                    </IconButton>
-                </div>
+        <Paper
+            sx={{ 
+                width: "80%", 
+                maxWidth: "1000px",
+                maxHeight: "90%", 
+                overflow: "auto",
+                padding: "20px"
+            }}
+            className="modal-paper"
+        >
+            <div className="modal-header-container">
+                <Typography variant="h5" className="modal-header">Collection wise permission</Typography>
+                <IconButton onClick={onClose} className="close-icon">
+                    <CloseIcon />
+                </IconButton>
+            </div>
 
-                <Box sx={{ marginBottom: 2 }}>
-                    <Typography variant="subtitle1" sx={{ marginBottom: 1 }}>Permission Level:</Typography>
-                    <FormControl>
-                        <RadioGroup
-                            row
-                            aria-labelledby="permission-level-radio-buttons"
-                            name="permission-level"
-                            value={selectedPermissionLevel}
-                            onChange={handlePermissionLevelChange}
-                        >
-                            {permissionTypes.map(permission => (
-                                <FormControlLabel
-                                    key={permission}
-                                    value={permission}
-                                    control={<Radio />}
-                                    label={permission.charAt(0).toUpperCase() + permission.slice(1)}
-                                />
-                            ))}
-                        </RadioGroup>
-                    </FormControl>
-                </Box>
+            <Box sx={{ marginBottom: 2 }}>
+                <FormControl>
+                    <RadioGroup
+                        row
+                        aria-labelledby="permission-level-radio-buttons"
+                        name="permission-level"
+                        value={selectedPermissionLevel}
+                        onChange={handlePermissionLevelChange}
+                    >
+                        {permissionTypes.map(permission => (
+                            <FormControlLabel
+                                key={permission}
+                                value={permission}
+                                control={<Radio />}
+                                label={permission.charAt(0).toUpperCase() + permission.slice(1)}
+                            />
+                        ))}
+                    </RadioGroup>
+                </FormControl>
+            </Box>
 
-                <Box component="form" className="modal-form">
-                    <List>
-                        {communities.map(community => {
-                            const filteredCollections = community.collections.filter(collection => {
-                                const collectionTitle = collection.metadata?.["dc.title"]?.[0]?.value || "Unnamed Collection";
-                                return collectionPermissions[collectionTitle]?.some(p => p.permission === selectedPermissionLevel);
-                            });
+            <Divider sx={{ my: 2 }} />
 
-                            if (filteredCollections.length === 0) return null;
-
-                            const allSelected = isAllSelected(community);
-
-                            return (
-                                <React.Fragment key={community.id}>
-                                    <ListItem>
-                                        <ListItemButton onClick={() => toggleCommunityExpand(community.id)}>
-                                            <ListItemText primary={community.metadata["dc.title"]?.[0]?.value} />
-                                            <ListItemIcon>
-                                                {community.expanded ? <img className="table_icon" src={iconsImgs.minus} alt="Minus" /> : <img className="table_icon" src={iconsImgs.add} alt="Add" />}
-                                            </ListItemIcon>
-                                        </ListItemButton>
-                                    </ListItem>
-                                    <Collapse in={community.expanded} timeout="auto" unmountOnExit>
-                                        <List component="div" disablePadding>
-                                            <ListItem sx={{ pl: 4 }}>
-                                            <FormControlLabel
-                                            control={
-                                                <Checkbox
-                                                    checked={allSelected}
-                                                    onClick={() => handleSelectAll(community)}
-                                                />
-                                            }
-                                            label= 'Select All'
-                                        />
-                                            </ListItem>
-                                            {filteredCollections.map(collection => {
-                                                const collectionTitle = collection.metadata?.["dc.title"]?.[0]?.value || "Unnamed Collection";
-                                                const isCollectionChecked = selectedPermissions[collectionTitle]?.has(selectedPermissionLevel) || false;
-
-                                                return (
-                                                    <ListItem key={collection.id} sx={{ pl: 8 }}>
-                                                        <FormControlLabel
-                                                            control={
-                                                                <Checkbox
-                                                                    checked={isCollectionChecked}
-                                                                    onChange={(e) => handleCollectionCheckboxChange(collectionTitle, e.target.checked)}
-                                                                />
-                                                            }
-                                                            label={collectionTitle}
-                                                        />
-                                                    </ListItem>
-                                                );
-                                            })}
-                                        </List>
-                                    </Collapse>
-                                </React.Fragment>
-                            );
-                        })}
+            <Grid container spacing={2}>
+                {/* Left Panel - Communities */}
+                <Grid item xs={4} sx={{ borderRight: "1px solid #e0e0e0" }}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>
+                        Communities
+                    </Typography>
+                    <List dense sx={{ maxHeight: '400px', overflow: 'auto' }}>
+                        {communities.map(community => (
+                            <ListItem 
+                                key={community.id} 
+                                disablePadding
+                                sx={{
+                                    backgroundColor: selectedCommunity?.id === community.id ? '#f0f0f0' : 'transparent'
+                                }}
+                            >
+                                <ListItemButton 
+                                    onClick={() => setSelectedCommunity(community)}
+                                    sx={{ py: 1 }}
+                                >
+                                    <ListItemText sx={{borderBottom: '1px solid #e0e0e0', py: 1}} primary={community.metadata["dc.title"]?.[0]?.value} />
+                                    {selectedCommunity?.id === community.id ? 
+                                        <img src={iconsImgs.minus} alt="Collapse" style={{ width: '16px', height: '16px' }} /> :
+                                        <img src={iconsImgs.arrow} alt="Expand" style={{ width: '16px', height: '16px' }} />}
+                                </ListItemButton>
+                            </ListItem>
+                        ))}
                     </List>
-                    <Box className="modal-footer">
-                        <button type="submit" className="add-user-btn" onClick={handleGroupChanges}>
-                            <span className="btn-text">Give Access</span>
-                            <span className="btn-icon">→</span>
-                        </button>
-                    </Box>
-                </Box>
-            </Paper>
-        </Modal>
+                </Grid>
+
+                {/* Right Panel - Collections */}
+                <Grid item xs={8}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>
+                            Collections
+                        </Typography>
+                        {selectedCommunity ? (
+                            <>
+                                <Box >
+                                    <FormControlLabel
+                                        control={
+                                            <Checkbox
+                                                checked={isAllSelected(selectedCommunity)}
+                                                onChange={() => handleSelectAll(selectedCommunity)}
+                                            />
+                                        }
+                                        label="Select All"
+                                    />
+                                </Box>
+                                <List dense sx={{ maxHeight: '400px', overflow: 'auto' }}>
+                                    {selectedCommunity.collections
+                                        .filter(collection => {
+                                            const collectionTitle = collection.metadata?.["dc.title"]?.[0]?.value || "Unnamed Collection";
+                                            return collectionPermissions[collectionTitle]?.some(p => p.permission === selectedPermissionLevel);
+                                        })
+                                        .map(collection => {
+                                            const collectionTitle = collection.metadata?.["dc.title"]?.[0]?.value || "Unnamed Collection";
+                                            const isCollectionChecked = selectedPermissions[collectionTitle]?.has(selectedPermissionLevel) || false;
+
+                                            return (
+                                                <ListItem key={collection.id} disablePadding>
+                                                    <FormControlLabel
+                                                        control={
+                                                            <Checkbox
+                                                                checked={isCollectionChecked}
+                                                                onChange={(e) => handleCollectionCheckboxChange(collectionTitle, e.target.checked)}
+                                                            />
+                                                        }
+                                                        label={collectionTitle}
+                                                        sx={{ width: '100%', ml: 0,borderBottom: '1px solid #e0e0e0' }}
+                                                    />
+                                                </ListItem>
+                                            );
+                                        })}
+                                </List>
+                            </>
+                        ) : (
+                            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                Select a community to view its collections.
+                            </Typography>
+                        )}
+                    </Grid>
+            </Grid>
+
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3, mb: 2 }}>
+                <Button 
+                    variant="contained" 
+                    onClick={handleGroupChanges}
+                    sx={{ 
+                        backgroundColor: '#1976d2',
+                        '&:hover': { backgroundColor: '#1565c0' },
+                        textTransform: 'none',
+                        padding: '8px 20px'
+                    }}
+                >
+                    Give Access
+                </Button>
+            </Box>
+        </Paper>
+    </Modal>
     );
 };
 
