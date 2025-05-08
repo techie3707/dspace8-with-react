@@ -278,13 +278,13 @@ interface ResourcePolicyData {
 export const updateResourcePolicyMetadata = async (policyId: string, data: ResourcePolicyData) => {
   const patchOperations = [];
   
-  if (data.policyType) {
-      patchOperations.push({
-          op: "add",
-          path: "/policyType",
-          value: data.policyType
-      });
-  }
+  // if (data.policyType) {
+  //     patchOperations.push({
+  //         op: "add",
+  //         path: "/policyType",
+  //         value: data.policyType
+  //     });
+  // }
   
   if (data.action) {
       patchOperations.push({
