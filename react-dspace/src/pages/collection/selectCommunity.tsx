@@ -30,6 +30,8 @@ const SelectCommunityModal: React.FC<SelectCommunityModalProps> = ({ open, onClo
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedCommunity, setSelectedCommunity] = useState<Community | null>(null);
 
+useEffect(() => {
+  fetchData(0, size, searchText)}, [open]);
   const fetchData = async (page: number, size: number, searchValue: string = '') => {
     try {
       setLoading(true);
@@ -43,6 +45,7 @@ const SelectCommunityModal: React.FC<SelectCommunityModalProps> = ({ open, onClo
     }
   };
 
+  
   useEffect(() => {
     if (searchTimeout) clearTimeout(searchTimeout);
     const timeout = setTimeout(() => {

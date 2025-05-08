@@ -154,20 +154,19 @@ const EditCommunity = () => {
     const handleShowCollection = async (uuid: string, e?: React.MouseEvent) => {
         e?.stopPropagation();
         try {
-            if (!collections[uuid]) {
-                const response = await fetchCollectionsItem(uuid);
-                const collectionData = response as EmbeddedCollections;
-                const collectionsWithEditingState = collectionData._embedded.collections.map(collection => ({
-                    ...collection,
-                    isEditing: false,
-                    editedTitle: collection.metadata["dc.title"]?.[0]?.value || ''
-                }));
+            const response = await fetchCollectionsItem(uuid);
+            const collectionData = response as EmbeddedCollections;
+            const collectionsWithEditingState = collectionData._embedded.collections.map(collection => ({
+                ...collection,
+                isEditing: false,
+                editedTitle: collection.metadata["dc.title"]?.[0]?.value || ''
+            }));
 
-                setCollections(prev => ({
-                    ...prev,
-                    [uuid]: collectionsWithEditingState
-                }));
-            }
+            setCollections(prev => ({
+                ...prev,
+                [uuid]: collectionsWithEditingState
+            }));
+
             setExpandedCommunity(expandedCommunity === uuid ? null : uuid);
         } catch (err) {
             setError('Failed to fetch collections');
@@ -336,7 +335,7 @@ const EditCommunity = () => {
                         <TopCommunity
                             open={openCommunityModal}
                             handleClose={() => setOpenCommunityModal(false)}
-                            onCommunityCreated={fetchCommunityData} 
+                            onCommunityCreated={fetchCommunityData}
                         />
                     </div>
                     <div>
@@ -371,7 +370,7 @@ const EditCommunity = () => {
                                         "&:hover": { backgroundColor: "#f0f0f0" },
                                         cursor: "pointer",
                                     }}
-                                    onClick={(e) => handleShowCollection(community.uuid, e)}
+                                        onClick={(e) => handleShowCollection(community.uuid, e)}
                                     >
                                         <TableCell>
                                             {community.isEditing ? (
@@ -379,6 +378,7 @@ const EditCommunity = () => {
                                                     variant="outlined"
                                                     size="small"
                                                     value={community.editedTitle}
+                                                    onClick={(e => e.stopPropagation())}
                                                     onChange={(e) => handleTitleChange(community.uuid, e.target.value)}
                                                     fullWidth
                                                 />
@@ -393,7 +393,9 @@ const EditCommunity = () => {
                                                         <IconButton
                                                             className='btn_table'
                                                             color="primary"
-                                                            onClick={() => handleSaveClick(community.uuid)}
+                                                            onClick={(e) => { 
+                                                                e.stopPropagation();
+                                                                 handleSaveClick(community.uuid)}}
                                                             title="Save"
                                                         >
                                                             <img className="table_icon" src={iconsImgs.save} alt="Save" />
@@ -401,7 +403,9 @@ const EditCommunity = () => {
                                                         <IconButton
                                                             className='btn_table'
                                                             color="secondary"
-                                                            onClick={() => handleCancelClick(community.uuid)}
+                                                            onClick={(e) => { 
+                                                                e.stopPropagation();
+                                                                 handleCancelClick(community.uuid)}}
                                                             title="Cancel"
                                                         >
                                                             <img className="table_icon" src={iconsImgs.cancel} alt="Cancel" />
@@ -412,7 +416,10 @@ const EditCommunity = () => {
                                                         <IconButton
                                                             className='btn_table'
                                                             color="primary"
-                                                            onClick={() => handleEditClick(community.uuid)}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleEditClick(community.uuid)
+                                                            }}
                                                             title="Edit"
                                                         >
                                                             <img className="table_icon" src={iconsImgs.edit} alt="Edit" />
@@ -420,7 +427,9 @@ const EditCommunity = () => {
                                                         <IconButton
                                                             className='btn_table_dlt'
                                                             color="error"
-                                                            onClick={() => handleDeleteClick(community.uuid)}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleDeleteClick(community.uuid)}}
                                                             title="Delete"
                                                         >
                                                             <img className="table_icon" src={iconsImgs.remove} alt="Remove" />
@@ -496,7 +505,7 @@ const EditCommunity = () => {
                                                                                     </IconButton>
                                                                                 </>
                                                                             ) : (
-                                                                                <Box >
+                                                                                <Box>
                                                                                     <IconButton
                                                                                         className='btn_table'
                                                                                         color="primary"
