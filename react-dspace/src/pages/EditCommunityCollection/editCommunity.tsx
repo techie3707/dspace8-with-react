@@ -151,7 +151,8 @@ const EditCommunity = () => {
         setDeleteModalOpen(true);
     };
 
-    const handleShowCollection = async (uuid: string) => {
+    const handleShowCollection = async (uuid: string, e?: React.MouseEvent) => {
+        e?.stopPropagation();
         try {
             if (!collections[uuid]) {
                 const response = await fetchCollectionsItem(uuid);
@@ -369,7 +370,9 @@ const EditCommunity = () => {
                                     <TableRow sx={{
                                         "&:hover": { backgroundColor: "#f0f0f0" },
                                         cursor: "pointer",
-                                    }}>
+                                    }}
+                                    onClick={(e) => handleShowCollection(community.uuid, e)}
+                                    >
                                         <TableCell>
                                             {community.isEditing ? (
                                                 <TextField
@@ -425,7 +428,10 @@ const EditCommunity = () => {
                                                         <IconButton
                                                             className='btn_table'
                                                             color="primary"
-                                                            onClick={() => handleShowCollection(community.uuid)}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleShowCollection(community.uuid);
+                                                            }}
                                                             title="View Collections"
                                                         >
                                                             {expandedCommunity === community.uuid ? <img className="table_icon" src={iconsImgs.minus} alt="Minus" /> : <img className="table_icon" src={iconsImgs.add} alt="Add" />}

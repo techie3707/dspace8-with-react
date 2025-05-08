@@ -37,29 +37,38 @@ const CreatePolicy = () => {
     const [isEditMode, setIsEditMode] = useState<boolean>(false);
     const [originalPolicyData, setOriginalPolicyData] = useState<ResourcePolicyData | null>(null);
     const [originalGroup, setOriginalGroup] = useState<string>("");
+    const [selectedGroupName, setSelectedGroupName] = useState<string>("");
+
 
     useEffect(() => {
+        setFormData({
+            policyType: "",
+            action: "",
+            type: { value: "resourcepolicy" }
+        });
+        setSelectedGroup("");
+        setOriginalPolicyData(null);
+        setOriginalGroup("");
+    
         if (policyId && uuid) {
             setIsEditMode(true);
             fetchPolicyData(uuid); 
         } else {
-            setFormData({
-                policyType: "",
-                action: "",
-                type: { value: "resourcepolicy" }
-            });
-            setSelectedGroup("");
+            setIsEditMode(false);
         }
-    }, [policyId]);
+    }, [policyId, uuid]);
 
-    const fetchPolicyData = async (policyId: string) => {
+    const fetchPolicyData = async (resourceUuid: string) => {
         try {
-            const response = await getResourcePolicies(policyId);
-            const policy = response?._embedded?.resourcepolicies?.[0];
+            const response = await getResourcePolicies(resourceUuid);
+            const policies = response?._embedded?.resourcepolicies || [];
+            
+            // Find the policy that matches the policyId from URL
+            const policy = policies.find(p => p.id.toString() === policyId);
             
             if (policy) {
                 const policyData = {
-                    policyType: policy.policyType,
+                    policyType: policy.policyType || "",
                     action: policy.action,
                     type: { value: "resourcepolicy" }
                 };
@@ -69,8 +78,11 @@ const CreatePolicy = () => {
                 
                 if (policy._embedded?.group) {
                     setSelectedGroup(policy._embedded.group.uuid);
+                    setSelectedGroupName(policy._embedded.group.name);
                     setOriginalGroup(policy._embedded.group.uuid);
                 }
+            } else {
+                console.error("Policy not found with ID:", policyId);
             }
         } catch (error) {
             console.error("Error fetching policy data:", error);
@@ -107,8 +119,9 @@ const CreatePolicy = () => {
         }));
     };
 
-    const handleSelectGroup = (groupId: string) => {
+    const handleSelectGroup = (groupId: string, groupName: string) => {
         setSelectedGroup(groupId);
+        setSelectedGroupName(groupName);
     };
 
     const handleSubmit = async () => {
@@ -152,7 +165,7 @@ const CreatePolicy = () => {
                 {isEditMode ? "Edit Resource Policy" : "Create New Resource Policy"}
             </Typography>
             
-            <Box>
+            {/* <Box>
                 <FormControl fullWidth>
                     <Select
                         labelId='policy-type'
@@ -167,7 +180,7 @@ const CreatePolicy = () => {
                         ))}
                     </Select>
                 </FormControl>
-            </Box>
+            </Box> */}
             
             <Box>
                 <FormControl fullWidth>
@@ -191,7 +204,7 @@ const CreatePolicy = () => {
                     label="The group that will be granted the permission"
                     variant="outlined"
                     fullWidth
-                    value={selectedGroup}
+                    value={selectedGroupName}
                     InputProps={{
                         readOnly: true,
                     }}
@@ -255,7 +268,7 @@ const CreatePolicy = () => {
                                 <TableCell>
                                     <Button
                                         variant="outlined"
-                                        onClick={() => handleSelectGroup(group.id)}
+                                        onClick={() => handleSelectGroup(group.id, group.name)}
                                     >
                                         {selectedGroup === group.id ? "Selected" : "Select"}
                                     </Button>
@@ -272,7 +285,7 @@ const CreatePolicy = () => {
                 <Button
                     variant="contained"
                     onClick={handleSubmit}
-                    disabled={!formData.policyType || !formData.action || !selectedGroup}
+                    disabled={ !formData.action || !selectedGroup}
                 >
                     {isEditMode ? "Update" : "Save"}
                 </Button>
