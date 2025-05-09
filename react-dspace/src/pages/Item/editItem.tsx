@@ -269,7 +269,7 @@ const EditItem = () => {
     }
 
     return (
-        <Container>
+        <Container sx={{mt: 2, mb: 2}} >
             <Container sx={{ marginBottom: "30px" }} >
                 <Box
                     sx={{

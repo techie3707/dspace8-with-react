@@ -120,7 +120,7 @@ const Sidebar: React.FC = () => {
   
   useEffect(() => {
     checkAuth();
-  }, []);
+  }, [isSidebarOpen]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
