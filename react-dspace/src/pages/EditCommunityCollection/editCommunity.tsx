@@ -319,6 +319,10 @@ const EditCommunity = () => {
         navigate(`/Policies/${collectionUuid}`);
     };
 
+    const handleCommunityPolicyClick = (communityUuid: string) => {
+        navigate(`/Policies/${communityUuid}`);
+    };
+
     return (
         <Container className="top_padding">
             <Box display="flex" justifyContent="space-between" className="header_epeople" alignItems="center" mb={2}>
@@ -393,9 +397,10 @@ const EditCommunity = () => {
                                                         <IconButton
                                                             className='btn_table'
                                                             color="primary"
-                                                            onClick={(e) => { 
+                                                            onClick={(e) => {
                                                                 e.stopPropagation();
-                                                                 handleSaveClick(community.uuid)}}
+                                                                handleSaveClick(community.uuid)
+                                                            }}
                                                             title="Save"
                                                         >
                                                             <img className="table_icon" src={iconsImgs.save} alt="Save" />
@@ -403,9 +408,10 @@ const EditCommunity = () => {
                                                         <IconButton
                                                             className='btn_table'
                                                             color="secondary"
-                                                            onClick={(e) => { 
+                                                            onClick={(e) => {
                                                                 e.stopPropagation();
-                                                                 handleCancelClick(community.uuid)}}
+                                                                handleCancelClick(community.uuid)
+                                                            }}
                                                             title="Cancel"
                                                         >
                                                             <img className="table_icon" src={iconsImgs.cancel} alt="Cancel" />
@@ -429,10 +435,19 @@ const EditCommunity = () => {
                                                             color="error"
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
-                                                                handleDeleteClick(community.uuid)}}
+                                                                handleDeleteClick(community.uuid)
+                                                            }}
                                                             title="Delete"
                                                         >
                                                             <img className="table_icon" src={iconsImgs.remove} alt="Remove" />
+                                                        </IconButton>
+                                                        <IconButton
+                                                            className='btn_table'
+                                                            color="secondary"
+                                                            onClick={() => handleCommunityPolicyClick(community.uuid)}
+                                                            title="CommunityPolicy"
+                                                        >
+                                                            <img className="table_icon" src={iconsImgs.access} alt="Remove" />
                                                         </IconButton>
                                                         <IconButton
                                                             className='btn_table'
@@ -526,7 +541,7 @@ const EditCommunity = () => {
                                                                                         className='btn_table'
                                                                                         color="secondary"
                                                                                         onClick={() => handleCollectionPolicyClick(community.uuid, collection.uuid)}
-                                                                                        title="Policy"
+                                                                                        title="CollectionPolicy"
                                                                                     >
                                                                                         <img className="table_icon" src={iconsImgs.access} alt="Remove" />
                                                                                     </IconButton>
