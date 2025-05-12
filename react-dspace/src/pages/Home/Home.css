@@ -282,6 +282,17 @@ display: block !important;
     gap: 30px;
   }
 }
+@media (max-width: 1440px) {
+  .col-xl-2 {
+    flex: 0 0 20% !important;
+    max-width: 20% !important;
+  }
+  .g-4{
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+  }
+}
 .search-area{
   position: relative !important;
   top: 21px;

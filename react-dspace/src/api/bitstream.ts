@@ -2,18 +2,31 @@ import { showToast } from "../contexts/ToastProvider";
 import { Bitstream, BitstreamsResponse, BitstreamUploadResponse, Bundle, BundlesResponse, PatchOperation } from "../data/bookDetail";
 import { siteConfig } from "../data/data";
 import axios from "axios";
+import { getAuthHeaders } from "./searchApi";
 const authToken = localStorage.getItem("authToken") || "";
 const csrfToken = localStorage.getItem("csrfToken") || "";
 
 export const downloadPDF = async (uuid: string, name: string) => {
   try {
-    const response = await fetch(`${siteConfig.apiEndpoint}/api/core/bitstreams/${uuid}/content`, {
-      method: 'GET'
-    });
+    const authToken = localStorage.getItem("authToken");
+    const csrfToken = localStorage.getItem("csrfToken");
 
-    if (!response.ok) {
-      throw new Error('Failed to download PDF');
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+
+    if (authToken) {
+      headers["Authorization"] = authToken;
     }
+
+    if (csrfToken) {
+      headers["X-XSRF-TOKEN"] = csrfToken;
+    }
+
+    const response = await fetch(`${siteConfig.apiEndpoint}/api/core/bitstreams/${uuid}/content`, {
+      method: 'GET',
+      headers,
+    });
 
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
@@ -33,14 +46,19 @@ export const downloadPDF = async (uuid: string, name: string) => {
 };
 
 export const getPDFUrl = (uuid: string): string => {
-  return `${siteConfig.apiEndpoint}/api/core/bitstreams/${uuid}/content`;
+  const authToken = localStorage.getItem("authToken");
+  const tokenParam = authToken ? `?authorization=${encodeURIComponent(authToken)}` : "";
+  return `${siteConfig.apiEndpoint}/api/core/bitstreams/${uuid}/content${tokenParam}`;
 };
+
 
 
 export const fetchPDFUrl = async (uuid: string): Promise<string> => {
   try {
+    const headers = getAuthHeaders();
     const response = await fetch(`${siteConfig.apiEndpoint}/api/core/bitstreams/${uuid}/content`, {
       method: "GET",
+      headers,
     });
 
     if (!response.ok) {
@@ -56,12 +74,41 @@ export const fetchPDFUrl = async (uuid: string): Promise<string> => {
 
 
 export const fetchItemBundles = async (id: string): Promise<Bundle[]> => {
-  const response = await axios.get<BundlesResponse>(`${siteConfig.apiEndpoint}/api/core/items/${id}/bundles?size=9999`);
+  const authToken = localStorage.getItem("authToken") || "";
+
+  const headers = authToken
+    ? {
+        "Content-Type": "application/json",
+        "X-XSRF-TOKEN": localStorage.getItem("csrfToken") || "",
+        Authorization: authToken,
+      }
+    : {
+        "Content-Type": "application/json",
+      };
+
+  const response = await axios.get<BundlesResponse>(`${siteConfig.apiEndpoint}/api/core/items/${id}/bundles?size=9999`, {
+    headers: headers,
+  });
+
   return response.data._embedded.bundles;
 };
 
+
+
+
 export const fetchBitstreams = async (bundleId: string): Promise<Bitstream[]> => {
-  const response = await axios.get<BitstreamsResponse>(`${siteConfig.apiEndpoint}/api/core/bundles/${bundleId}/bitstreams?page=0&size=5`);
+  const headers = authToken
+  ? {
+      "Content-Type": "application/json",
+      "X-XSRF-TOKEN": localStorage.getItem("csrfToken") || "",
+      Authorization: authToken,
+    }
+  : {
+      "Content-Type": "application/json",
+    };
+  const response = await axios.get<BitstreamsResponse>(`${siteConfig.apiEndpoint}/api/core/bundles/${bundleId}/bitstreams?page=0&size=5`, {
+    headers: headers,
+  });
   return response.data._embedded.bitstreams;
 };
 

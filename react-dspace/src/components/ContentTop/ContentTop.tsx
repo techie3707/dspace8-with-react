@@ -190,6 +190,18 @@ const ContentTop: React.FC = () => {
             >
               View Profile
             </MenuItem>
+            <MenuItem
+              onClick={() => {
+                if (userId) {
+                  navigate(`/userCart/${userId}`);
+                  handleClose();
+                } else {
+                  showToast("User ID not available", "error");
+                }
+              }}
+            >
+              My List
+            </MenuItem>
             <MenuItem onClick={handleLogout}>Logout</MenuItem>
           </Menu>
         </Box>

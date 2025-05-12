@@ -4,6 +4,7 @@ import {
   getNavigationLinks,
   generateNavigationLinks,
   NavigationLink,
+  siteConfig,
 } from "../../data/data";
 import { SidebarContext } from "../../contexts/sidebarContext";
 import { useNavigate } from "react-router-dom";
@@ -153,9 +154,9 @@ const Sidebar: React.FC = () => {
 
       <div className="user-info">
         <div className="info-img img-fit-cover">
-          <img src={personsImgs.person_one} alt="profile" />
+          <img src={personsImgs.brand_two} alt="profile" />
         </div>
-        <span className="info-name">Abhishek</span>
+        <span className="info-name">{siteConfig.name}</span>
       </div>
 
       <nav className="navigation">

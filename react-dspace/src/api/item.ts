@@ -200,7 +200,27 @@ export const patchItemMetadata = async (itemId: string, patchOperations: PatchOp
 };
 
 export const fetchItemDetails = async (id: string): Promise<BookDetailsData> => {
-    const response = await axios.get<BookDetailsData>(`${siteConfig.apiEndpoint}/api/core/items/${id}?embed=thumbnail&embed=accessStatus`);
+    const authToken = localStorage.getItem("authToken");
+    const csrfToken = localStorage.getItem("csrfToken");
+  
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+  
+    if (authToken) {
+      headers["Authorization"] = authToken;
+    }
+  
+    if (csrfToken) {
+      headers["X-XSRF-TOKEN"] = csrfToken;
+    }
+  
+    const response = await axios.get<BookDetailsData>(
+      `${siteConfig.apiEndpoint}/api/core/items/${id}?embed=thumbnail&embed=accessStatus`,
+      { headers }
+    );
+  
     return response.data;
-};
+  };
+  
 

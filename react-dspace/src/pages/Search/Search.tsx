@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import {searchObjects,fetchFacets,fetchHasFileCounts,parseSearchParamsFromUrl,updateUrlWithSearchParams,fetchFacet,} from '../../api/searchApi';
+import { searchObjects, fetchFacets, fetchHasFileCounts, parseSearchParamsFromUrl, updateUrlWithSearchParams, fetchFacet, } from '../../api/searchApi';
 import { fetchItemBundles, fetchBitstreams } from '../../api/bitstream';
 import './Search.css';
 import PaginationComponent from '../../components/Pagination/PaginationComponent';
 import YearRangeSlider from '../Search/YearRangeSlider';
-import {sortOptions,resultsPerPageOptions,filterSections,metadataFields,FilterSection,SearchParams,FilterOption,} from '../../data/searchData';
+import { sortOptions, resultsPerPageOptions, filterSections, metadataFields, FilterSection, SearchParams, FilterOption, } from '../../data/searchData';
 import { useNavigate } from 'react-router-dom';
 import { Button, Grid, IconButton, TextField } from '@mui/material';
 import { iconsImgs } from '../../utils/images';
 import { siteConfig } from '../../data/data';
 import { Bitstream } from '../../data/bookDetail';
 import Loader from '../loader/loader';
+import SecureImage from './SecureImage';
 
 const Search: React.FC = () => {
     const initialParams = parseSearchParamsFromUrl();
@@ -44,7 +45,7 @@ const Search: React.FC = () => {
     const navigate = useNavigate();
     const [facetPagination, setFacetPagination] = useState<Record<string, { page: number, size: number }>>(
         filterSections.reduce((acc, section) => {
-            acc[section.id] = { page: 0, size: 5 }; 
+            acc[section.id] = { page: 0, size: 5 };
             return acc;
         }, {} as Record<string, { page: number, size: number }>)
     );
@@ -57,67 +58,67 @@ const Search: React.FC = () => {
 
     const fetchAllFacets = async (currentFilters: Record<string, any> = filters) => {
         try {
-          const params: SearchParams = {
-            query: inputValue,
-            page: page - 1, 
-            size: size,     
-            filters: currentFilters,
-            sort: getSortParam(),
-            scope: scope,
-          };
-      
-          const [facetsResponse, hasFileResponse] = await Promise.all([
-            fetchFacets(params, 0, 5), 
-            fetchHasFileCounts(params, 0, 5)
-          ]);
-      
-          setFacets(facetsResponse);
-          setHasFileCounts(hasFileResponse);
-        } catch (error) {
-          console.error('Error fetching facets:', error);
-        }
-      };
+            const params: SearchParams = {
+                query: inputValue,
+                page: page - 1,
+                size: size,
+                filters: currentFilters,
+                sort: getSortParam(),
+                scope: scope,
+            };
 
-      const loadMoreFacetItems = async (sectionId: string) => {
+            const [facetsResponse, hasFileResponse] = await Promise.all([
+                fetchFacets(params, 0, 5),
+                fetchHasFileCounts(params, 0, 5)
+            ]);
+
+            setFacets(facetsResponse);
+            setHasFileCounts(hasFileResponse);
+        } catch (error) {
+            console.error('Error fetching facets:', error);
+        }
+    };
+
+    const loadMoreFacetItems = async (sectionId: string) => {
         const section = filterSections.find(s => s.id === sectionId);
         if (!section) return;
-      
+
         const currentPagination = facetPagination[sectionId];
         const nextPage = currentPagination.page + 1;
-        
+
         try {
-          const params: SearchParams = {
-            query: inputValue,
-            page: page - 1, 
-            size: size,     
-            filters: filters,
-            sort: getSortParam(),
-            scope: scope,
-          };
-      
-          const newValues = await fetchFacet(
-            section.fieldName, 
-            params, 
-            nextPage, 
-            currentPagination.size 
-          );
-      
-          setFacets(prev => ({
-            ...prev,
-            [sectionId]: [...(prev[sectionId] || []), ...newValues]
-          }));
-      
-          setFacetPagination(prev => ({
-            ...prev,
-            [sectionId]: {
-              ...prev[sectionId],
-              page: nextPage
-            }
-          }));
+            const params: SearchParams = {
+                query: inputValue,
+                page: page - 1,
+                size: size,
+                filters: filters,
+                sort: getSortParam(),
+                scope: scope,
+            };
+
+            const newValues = await fetchFacet(
+                section.fieldName,
+                params,
+                nextPage,
+                currentPagination.size
+            );
+
+            setFacets(prev => ({
+                ...prev,
+                [sectionId]: [...(prev[sectionId] || []), ...newValues]
+            }));
+
+            setFacetPagination(prev => ({
+                ...prev,
+                [sectionId]: {
+                    ...prev[sectionId],
+                    page: nextPage
+                }
+            }));
         } catch (error) {
-          console.error('Error loading more facet items:', error);
+            console.error('Error loading more facet items:', error);
         }
-      };
+    };
 
     const handleSearch = async (
         currentFilters: Record<string, any> = filters,
@@ -159,6 +160,8 @@ const Search: React.FC = () => {
     useEffect(() => {
         handleSearch();
     }, []);
+
+
 
     const updateFilter = (filterType: string, value: any, isChecked: boolean) => {
         setFilters(prev => {
@@ -270,21 +273,21 @@ const Search: React.FC = () => {
 
                         {/* Show more button */}
                         {facets[section.id].length % facetPagination[section.id]?.size === 0 && (
-                                <button
+                            <button
                                 className='show-more-button'
-                                    onClick={() => loadMoreFacetItems(section.id)}
-                                    style={{
-                                        background: 'none',
-                                        border: 'none',
-                                        color: '#1a73e8',
-                                        cursor: 'pointer',
-                                        padding: '10px',
-                                        textAlign: 'left',
-                                        width: '100%'
-                                    }}
-                                >
-                                    Show more
-                                </button>
+                                onClick={() => loadMoreFacetItems(section.id)}
+                                style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    color: '#1a73e8',
+                                    cursor: 'pointer',
+                                    padding: '10px',
+                                    textAlign: 'left',
+                                    width: '100%'
+                                }}
+                            >
+                                Show more
+                            </button>
                         )}
                     </ul>
                 );
@@ -494,12 +497,12 @@ const Search: React.FC = () => {
                                                     ?.filter(bitstream => /\.(jpe?g|png)$/i.test(bitstream.name))
                                                     .slice(0, 1)
                                                     .map(bitstream => (
-                                                        <img
+                                                        <SecureImage
                                                             key={bitstream.uuid}
-                                                            className='thumbnail-img_list img-fluid'
-                                                            src={`${siteConfig.apiEndpoint}/api/core/bitstreams/${bitstream.uuid}/content`}
-                                                            alt='Thumbnail'
-                                                            style={{ marginRight: '16px', maxHeight: '100px' }}
+                                                            uuid={bitstream.uuid}
+                                                            className="thumbnail-img img-fluid"
+                                                            style={{ maxHeight: '300px' }}
+                                                            alt="Thumbnail"
                                                         />
                                                     ))}
                                                 <div>
@@ -584,14 +587,15 @@ const Search: React.FC = () => {
                                                         ?.filter(bitstream => /\.(jpe?g|png)$/i.test(bitstream.name))
                                                         .slice(0, 1)
                                                         .map(bitstream => (
-                                                            <img
+                                                            <SecureImage
                                                                 key={bitstream.uuid}
-                                                                className='thumbnail-img img-fluid'
-                                                                src={`${siteConfig.apiEndpoint}/api/core/bitstreams/${bitstream.uuid}/content`}
-                                                                alt='Thumbnail'
-                                                                style={{ maxHeight: '300px' }}
+                                                                uuid={bitstream.uuid}
+                                                                className="thumbnail-img_list img-fluid"
+                                                                style={{ marginRight: '16px', maxHeight: '100px' }}
+                                                                alt="Thumbnail"
                                                             />
                                                         ))}
+
                                                 </div>
 
                                                 {/* Abstract */}

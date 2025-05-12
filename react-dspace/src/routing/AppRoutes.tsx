@@ -42,6 +42,7 @@ import SupervisionSelecter from "../pages/workflow/supervisionSelecter";
 import CreateResourcePolicy from "../pages/workflow/createResourcePolicy";
 import Policies from "../pages/collection/policy";
 import CreatePolicy from "../pages/collection/createPolicy";
+import MyCart from "../pages/my-cart/MyCart";
 
 
 
@@ -64,6 +65,12 @@ const UserProfileWrapper = () => {
   if (!userId) return null;
 
   return <UserProfile userId={userId} />;
+};
+const UserCartWrapper = () => {
+  const { userId } = useParams<{ userId: string }>();
+  if (!userId) return null;
+
+  return <MyCart userId={userId} />;
 };
 const AppRoutes = () => {
   return (
@@ -101,6 +108,7 @@ const AppRoutes = () => {
         <Route path="/createResourcePolicy/:uuid" element={<CreateResourcePolicy />} />
         <Route path="/usermanagement" element={<ProtectedRoute element={<UserManagement />} />} />
         <Route path="/userProfile/:userId" element={<ProtectedRoute element={<UserProfileWrapper />} />}/>
+        <Route path="/userCart/:userId" element={<ProtectedRoute element={<UserCartWrapper />} />}/>
         <Route path="/metadataSchemas" element={<ProtectedRoute element={<MetadataSchemas />} />} />
         <Route path="/bitstream/:schemaId/:schemaName" element={<ProtectedRoute element={<Bitstream />} />} />
         <Route path="/groups" element={<ProtectedRoute element={<Groups />} />} />

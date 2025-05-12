@@ -21,7 +21,8 @@ import edit from "../assets/icons/edit.png";
 import remove from "../assets/icons/delete.png";
 import access from "../assets/icons/access-control.png";
 import person_one from "../assets/images/person_one.jpg";
-import brand_one from "../assets/images/Final LogoESD.png";
+import brand_one from "../assets/images/Techbets.png";
+import brand_two from "../assets/images/Techbets1.png";
 import home_main from "../assets/images/homepage.svg";
 import grid from "../assets/icons/grid.png";
 import list from "../assets/icons/list.png";
@@ -95,6 +96,7 @@ interface IconsImages {
 interface PersonsImages {
     person_one: string;
     brand_one: string;
+    brand_two: string;
     home_main: string;
 }
 interface About_US{
@@ -109,7 +111,7 @@ export const iconsImgs: IconsImages = {
 };
 
 export const personsImgs: PersonsImages = {
-    person_one, brand_one, home_main
+    person_one, brand_one, brand_two, home_main
 };
 
 export const about_us: About_US = {

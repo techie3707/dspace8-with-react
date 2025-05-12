@@ -56,13 +56,32 @@ const Home = () => {
         </div>
         <div className="row g-4">
           {[
-            { "title": "Cosmic Chronicles", "description": "Exploring the latest advancements and discoveries in space science and astronomy.", "link": "/", "class": "card_d" },
-            { "title": "Fashion Forward", "description": "A deep dive into the world of fashion, style trends, and iconic designs shaping the industry.", "link": "/", "class": "card_d" },
-            { "title": "Tech Innovations", "description": "Bringing you the latest breakthroughs in technology, gadgets, and digital transformation.", "link": "/", "class": "card_h" },
-            { "title": "Travel Escapes", "description": "Discover breathtaking destinations, travel tips, and cultural experiences from around the world.", "link": "/", "class": "card_c" },
-            { "title": "Culinary Delights", "description": "A gastronomic journey through exquisite recipes, food trends, and expert cooking insights.", "link": "/", "class": "card_k" }
+            {
+              "title": "Document Insights",
+              "description": "Stay updated with the latest trends in document management, digital archiving, and smart file systems.",
+              "link": "/",
+              "class": "card_d"
+            },
+            {
+              "title": "Compliance & Security",
+              "description": "Explore essential strategies for data privacy, regulatory compliance, and secure document handling.",
+              "link": "/",
+              "class": "card_d"
+            },
+            {
+              "title": "Workflow Automation",
+              "description": "Learn how automation is transforming document processing, approvals, and team collaboration.",
+              "link": "/",
+              "class": "card_h"
+            },
+            {
+              "title": "Cloud Storage Solutions",
+              "description": "Discover scalable and reliable cloud-based document storage solutions for modern businesses.",
+              "link": "/",
+              "class": "card_c"
+            },
           ].map((dept, index) => (
-            <div className="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" key={index}>
+            <div className="col-12 col-sm-6 col-md-3 col-lg-3 col-xl-2" key={index}>
               <a href={dept.link} className={`card ${dept.class}`}>
                 <div className="card-content">
                   <div className="card-title">{dept.title}</div>

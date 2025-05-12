@@ -3,7 +3,29 @@ import { siteConfig } from "../data/data";
 import { FacetResult, ObjectSearchResult, SearchParams, filterSections, FilterOption, SearchFilters, AdvancedFilter, advancedSearchFields } from "../data/searchData";
 
 
- const buildApiQueryParams = (params: SearchParams): string => {
+export const getAuthHeaders = (): Record<string, string> => {
+  const authToken = localStorage.getItem("authToken") || "";
+  const csrfToken = localStorage.getItem("csrfToken") || "";
+
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+
+  if (authToken) {
+    headers["Authorization"] = authToken;
+  }
+  if (csrfToken) {
+    headers["X-XSRF-TOKEN"] = csrfToken;
+  }
+
+  return headers;
+};
+
+
+
+
+
+const buildApiQueryParams = (params: SearchParams): string => {
   const queryParams = new URLSearchParams();
   queryParams.append('configuration', 'default');
 
@@ -107,11 +129,11 @@ export const updateUrlWithSearchParams = (params: SearchParams) => {
   if (params.sort) {
     urlParams.set('sort', params.sort);
   }
-  
+
   if (params.scope) {
     urlParams.set('scope', params.scope);
   }
-  
+
   if (params.filters) {
     Object.entries(params.filters).forEach(([key, value]) => {
       if (!value) return;
@@ -132,13 +154,13 @@ export const updateUrlWithSearchParams = (params: SearchParams) => {
       urlParams.append('af_value', filter.value);
     });
   }
-  
+
   const newUrl = `${window.location.pathname}?${urlParams.toString()}`;
   window.history.pushState({ path: newUrl }, '', newUrl);
 };
 
 export const searchObjects = async (
-  params: SearchParams
+  params: SearchParams, isAuthenticated: boolean = false
 ): Promise<{ results: any[]; totalElements: number }> => {
   let apiUrl = `${siteConfig.apiEndpoint}/api/discover/search/objects?${buildApiQueryParams(params)}&dsoType=item&scope=${params.scope}`;
 
@@ -148,24 +170,26 @@ export const searchObjects = async (
 
   apiUrl += '&embed=thumbnail&embed=item/thumbnail'
   try {
-    const response = await axios.get<ObjectSearchResult>(apiUrl);
+    const authToken = localStorage.getItem("authToken");
+    const config = authToken ? { headers: getAuthHeaders() } : {};
+    const response = await axios.get<ObjectSearchResult>(apiUrl, config);
     return {
       results: response.data._embedded.searchResult._embedded.objects || [],
       totalElements: response.data._embedded.searchResult.page?.totalElements || 0,
     };
-  } catch (error:any) {
+  } catch (error: any) {
     const errorStatus = error.response?.status || 500;
-    if(errorStatus === 400){
+    if (errorStatus === 400) {
       window.location.href = `/error-400`;
-    }else if(errorStatus === 401){
+    } else if (errorStatus === 401) {
       window.location.href = `/error-401`;
-    }else if(errorStatus === 403){
+    } else if (errorStatus === 403) {
       window.location.href = `/error-403`;
-    }else if(errorStatus === 422){
+    } else if (errorStatus === 422) {
       window.location.href = `/error-422`;
-    }else if(errorStatus === 500){
+    } else if (errorStatus === 500) {
       window.location.href = `/error-500`;
-    }else{
+    } else {
       window.location.href = `/error-404`;
     }
     return {
@@ -178,12 +202,13 @@ export const searchObjects = async (
 export const fetchFacet = async (
   facetName: string,
   params: SearchParams,
-  facetPage: number = 0,  
+  facetPage: number = 0,
   facetSize: number = 5,
-  prefix?: string    
+  prefix?: string,
+  isAuthenticated: boolean = false
 ): Promise<FilterOption[]> => {
-  const facetParams = {...params};
-  
+  const facetParams = { ...params };
+
   facetParams.page = facetPage;
   facetParams.size = facetSize;
 
@@ -192,12 +217,13 @@ export const fetchFacet = async (
   if (facetParams.query) {
     f_url += `&query=${encodeURIComponent(facetParams.query)}`;
   }
-  
+
   if (prefix) {
     f_url += `&prefix=${encodeURIComponent(prefix)}`;
   }
-
-  const response = await axios.get<FacetResult>(f_url);
+  const authToken = localStorage.getItem("authToken");
+  const config = authToken ? { headers: getAuthHeaders() } : {};
+  const response = await axios.get<FacetResult>(f_url, config);
   return response.data._embedded?.values?.map((value: any) => ({
     id: value.label,
     label: value.label,
@@ -205,10 +231,15 @@ export const fetchFacet = async (
   })) || [];
 };
 
-export const fetchFacets = async (params: SearchParams, facetPage: number = 0, facetSize: number = 5) => {
+export const fetchFacets = async (
+  params: SearchParams,
+  facetPage: number = 0,
+  facetSize: number = 5,
+  isAuthenticated: boolean = false
+) => {
   const facetPromises = filterSections.map(section => {
     if (section.filterType === 'checkbox' || section.filterType === 'boolean') {
-      return fetchFacet(section.fieldName, params, facetPage, facetSize);
+      return fetchFacet(section.fieldName, params, facetPage, facetSize, undefined, isAuthenticated);
     }
     return Promise.resolve([]);
   });
@@ -223,13 +254,24 @@ export const fetchFacets = async (params: SearchParams, facetPage: number = 0, f
   }, {} as Record<string, FilterOption[]>);
 };
 
-export const fetchHasFileCounts = async (params: SearchParams, facetPage: number = 0, facetSize: number = 5) => {
-  const options = await fetchFacet('has_content_in_original_bundle', params, facetPage, facetSize);
+
+export const fetchHasFileCounts = async (
+  params: SearchParams,
+  facetPage: number = 0,
+  facetSize: number = 5,
+  isAuthenticated: boolean = false
+) => {
+  const [options] = await Promise.all([
+    fetchFacet('has_content_in_original_bundle', params, facetPage, facetSize, undefined, isAuthenticated)
+  ]);
+
   return {
-    hasFileCount: options.find(o => o.id === 'true')?.count || 0,
-    noFileCount: options.find(o => o.id === 'false')?.count || 0
+    hasFileCount: options.find(option => option.id === 'true')?.count ?? 0,
+    noFileCount: options.find(option => option.id === 'false')?.count ?? 0
   };
 };
+
+
 
 
 

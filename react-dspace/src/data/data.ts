@@ -13,7 +13,7 @@ export interface NavigationLink {
 
 
 export const siteConfig = {
-    name: "EasySmartDocs",
+    name: "TechBets",
     logo: "/assets/logo.png",
     apiEndpoint: "http://localhost:8080/server"
 };
@@ -66,7 +66,7 @@ export const generateNavigationLinks = (
 
 
 export const footerData = {
-    companyName: "EasySmartDocs",
+    companyName: "TechBets",
     contacts: {
         phone: "+1 234 567 890",
         email: "info@example.com",

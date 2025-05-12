@@ -10,6 +10,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { iconsImgs } from '../../utils/images';
 import { IconButton } from '@mui/material';
 import Loader from '../loader/loader';
+import SecureImage from '../Search/SecureImage';
 
 
 
@@ -84,12 +85,13 @@ const BookDetails: React.FC = () => {
                             .filter(bitstream => /\.(jpe?g|png)$/i.test(bitstream.name))
                             .slice(0, 1)
                             .map(bitstream => (
-                                <img
+                                <SecureImage
                                     key={bitstream.uuid}
-                                    className='thumbnail-img img-fluid'
-                                    src={`${siteConfig.apiEndpoint}/api/core/bitstreams/${bitstream.uuid}/content`}
-                                    alt='Thumbnail'
+                                    uuid={bitstream.uuid}
+                                    className="thumbnail-img img-fluid"
+                                    alt="Thumbnail"
                                 />
+
                             ))}
                     </div>
 
@@ -139,39 +141,39 @@ const BookDetails: React.FC = () => {
                                     if (pdfBitstreams.length === 1 || pdfBitstreams.length === 0) {
                                         return (
                                             <>
-                                            <tr>
-                                                <th>Action</th>
-                                                <td>
-                                                    <ul className='list-unstyled'>
-                                                        {pdfBitstreams.map(bitstream => (
-                                                            <li key={bitstream.uuid} className='mb-2'>
-                                                                <button className='custom-btn' onClick={() => window.open(`/pdf-viewer?uuid=${bitstream.uuid}`, '_blank')}>
-                                                                    View PDF
-                                                                </button>
-                                                                <button className='custom-btn' onClick={() => window.open(`/flip-book-viewer?uuid=${bitstream.uuid}`, '_blank')}>
-                                                                    View In Flip PDF
-                                                                </button>
-                                                                {isAuthenticated && (
-                                                                    <>
-                                                                        <button className='custom-btn' onClick={() => downloadPDF(bitstream.uuid, bitstream.name)}>
-                                                                            Download PDF
-                                                                        </button>
-                                                                    </>
-                                                                )}
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                </td>
-                                            </tr>
-                                             {isAuthenticated && (
-                                                 <tr>
-                                                     <td colSpan={2} className="text-end">
-                                                         <button className='custom-btn' style={{ width: '100%' }} onClick={() => navigate(`/edit-item/${id}`)}>
-                                                             Edit Item
-                                                         </button>
-                                                     </td>
-                                                 </tr>
-                                             )}
+                                                <tr>
+                                                    <th>Action</th>
+                                                    <td>
+                                                        <ul className='list-unstyled'>
+                                                            {pdfBitstreams.map(bitstream => (
+                                                                <li key={bitstream.uuid} className='mb-2'>
+                                                                    <button className='custom-btn' onClick={() => window.open(`/pdf-viewer?uuid=${bitstream.uuid}`, '_blank')}>
+                                                                        View PDF
+                                                                    </button>
+                                                                    <button className='custom-btn' onClick={() => window.open(`/flip-book-viewer?uuid=${bitstream.uuid}`, '_blank')}>
+                                                                        View In Flip PDF
+                                                                    </button>
+                                                                    {isAuthenticated && (
+                                                                        <>
+                                                                            <button className='custom-btn' onClick={() => downloadPDF(bitstream.uuid, bitstream.name)}>
+                                                                                Download PDF
+                                                                            </button>
+                                                                        </>
+                                                                    )}
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    </td>
+                                                </tr>
+                                                {isAuthenticated && (
+                                                    <tr>
+                                                        <td colSpan={2} className="text-end">
+                                                            <button className='custom-btn' style={{ width: '100%' }} onClick={() => navigate(`/edit-item/${id}`)}>
+                                                                Edit Item
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                )}
                                             </>
                                         );
                                     }
