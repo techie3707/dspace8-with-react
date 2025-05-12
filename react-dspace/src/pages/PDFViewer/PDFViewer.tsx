@@ -21,6 +21,7 @@ import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import { getAuthStatus } from "../../api/authApi";
 import { updateUserCart } from "../../api/cart";
+import { getAuthHeaders } from "../../api/searchApi";
 
 const parsePages = (input: string): number[] => {
     const pages: number[] = [];
@@ -59,15 +60,20 @@ const PDFViewer: React.FC = () => {
 
     useEffect(() => {
         let pdfBlobUrl: string | null = null;
-
         const fetchPDF = async () => {
             try {
                 setLoading(true);
+        
+                const headers = getAuthHeaders();
                 const response = await axios.get(
                     `${siteConfig.apiEndpoint}/api/core/bitstreams/${uuid}/content`,
-                    { responseType: "blob" }
+                    {
+                        responseType: "blob",
+                        headers, // include auth headers
+                    }
                 );
-                pdfBlobUrl = URL.createObjectURL(response.data as Blob);
+        
+                const pdfBlobUrl = URL.createObjectURL(response.data as Blob);
                 setPdfUrl(pdfBlobUrl);
                 setLoading(false);
             } catch (error) {

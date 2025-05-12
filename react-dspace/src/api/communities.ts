@@ -26,16 +26,23 @@ export const fetchCommunities = async () => {
     }
 };
 
-export const fetchCollectionsItem = async(uuid:string) =>{
-    const apiUrl = `${siteConfig.apiEndpoint}/api/core/communities/${uuid}/collections`
-    try{
-        const response = await axios.get(apiUrl);
-        return response.data
-    }catch(error){
-        console.error('Failed to fatch collection',error)
+export const fetchCollectionsItem = async (uuid: string) => {
+    const apiUrl = `${siteConfig.apiEndpoint}/api/core/communities/${uuid}/collections`;
+    try {
+        const response = await axios.get(apiUrl, {
+            headers: {
+                "Content-Type": "application/json",
+                "X-XSRF-TOKEN": csrfToken,
+                Authorization: authToken,
+            },
+            withCredentials: true,
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Failed to fetch collection', error);
     }
+};
 
-}
 
 export const deleteCommunity = async (uuid: string) => {
     try {
