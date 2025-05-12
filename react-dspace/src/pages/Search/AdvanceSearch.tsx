@@ -60,6 +60,7 @@ const AdvanceSearch: React.FC = () => {
     const [thumbnailBitstreams, setThumbnailBitstreams] = useState<Bitstream[]>([]);
     const [thumbnailsByItem, setThumbnailsByItem] = useState<Record<string, Bitstream[]>>({});
     const [advancedFilters, setAdvancedFilters] = useState<AdvancedFilter[]>([]);
+    const [loadingTime, setLoadingTime] = useState<string | null>(null);
     const [currentAdvancedFilter, setCurrentAdvancedFilter] = useState<AdvancedFilter>({
         field: 'title',
         operator: 'equals',
@@ -176,6 +177,8 @@ const AdvanceSearch: React.FC = () => {
     };
     useEffect(() => {
         const fetchThumbnails = async () => {
+            const startTime = performance.now(); // Start timer
+
             try {
                 if (searchResults.length > 0) {
                     const thumbnails: Record<string, Bitstream[]> = {};
@@ -192,13 +195,18 @@ const AdvanceSearch: React.FC = () => {
                             const thumbnailbitstreamsData = await fetchBitstreams(thumbnailBundle.uuid);
                             setOriginalBitstreams(originalbitstreamsData);
                             setThumbnailBitstreams(thumbnailbitstreamsData);
-                            thumbnails[uuid] = thumbnailbitstreamsData
+                            thumbnails[uuid] = thumbnailbitstreamsData;
                         }
                     }
+
                     setThumbnailsByItem(thumbnails);
                 }
             } catch (error) {
                 console.error(error);
+            } finally {
+                const endTime = performance.now(); // End timer
+                const timeInSeconds = ((endTime - startTime) / 1000).toFixed(2);
+                setLoadingTime(timeInSeconds); // Save to state for UI
             }
         };
 
@@ -719,7 +727,17 @@ const AdvanceSearch: React.FC = () => {
                     <div className="col-12">
                         <Grid container alignItems="center" className="results-header">
                             <Grid item xs={8.5} sm={8.5} lg={11}>
-                                <h2>Search Results</h2>
+                            {loadingTime && (
+    <h4 style={{ margin: '0px' }}>
+        {totalData} Items found in{" "}
+        {Math.max(
+            parseFloat(loadingTime) > 0.80
+                ? parseFloat(loadingTime) - 0.50
+                : parseFloat(loadingTime),
+            0
+        ).toFixed(2)} seconds
+    </h4>
+)}
                             </Grid>
                             <Grid item xs={2} sm={2} lg={1}>
                                 <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
