@@ -34,8 +34,8 @@ import { iconsImgs } from "../../../utils/images";
 
 interface AccessManagementProps {
     open: boolean;
-    onClose: () => void;
-    userId: string;
+    onClose: (groups?: { uuid: string; groupName: string }[]) => void;
+    userId: string | null; 
 }
 
 interface CommunityWithCollections extends Community {
@@ -115,7 +115,12 @@ const AccessManagement: React.FC<AccessManagementProps> = ({ open, onClose, user
 
     useEffect(() => {
         const fetchUserAssignedGroups = async () => {
-            if (!userId) return;
+            if (!userId) {
+                setInitialUserGroups([]);
+                setSelectedGroups([]);
+                return;
+            }
+            
             try {
                 const response = await fetchUserGroupsList(userId);
                 const userGroups: Group[] = response.groups || [];
@@ -148,16 +153,6 @@ const AccessManagement: React.FC<AccessManagementProps> = ({ open, onClose, user
         };
         fetchUserAssignedGroups();
     }, [userId]);
-
-    const toggleCommunityExpand = (communityId: string) => {
-        setCommunities(prevCommunities =>
-            prevCommunities.map(community =>
-                community.id === communityId
-                    ? { ...community, expanded: !community.expanded }
-                    : community
-            )
-        );
-    };
 
     const handlePermissionLevelChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSelectedPermissionLevel(event.target.value);
@@ -234,38 +229,31 @@ const AccessManagement: React.FC<AccessManagementProps> = ({ open, onClose, user
         });
     };
 
-    const handleGroupChanges = async (): Promise<void> => {
-        const prevGroupsSet = new Set(initialUserGroups.map(g => g.uuid));
-        const newGroupsSet = new Set(selectedGroups.map(g => g.uuid));
-    
-        const addedGroups = selectedGroups.filter(g => !prevGroupsSet.has(g.uuid));
-        const removedGroups = initialUserGroups.filter(g => !newGroupsSet.has(g.uuid));
-    
-        if (addedGroups.length === 0 && removedGroups.length === 0) {
-            onClose();
-            return;
-        }
-    
-        try {
-            await Promise.all(addedGroups.map(async (group) => {
-                try {
+     const handleGroupChanges = async (): Promise<void> => {
+        if (userId) {
+            // Existing user flow
+            const prevGroupsSet = new Set(initialUserGroups.map(g => g.uuid));
+            const newGroupsSet = new Set(selectedGroups.map(g => g.uuid));
+        
+            const addedGroups = selectedGroups.filter(g => !prevGroupsSet.has(g.uuid));
+            const removedGroups = initialUserGroups.filter(g => !newGroupsSet.has(g.uuid));
+        
+            try {
+                await Promise.all(addedGroups.map(async (group) => {
                     await addMemberToGroup(group.uuid, userId);
-                } catch (error) {
-                    console.error(`Failed to add user to group ${group.groupName}:`, error);
-                }
-            }));
-    
-            await Promise.all(removedGroups.map(async (group) => {
-                try {
+                }));
+            
+                await Promise.all(removedGroups.map(async (group) => {
                     await removeMemberToGroup(group.uuid, userId);
-                } catch (error) {
-                    console.error(`Failed to remove user from group ${group.groupName}:`, error);
-                }
-            }));
-    
-            onClose();
-        } catch (error) {
-            console.error("Error updating user groups:", error);
+                }));
+            
+                onClose(selectedGroups);
+            } catch (error) {
+                console.error("Error updating user groups:", error);
+            }
+        } else {
+            // New user flow - just return selected groups
+            onClose(selectedGroups);
         }
     };
 
@@ -276,7 +264,7 @@ const AccessManagement: React.FC<AccessManagementProps> = ({ open, onClose, user
     ));
 
     return (
-        <Modal open={open} onClose={onClose}>
+        <Modal open={open} onClose={() => onClose()} >
         <Paper
             sx={{ 
                 width: "80%", 
@@ -289,7 +277,7 @@ const AccessManagement: React.FC<AccessManagementProps> = ({ open, onClose, user
         >
             <div className="modal-header-container">
                 <Typography variant="h5" className="modal-header">Collection wise permission</Typography>
-                <IconButton onClick={onClose} className="close-icon">
+                <IconButton onClick={() => onClose()} className="close-icon">
                     <CloseIcon />
                 </IconButton>
             </div>
