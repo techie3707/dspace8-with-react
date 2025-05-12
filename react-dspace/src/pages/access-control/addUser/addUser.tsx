@@ -6,6 +6,8 @@ import "./addUser.css";
 import CloseIcon from "@mui/icons-material/Close";
 import { addUser } from "../../../api/usermanagement";
 import Loader from "../../loader/loader";
+import AccessManagement from "../accessManagement/accessManagement";
+import { addMemberToGroup } from "../../../api/group";
 interface AddUserProps {
     open: boolean;
     onClose: () => void;
@@ -18,7 +20,10 @@ const AddUser: React.FC<AddUserProps> = ({ open, onClose, fetchUsers }) => {
         lastname: "",
         email: "",
     });
-    const [loading,setLoading] = useState(false)
+    const [loading, setLoading] = useState(false)
+    const [accessModalOpen, setAccessModalOpen] = useState<boolean>(false);
+    const [selectedGroups, setSelectedGroups] = useState<{ uuid: string; groupName: string }[]>([]);
+
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -46,7 +51,15 @@ const AddUser: React.FC<AddUserProps> = ({ open, onClose, fetchUsers }) => {
 
         try {
             setLoading(true);
-            await addUser(userData);
+            const createdUser = await addUser(userData) as { id: string };
+
+            if (selectedGroups.length > 0) {
+                await Promise.all(
+                    selectedGroups.map(group =>
+                        addMemberToGroup(group.uuid, createdUser.id)
+                    )
+                );
+            }
             fetchUsers();
             onClose();
         } catch (error) {
@@ -54,6 +67,17 @@ const AddUser: React.FC<AddUserProps> = ({ open, onClose, fetchUsers }) => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleAccess = () => {
+        setAccessModalOpen(true);
+    }
+
+    const handleAccessSubmit = (groups?: { uuid: string; groupName: string }[]) => {
+        if (groups) {
+            setSelectedGroups(groups);
+        }
+        setAccessModalOpen(false);
     };
     return (
         <Modal open={open} onClose={onClose}>
@@ -96,14 +120,30 @@ const AddUser: React.FC<AddUserProps> = ({ open, onClose, fetchUsers }) => {
                         required
                         className="custom-textfield"
                     />
-                    <Box className="modal-footer">
-                        <button type="submit" className="add-user-btn">
+                    <Box sx={{ display: 'flex'}}>
+                        <button
+                            type="submit"
+                            onClick={handleAccess}
+                            className="add-user-btn"
+                            style={{  position: 'relative',right:'12px', marginTop: '30px'}} 
+                        >
+                            <span className="btn-text">Collection Wise Permission</span>
+                        </button>
+
+                        <button
+                            type="submit"
+                            className="add-user-btn"
+                            style={{  position: 'relative', left:'12px', marginTop: '30px'}}>
                             <span className="btn-text">Add User</span>
                             <span className="btn-icon">→</span>
                         </button>
                     </Box>
-
                 </Box>
+                <AccessManagement
+                    open={accessModalOpen}
+                    onClose={handleAccessSubmit}
+                    userId={null}
+                />
             </Paper>
 
         </Modal>
