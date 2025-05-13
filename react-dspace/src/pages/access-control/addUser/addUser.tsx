@@ -23,10 +23,18 @@ const AddUser: React.FC<AddUserProps> = ({ open, onClose, fetchUsers }) => {
     const [loading, setLoading] = useState(false)
     const [accessModalOpen, setAccessModalOpen] = useState<boolean>(false);
     const [selectedGroups, setSelectedGroups] = useState<{ uuid: string; groupName: string }[]>([]);
+    const [formValid, setFormValid] = useState(false);
 
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newFormData = { ...formData, [e.target.name]: e.target.value };
+        setFormData(newFormData);
+        
+        setFormValid(
+            newFormData.firstname.trim() !== "" && 
+            newFormData.lastname.trim() !== "" && 
+            newFormData.email.trim() !== ""
+        );
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -62,6 +70,12 @@ const AddUser: React.FC<AddUserProps> = ({ open, onClose, fetchUsers }) => {
             }
             fetchUsers();
             onClose();
+             setFormData({
+                firstname: "",
+                lastname: "",
+                email: "",
+            });
+            setSelectedGroups([]);
         } catch (error) {
             toast.error("Failed to add user. Please try again.");
         } finally {
@@ -122,7 +136,7 @@ const AddUser: React.FC<AddUserProps> = ({ open, onClose, fetchUsers }) => {
                     />
                     <Box sx={{ display: 'flex'}}>
                         <button
-                            type="submit"
+                            type="button"
                             onClick={handleAccess}
                             className="add-user-btn"
                             style={{  position: 'relative',right:'12px', marginTop: '30px'}} 
@@ -131,9 +145,10 @@ const AddUser: React.FC<AddUserProps> = ({ open, onClose, fetchUsers }) => {
                         </button>
 
                         <button
-                            type="submit"
+                            type="button"
+                            onClick={handleSubmit}
                             className="add-user-btn"
-                            style={{  position: 'relative', left:'12px', marginTop: '30px'}}>
+                            style={{  position: 'relative', left:'12px', marginTop: '30px',transition: 'none'}}>
                             <span className="btn-text">Add User</span>
                             <span className="btn-icon">→</span>
                         </button>

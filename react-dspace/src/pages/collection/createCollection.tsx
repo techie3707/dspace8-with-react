@@ -42,7 +42,7 @@ const CreateCollectionModal: React.FC<CreateCollectionModalProps> = ({
       setTitle('');
       setDescription('');
       showToast("Collection created successfully!", "success");
-      onClose(); // Close modal on success
+      onClose(); 
     } catch (error) {
       showToast("Error creating collection", "error");
     } finally {
