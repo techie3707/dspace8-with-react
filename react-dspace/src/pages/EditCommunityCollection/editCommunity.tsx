@@ -20,18 +20,19 @@ const EditCommunity = () => {
     const [itemToDelete, setItemToDelete] = useState<{
         type: 'community' | 'collection';
         uuid: string;
-        communityUuid?: string; // Only for collections
+        communityUuid?: string;
         name: string;
     } | null>(null);
 
     const navigate = useNavigate();
 
     const [modalOpen, setModalOpen] = useState(false);
+    const [openCommunityModal, setOpenCommunityModal] = useState(false);
 
     const handleButtonClick = () => {
         setModalOpen(true);
     };
-    const [openCommunityModal, setOpenCommunityModal] = useState(false);
+
 
     const handleButtonCommunity = () => {
         setOpenCommunityModal(true);
@@ -343,11 +344,17 @@ const EditCommunity = () => {
                         />
                     </div>
                     <div>
-                        <Button variant="contained" color="success" onClick={handleButtonClick}>
+                        <Button variant="contained" color="success"
+                            onClick={() => {
+                                handleButtonClick();
+                                setExpandedCommunity(null);
+                            }} >
                             <img className="collection_icon" src={iconsImgs.collection} alt="collection" />
                             Create Collection
                         </Button>
-                        <SelectCommunityModal open={modalOpen} onClose={() => setModalOpen(false)} />
+                        <SelectCommunityModal open={modalOpen}
+                            onClose={() => setModalOpen(false)}
+                        />
                     </div>
                 </Box>
             </Box>
