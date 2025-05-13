@@ -590,8 +590,8 @@ const Search: React.FC = () => {
                                                             <SecureImage
                                                                 key={bitstream.uuid}
                                                                 uuid={bitstream.uuid}
-                                                                className="thumbnail-img_list img-fluid"
-                                                                style={{ marginRight: '16px', maxHeight: '100px' }}
+                                                                className="thumbnail-img img-fluid"
+                                                                style={{ maxHeight: '300px' }}
                                                                 alt="Thumbnail"
                                                             />
                                                         ))}

@@ -5,6 +5,7 @@ import { ItemInfo, workspaceitemresponse, Workspaceresponse } from "../data/item
 import { BookDetailsData } from "../data/bookDetail";
 import { PatchOperation } from "../data/itemFormData";
 import { fetchCsrfToken } from "./csrf";
+import { getAuthHeaders } from "./searchApi";
 
 const authToken = localStorage.getItem("authToken") || "";
 const csrfToken = localStorage.getItem("csrfToken") || "";
@@ -115,16 +116,22 @@ export const fetchWorkspaceItems = async (collectionId: string) => {
 export const fetchItemInfo = async (itemId: string) => {
     const apiUrl = `${siteConfig.apiEndpoint}/api/core/items/${itemId}`;
     try {
-        const response = await axios.get<ItemInfo>(apiUrl);
-        if (response.status !== 200) {
-            throw new Error(`Error fetching item details: ${response.statusText}`);
-        }
-        return response.data;
+      const authToken = localStorage.getItem("authToken");
+      const config = authToken ? { headers: getAuthHeaders() } : {};
+  
+      const response = await axios.get<ItemInfo>(apiUrl, config);
+  
+      if (response.status !== 200) {
+        throw new Error(`Error fetching item details: ${response.statusText}`);
+      }
+  
+      return response.data;
     } catch (error) {
-        console.error("Error fetching item details:", error);
-        throw error;
+      console.error("Error fetching item details:", error);
+      throw error;
     }
-};
+  };
+  
 
 
 export const InsertImage = async (itemId: string, file: File) => {
