@@ -29,6 +29,7 @@ import { iconsImgs } from '../../utils/images';
 import { siteConfig } from '../../data/data';
 import { Bitstream } from '../../data/bookDetail';
 import Loader from '../loader/loader';
+import SecureImage from './SecureImage';
 
 const AdvanceSearch: React.FC = () => {
     const initialParams = parseSearchParamsFromUrl();
@@ -569,65 +570,65 @@ const AdvanceSearch: React.FC = () => {
                                 ))}
                             </select>
                             <div className='input-suggetion-container'>
-                            <input className=''
-                                value={currentAdvancedFilter.value}
-                                onChange={(e) => {
-                                    setCurrentAdvancedFilter({
-                                        ...currentAdvancedFilter,
-                                        value: e.target.value
-                                    });
+                                <input className=''
+                                    value={currentAdvancedFilter.value}
+                                    onChange={(e) => {
+                                        setCurrentAdvancedFilter({
+                                            ...currentAdvancedFilter,
+                                            value: e.target.value
+                                        });
 
-                                    if (currentAdvancedFilter.field === 'author' ||
-                                        currentAdvancedFilter.field === 'entityType' ||
-                                        currentAdvancedFilter.field === 'subject') {
-                                        fetchSuggestions(currentAdvancedFilter.field, e.target.value);
-                                    }
-                                }}
-                                onFocus={() => {
-                                    if (currentAdvancedFilter.value.length > 1 &&
-                                        (currentAdvancedFilter.field === 'author' ||
+                                        if (currentAdvancedFilter.field === 'author' ||
                                             currentAdvancedFilter.field === 'entityType' ||
-                                            currentAdvancedFilter.field === 'subject')) {
-                                        setShowSuggestions(true);
-                                    }
-                                }}
-                                onBlur={() => {
-                                    setTimeout(() => setShowSuggestions(false), 200);
-                                }}
-                                placeholder="Enter value"
-                                onKeyPress={(e) => {
-                                    if (e.key === 'Enter') {
-                                        setShowSuggestions(false);
-                                        handleAddFilter();
-                                    }
-                                }}
-                            />
-                            {showSuggestions && suggestions.field === currentAdvancedFilter.field &&
-                                suggestions.values.length > 0 && (
-                                    <ul className="suggestions-list" >
-                                        {suggestions.values.map((suggestion, index) => (
-                                            <li
-                                                key={index}
-                                                // style={{
-                                                //     padding: '8px 12px',
-                                                //     cursor: 'pointer',
-                                                //     borderBottom: '1px solid #eee'
-                                                // }}
-                                                onMouseDown={(e) => {
-                                                    e.preventDefault();
-                                                    setCurrentAdvancedFilter({
-                                                        ...currentAdvancedFilter,
-                                                        value: suggestion
-                                                    });
-                                                    setShowSuggestions(false);
-                                                }}
-                                            >
-                                                {suggestion}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
-                                </div>
+                                            currentAdvancedFilter.field === 'subject') {
+                                            fetchSuggestions(currentAdvancedFilter.field, e.target.value);
+                                        }
+                                    }}
+                                    onFocus={() => {
+                                        if (currentAdvancedFilter.value.length > 1 &&
+                                            (currentAdvancedFilter.field === 'author' ||
+                                                currentAdvancedFilter.field === 'entityType' ||
+                                                currentAdvancedFilter.field === 'subject')) {
+                                            setShowSuggestions(true);
+                                        }
+                                    }}
+                                    onBlur={() => {
+                                        setTimeout(() => setShowSuggestions(false), 200);
+                                    }}
+                                    placeholder="Enter value"
+                                    onKeyPress={(e) => {
+                                        if (e.key === 'Enter') {
+                                            setShowSuggestions(false);
+                                            handleAddFilter();
+                                        }
+                                    }}
+                                />
+                                {showSuggestions && suggestions.field === currentAdvancedFilter.field &&
+                                    suggestions.values.length > 0 && (
+                                        <ul className="suggestions-list" >
+                                            {suggestions.values.map((suggestion, index) => (
+                                                <li
+                                                    key={index}
+                                                    // style={{
+                                                    //     padding: '8px 12px',
+                                                    //     cursor: 'pointer',
+                                                    //     borderBottom: '1px solid #eee'
+                                                    // }}
+                                                    onMouseDown={(e) => {
+                                                        e.preventDefault();
+                                                        setCurrentAdvancedFilter({
+                                                            ...currentAdvancedFilter,
+                                                            value: suggestion
+                                                        });
+                                                        setShowSuggestions(false);
+                                                    }}
+                                                >
+                                                    {suggestion}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                            </div>
 
                             <Button variant="contained" onClick={handleAddFilter}>
                                 Add
@@ -770,12 +771,12 @@ const AdvanceSearch: React.FC = () => {
                                                     ?.filter(bitstream => /\.(jpe?g|png)$/i.test(bitstream.name))
                                                     .slice(0, 1)
                                                     .map(bitstream => (
-                                                        <img
+                                                        <SecureImage
                                                             key={bitstream.uuid}
-                                                            className='thumbnail-img_list img-fluid'
-                                                            src={`${siteConfig.apiEndpoint}/api/core/bitstreams/${bitstream.uuid}/content`}
-                                                            alt='Thumbnail'
-                                                            style={{ marginRight: '16px', maxHeight: '100px' }}
+                                                            uuid={bitstream.uuid}
+                                                            className="thumbnail-img img-fluid"
+                                                            style={{ maxHeight: '300px' }}
+                                                            alt="Thumbnail"
                                                         />
                                                     ))}
                                                 <div>
@@ -860,12 +861,12 @@ const AdvanceSearch: React.FC = () => {
                                                         ?.filter(bitstream => /\.(jpe?g|png)$/i.test(bitstream.name))
                                                         .slice(0, 1)
                                                         .map(bitstream => (
-                                                            <img
+                                                            <SecureImage
                                                                 key={bitstream.uuid}
-                                                                className='thumbnail-img img-fluid'
-                                                                src={`${siteConfig.apiEndpoint}/api/core/bitstreams/${bitstream.uuid}/content`}
-                                                                alt='Thumbnail'
-                                                                style={{ margin: '16px', maxHeight: '300px' }}
+                                                                uuid={bitstream.uuid}
+                                                                className="thumbnail-img img-fluid"
+                                                                style={{ maxHeight: '300px' }}
+                                                                alt="Thumbnail"
                                                             />
                                                         ))}
                                                 </div>
