@@ -10,6 +10,9 @@ import PaginationComponent from '../../components/Pagination/PaginationComponent
 import { resultsPerPageOptions, sortOptions } from '../../data/searchData';
 import { useNavigate } from 'react-router-dom';
 import Loader from '../loader/loader';
+import { Bitstream } from '../../data/bookDetail';
+import { fetchBitstreams, fetchItemBundles } from '../../api/bitstream';
+import SecureImage from '../Search/SecureImage';
 
 const Workflow = () => {
     const initialParams = parseSearchParamsFromUrl();
@@ -37,6 +40,8 @@ const Workflow = () => {
             }, {} as Record<string, { page: number, size: number }>)
         );
     const navigate = useNavigate();
+    const [thumbnailsByItem, setThumbnailsByItem] = useState<Record<string, Bitstream[]>>({});
+    
 
 
     const fetchAllFacets = async (currentFilters: Record<string, any> = filters) => {
@@ -99,6 +104,38 @@ const Workflow = () => {
     useEffect(() => {
         handleSearch();
     }, [])
+
+
+        useEffect(() => {
+            const fetchThumbnails = async () => {
+                try {
+                    if (searchResults.length > 0) {
+                        const thumbnails: Record<string, Bitstream[]> = {};
+    
+                        for (const result of searchResults) {
+                            const uuid = result._embedded?.indexableObject?._embedded?.item.uuid;
+                            if (!uuid) continue;
+    
+                            const bundles = await fetchItemBundles(uuid);
+                            if (bundles.length > 0) {
+                                const originalBundle = bundles.find(b => b.name === 'ORIGINAL') || bundles[0];
+                                const thumbnailBundle = bundles.find(b => b.name === 'THUMBNAIL') || bundles[0];
+                                const originalbitstreamsData = await fetchBitstreams(originalBundle.uuid);
+                                const thumbnailbitstreamsData = await fetchBitstreams(thumbnailBundle.uuid);
+                                // setOriginalBitstreams(originalbitstreamsData);
+                                // setThumbnailBitstreams(thumbnailbitstreamsData);
+                                thumbnails[uuid] = thumbnailbitstreamsData
+                            }
+                        }
+                        setThumbnailsByItem(thumbnails);
+                    }
+                } catch (error) {
+                    console.error(error);
+                }
+            };
+    
+            fetchThumbnails();
+        }, [searchResults]);
 
     const loadMoreFacetItems = async (sectionId: string) => {
         const section = FilterOption.find(s => s.id === sectionId);
@@ -429,18 +466,18 @@ const Workflow = () => {
                                     return (
                                         <Grid item xs={12} key={index}>
                                             <div style={{ display: 'flex', alignItems: 'center', padding: '10px', border: '1px solid #ddd', borderRadius: '6px' }}>
-                                                {/* {thumbnailsByItem[result._embedded?.indexableObject?.uuid]
+                                               {thumbnailsByItem[result._embedded?.indexableObject?._embedded?.item.uuid]
                                                     ?.filter(bitstream => /\.(jpe?g|png)$/i.test(bitstream.name))
                                                     .slice(0, 1)
-                                                    .map(bitstream => ( */}
-                                                <img
-                                                    // key={bitstream.uuid}
-                                                    className='thumbnail-img_list img-fluid'
-                                                    src={`${siteConfig.apiEndpoint}/api/core/bitstreams/{bitstream.uuid}/content`}
-                                                    alt='Thumbnail'
-                                                    style={{ marginRight: '16px', maxHeight: '100px' }}
-                                                />
-                                                {/* ))} */}
+                                                    .map(bitstream => (
+                                                        <SecureImage
+                                                            key={bitstream.uuid}
+                                                            uuid={bitstream.uuid}
+                                                            className="thumbnail-img img-fluid"
+                                                            style={{ maxHeight: '300px' }}
+                                                            alt="Thumbnail"
+                                                        />
+                                                    ))}
                                                 <div>
                                                     <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
                                                         <span style={{
@@ -573,18 +610,18 @@ const Workflow = () => {
 
                                                 {/* Thumbnail */}
                                                 <div style={{ display: 'flex', justifyContent: 'center', margin: '10px 0' }}>
-                                                    {/* {thumbnailsByItem[result._embedded?.indexableObject?.uuid]
-                                                        ?.filter(bitstream => /\.(jpe?g|png)$/i.test(bitstream.name))
-                                                        .slice(0, 1)
-                                                        .map(bitstream => ( */}
-                                                    <img
-                                                        // key={bitstream.uuid}
-                                                        className='thumbnail-img img-fluid'
-                                                        src={`${siteConfig.apiEndpoint}/api/core/bitstreams/{bitstream.uuid}/content`}
-                                                        alt='Thumbnail'
-                                                        style={{ maxHeight: '300px' }}
-                                                    />
-                                                    {/* ))} */}
+                                                   {thumbnailsByItem[result._embedded?.indexableObject?._embedded?.item.uuid]
+                                                    ?.filter(bitstream => /\.(jpe?g|png)$/i.test(bitstream.name))
+                                                    .slice(0, 1)
+                                                    .map(bitstream => (
+                                                        <SecureImage
+                                                            key={bitstream.uuid}
+                                                            uuid={bitstream.uuid}
+                                                            className="thumbnail-img img-fluid"
+                                                            style={{ maxHeight: '300px' }}
+                                                            alt="Thumbnail"
+                                                        />
+                                                    ))}
                                                 </div>
 
                                                 {/* Abstract */}
