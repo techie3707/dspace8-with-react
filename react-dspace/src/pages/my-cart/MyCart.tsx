@@ -10,7 +10,9 @@ import {
     TableContainer,
     TableRow,
     CircularProgress,
+    Button,
 } from '@mui/material';
+import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import { getUserById } from '../../api/usermanagement';
 import { downloadPDF } from '../../api/bitstream';
 import { siteConfig } from '../../data/data';
@@ -20,9 +22,9 @@ type MyCartProps = {
 };
 
 type CartItemInfo = {
-    fullUuid: string;       
-    uuid: string;        
-    name: string;     
+    fullUuid: string;
+    uuid: string;
+    name: string;
 };
 
 const MyCart: React.FC<MyCartProps> = ({ userId }) => {
@@ -92,7 +94,15 @@ const MyCart: React.FC<MyCartProps> = ({ userId }) => {
             </Typography>
 
             {cartItems.length === 0 ? (
-                <Typography>No items found in your cart.</Typography>
+                <Box textAlign="center" py={4}>
+                    <ShoppingCartOutlinedIcon sx={{ fontSize: 64, color: 'grey.500', mb: 2 }} />
+                    <Typography variant="h6" gutterBottom>
+                        Your cart is empty.
+                    </Typography>
+                    <Button variant="contained" color="primary">
+                        Add Books
+                    </Button>
+                </Box>
             ) : (
                 <TableContainer>
                     <Table>
@@ -126,3 +136,4 @@ const MyCart: React.FC<MyCartProps> = ({ userId }) => {
 };
 
 export default MyCart;
+

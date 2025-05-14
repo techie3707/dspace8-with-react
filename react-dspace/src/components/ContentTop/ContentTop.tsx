@@ -10,6 +10,7 @@ import { getAuthStatus, logout } from "../../api/authApi";
 import { showToast } from "../../contexts/ToastProvider";
 import { getUserById } from "../../api/usermanagement";
 import SearchIcon from "@mui/icons-material/Search";
+import CloseIcon from '@mui/icons-material/Close';
 
 const ContentTop: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -105,6 +106,10 @@ const ContentTop: React.FC = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+  const handleCloseClick = () => {
+    setIsSearchOpen(false);
+    setSearchQuery('');
+  };
 
   const handleLogout = async () => {
     try {
@@ -122,97 +127,126 @@ const ContentTop: React.FC = () => {
 
   return (
     <div className="main-content-top">
-  <div className="content-top-left">
-    {isAuthenticated && (
-      <button type="button" className="sidebar-toggler" onClick={toggleSidebar}>
-        <img src={iconsImgs.menu} alt="Menu" />
-      </button>
-    )}
-    <img className="brand-logo" src={personsImgs.brand_one} alt="profile" onClick={() => navigate("/")} />
-  </div>
-  <Box display="flex" alignItems="center" gap={1}>
-    <Box display="flex" alignItems="center" gap={1}>
-      {isSearchOpen ? (
-        <TextField
-          variant="outlined"
-          size="small"
-          placeholder="Search..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          sx={{
-            width: 200,
-            height: 25,
-            backgroundColor: 'white',
-            borderRadius: 1,
-            '& .MuiOutlinedInput-root': {
-              paddingRight: 0,
-            },
-          }}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton onClick={handleSearchClick} edge="end">
-                  <SearchIcon />
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-        />
-      ) : (
-        <IconButton onClick={handleSearchClick}>
-          <SearchIcon />
-        </IconButton>
-      )}
-    </Box>
-
-    {/* Added Navigation Links */}
-    <Box display="flex" alignItems="center" gap={2}>
-      <button className="nav-link-btn" onClick={() => navigate("/about")}>About Us</button>
-      <button className="nav-link-btn" onClick={() => navigate("/contact")}>Contact Us</button>
-    </Box>
-
-    {isAuthenticated ? (
-      <>
-        <Box>
-          <button className="profile-btn welcome-btn" onClick={handleClick}>
-            Welcome! {firstName || "User"}
+      <div className="content-top-left">
+        {isAuthenticated && (
+          <button type="button" className="sidebar-toggler" onClick={toggleSidebar}>
+            <img src={iconsImgs.menu} alt="Menu" />
           </button>
-          <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-            <MenuItem
-              onClick={() => {
-                if (userId) {
-                  navigate(`/userProfile/${userId}`);
-                  handleClose();
-                } else {
-                  showToast("User ID not available", "error");
+        )}
+        <img className="brand-logo" src={personsImgs.brand_one} alt="profile" onClick={() => navigate("/")} />
+      </div>
+      <Box display="flex" alignItems="center" gap={1}>
+        <Box
+          display="flex"
+          alignItems="center"
+          height={40}
+          marginBottom={0} 
+        >
+          {isSearchOpen ? (
+            <TextField
+              className="main_search"
+              variant="outlined"
+              size="small"
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleSearchClick(); 
                 }
               }}
-            >
-              View Profile
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                if (userId) {
-                  navigate(`/userCart/${userId}`);
-                  handleClose();
-                } else {
-                  showToast("User ID not available", "error");
-                }
+              sx={{
+                backgroundColor: 'white',
+                borderRadius: 1,
+                height: '100%',
+                '& .MuiInputBase-root': {
+                  height: '100%',
+                  fontSize: 14,
+                  paddingY: 0,
+                },
               }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <IconButton
+                      onClick={handleSearchClick}
+                      edge="start"
+                      sx={{ p: 0.5 }}
+                    >
+                      <SearchIcon fontSize="small" />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={handleCloseClick}
+                      edge="end"
+                      sx={{ p: 0.5 }}
+                    >
+                      <CloseIcon fontSize="small" />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          ) : (
+            <IconButton
+              onClick={handleSearchClick}
+              sx={{ height: '100%', p: 1 }}
             >
-              My List
-            </MenuItem>
-            <MenuItem onClick={handleLogout}>Logout</MenuItem>
-          </Menu>
+              <SearchIcon />
+            </IconButton>
+          )}
         </Box>
-      </>
-    ) : (
-      <button className="login-btn content-top-btn" onClick={() => navigate("/login")}>
-         Login
-      </button>
-    )}
-  </Box>
-</div>
+        {/* Added Navigation Links */}
+        <Box display="flex" alignItems="center" gap={2}>
+          <button className="nav-link-btn" onClick={() => navigate("/about")}>About Us</button>
+          <button className="nav-link-btn" onClick={() => navigate("/contact")}>Contact Us</button>
+        </Box>
+
+        {isAuthenticated ? (
+          <>
+            <Box>
+              <button className="profile-btn welcome-btn" onClick={handleClick}>
+                Welcome! {firstName || "User"}
+              </button>
+              <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+                <MenuItem
+                  onClick={() => {
+                    if (userId) {
+                      navigate(`/userProfile/${userId}`);
+                      handleClose();
+                    } else {
+                      showToast("User ID not available", "error");
+                    }
+                  }}
+                >
+                  View Profile
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    if (userId) {
+                      navigate(`/userCart/${userId}`);
+                      handleClose();
+                    } else {
+                      showToast("User ID not available", "error");
+                    }
+                  }}
+                >
+                  My List
+                </MenuItem>
+                <MenuItem onClick={handleLogout}>Logout</MenuItem>
+              </Menu>
+            </Box>
+          </>
+        ) : (
+          <button className="login-btn content-top-btn" onClick={() => navigate("/login")}>
+            Login
+          </button>
+        )}
+      </Box>
+    </div>
   );
 };
 

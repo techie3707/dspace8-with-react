@@ -151,7 +151,7 @@
     width: 100%;
   }
   
-  label {
+  .contact_label {
     font-size: 0.9rem;
     color: #374151;
     margin-bottom: 0.5rem;
@@ -159,7 +159,7 @@
   }
   
   
-  input,
+  .input_contact,
   textarea {
     width: 100%;
     padding: 0.75rem 1rem;
@@ -170,7 +170,7 @@
     transition: all 0.2s ease;
   }
   
-  input:focus,
+  .input_contact:focus,
   textarea:focus {
     border-color: #2563eb;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);

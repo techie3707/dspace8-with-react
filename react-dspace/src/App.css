@@ -659,5 +659,8 @@ button {
   color: rgb(129, 20, 246);
 }
 .main-content-holder{
-  margin-top: 45px;
+  margin-top: 43px;
+}
+.main_search.MuiTextField-root {
+  margin-bottom: 0 !important;
 }

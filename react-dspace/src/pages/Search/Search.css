@@ -297,8 +297,8 @@
  }
 
  .grid_main h3 {
-     font-size: 17px;
-     margin-bottom: 10px;
+     font-size: 12px;
+     margin-bottom: 2px;
  }
 
  .grid_main p {
@@ -311,8 +311,10 @@
      width: 1rem;
      height: 1rem;
  }
+.item_title{
+    padding-left: 10px;
+}
 
- .item_title,
  .item_date {
      padding-top: 10px;
  }

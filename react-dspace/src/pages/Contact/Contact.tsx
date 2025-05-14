@@ -47,21 +47,21 @@ const Contact = () => {
           <h2 className="form-title">Send Us a Message</h2>
           <form className="contact-form">
             <div className="form-group">
-              <label>Full Name <span>*</span></label>
-              <input type="text" required placeholder="Enter your name" />
+              <label className="contact_label">Full Name <span>*</span></label>
+              <input className="input_contact" type="text" required placeholder="Enter your name" />
             </div>
             <div className="form-group">
-              <label>Email Address <span>*</span></label>
-              <input type="email" required placeholder="example@mail.com" />
+              <label className="contact_label">Email Address <span>*</span></label>
+              <input className="input_contact" type="email" required placeholder="example@mail.com" />
             </div>
             <div className="form-row">
               <div className="form-phone">
-                <label>Contact Number <span>*</span></label>
-                <input type="tel" required placeholder="Your phone number" />
+                <label className="contact_label">Contact Number <span>*</span></label>
+                <input className="input_contact" type="tel" required placeholder="Your phone number" />
               </div>
             </div>
             <div className="form-group">
-              <label>Comments</label>
+              <label className="contact_label">Comments</label>
               <textarea rows={4} placeholder="Your message..."></textarea>
             </div>
             <button type="submit">SEND MESSAGE</button>
