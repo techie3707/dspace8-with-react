@@ -94,37 +94,33 @@ const BatchImport: React.FC = () => {
           ))}
         </Select>
       </FormControl>
-
-
-      <input type="file" accept=".zip" style={{ display: "none" }} id="file-upload" onChange={handleFileChange} />
       <label htmlFor="file-upload" className="b_import_label">
-      <Box 
-  className="upload-container" 
-  sx={{
-    border: "2px dashed gray",
-    padding: 3,
-    textAlign: "center",
-    marginTop: 2,
-    cursor: "pointer",
-    backgroundColor: "#f9f9f9",
-  }}
-  onClick={() => document.getElementById('fileInput')?.click()}
->
-  <input 
-    type="file" 
-    id="fileInput" 
-    accept=".zip"
-    hidden 
-    onChange={handleFileChange} 
-  />
-  <Typography variant="body2" className="upload-text">
-    <span className="upload-icon">☁️</span> Upload a ZIP File
-  </Typography>
-  <Typography variant="caption" color="gray">
-    {selectedFile ? selectedFile.name : "Only .zip files are allowed"}
-  </Typography>
-</Box>
-
+        <Box
+          className="upload-container"
+          sx={{
+            border: "2px dashed gray",
+            padding: 3,
+            textAlign: "center",
+            marginTop: 2,
+            cursor: "pointer",
+            backgroundColor: "#f9f9f9",
+          }}
+          onClick={() => document.getElementById('fileInput')?.click()}
+        >
+          <input
+            type="file"
+            id="file-upload"
+            accept=".zip"
+            hidden
+            onChange={handleFileChange}
+          />
+          <Typography variant="body2" className="upload-text">
+            <span className="upload-icon">☁️</span> Upload a ZIP File
+          </Typography>
+          <Typography variant="caption" color="gray">
+            {selectedFile ? selectedFile.name : "Only .zip files are allowed"}
+          </Typography>
+        </Box>
       </label>
 
       <Box display="flex" justifyContent="space-between" alignItems="center" marginTop={3}>
