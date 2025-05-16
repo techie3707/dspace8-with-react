@@ -68,7 +68,7 @@ const BatchImport: React.FC = () => {
   };
 
   return (
-    <Paper elevation={3} sx={{ padding: 3, maxWidth: 600, margin: "auto" }}>
+    <Paper elevation={3} sx={{ padding: 3, maxWidth: 600, margin: "auto", marginTop: 4 }}>
       <Typography variant="h5" gutterBottom>
         Import Batch
       </Typography>

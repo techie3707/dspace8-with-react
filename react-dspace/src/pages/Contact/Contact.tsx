@@ -34,8 +34,8 @@ const Contact = () => {
               (Near to Noida Sector - 15,)
             </p>
             <div className="company-contact">
-              <p>📞 +91 9999026602</p>
-              <p>📱 +91 7717754871</p>
+              <p>📞 +91 8080004990</p>
+              <p>📱 +91 9999363633</p>
               <p>📧 <a href="mailto:info@techbets.in">info@techbets.in</a></p>
             </div>
 

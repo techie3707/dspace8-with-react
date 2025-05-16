@@ -664,3 +664,6 @@ button {
 .main_search.MuiTextField-root {
   margin-bottom: 0 !important;
 }
+.login-container{
+  margin-bottom: 20px;
+}
