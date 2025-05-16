@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { TextField, Button, Box, Typography, Paper, Alert } from "@mui/material";
+import { TextField, Button, Box, Typography, Paper, Alert, IconButton, Grid } from "@mui/material";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import CloseIcon from "@mui/icons-material/Close";
@@ -80,50 +80,116 @@ const Register: React.FC = () => {
     if (error) return <Typography color="error">{error}</Typography>;
 
     return (
-        <Paper elevation={3} sx={{ padding: 3, maxWidth: 400, margin: "auto", marginTop: 5 }}>
-            <ToastContainer />
-            <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Typography variant="h5">User Register</Typography>
-                <CloseIcon />
-            </Box>
+<Paper
+  elevation={6}
+  sx={{
+    padding: 4,
+    maxWidth: 500,
+    margin: "auto",
+    marginTop: 8,
+    marginBottom:6,
+    borderRadius: 3,
+    backgroundColor: "#fafafa",
+  }}
+>
+  <ToastContainer />
 
-            <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
-                <TextField label="Email address" fullWidth value={email} disabled sx={{ mb: 2 }} />
-                <TextField label="First Name" fullWidth value={firstName} onChange={(e) => setFirstName(e.target.value)} required sx={{ mb: 2 }} />
-                <TextField label="Last Name" fullWidth value={lastName} onChange={(e) => setLastName(e.target.value)} required sx={{ mb: 2 }} />
-                <TextField label="Phone Number" fullWidth value={phone} onChange={(e) => setPhone(e.target.value)} required sx={{ mb: 2 }} />
+  <Box display="flex" justifyContent="center" alignItems="center" mb={2}>
+    <Typography variant="h5" fontWeight="bold">
+      User Registration
+    </Typography>
+ 
+  </Box>
 
-                <TextField
-                    label="New Password"
-                    type="password"
-                    fullWidth
-                    value={password}
-                    onChange={handlePasswordChange}
-                    required
-                    error={!!passwordError}
-                    helperText={passwordError}
-                    sx={{ mb: 2 }}
-                />
+  <Box component="form" onSubmit={handleSubmit}>
+    <Grid container spacing={2}>
+      <Grid item xs={6}>
+        <TextField
+          label="First Name"
+          fullWidth
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+          required
+        />
+      </Grid>
+      <Grid item xs={6}>
+        <TextField
+          label="Last Name"
+          fullWidth
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
+          required
+        />
+      </Grid>
+    </Grid>
 
-                <TextField
-                    label="Confirm Password"
-                    type="password"
-                    fullWidth
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    required
-                    error={password !== confirmPassword}
-                    helperText={password !== confirmPassword ? "Passwords do not match." : ""}
-                    sx={{ mb: 2 }}
-                />
+    <TextField
+      label="Email Address"
+      fullWidth
+      value={email}
+      disabled
+      sx={{ mt: 2 }}
+    />
 
-                {!isFormValid && <Alert severity="error">All fields are required, and passwords must match and be at least 8 characters long.</Alert>}
+    <TextField
+      label="Phone Number"
+      fullWidth
+      value={phone}
+      onChange={(e) => setPhone(e.target.value)}
+      required
+      sx={{ mt: 2 }}
+    />
 
-                <Button type="submit" variant="contained" color="primary" fullWidth disabled={!isFormValid}>
-                    Submit
-                </Button>
-            </Box>
-        </Paper>
+    <TextField
+      label="New Password"
+      type="password"
+      fullWidth
+      value={password}
+      onChange={handlePasswordChange}
+      required
+      error={!!passwordError}
+      helperText={passwordError}
+      sx={{ mt: 2 }}
+    />
+
+    <TextField
+      label="Confirm Password"
+      type="password"
+      fullWidth
+      value={confirmPassword}
+      onChange={(e) => setConfirmPassword(e.target.value)}
+      required
+      error={password !== confirmPassword}
+      helperText={password !== confirmPassword ? "Passwords do not match." : ""}
+      sx={{ mt: 2 }}
+    />
+
+    {!isFormValid && (
+      <Alert severity="error" sx={{ mt: 2 }}>
+        All fields are required. Passwords must match and be at least 8 characters.
+      </Alert>
+    )}
+
+    <Button
+      type="submit"
+      variant="contained"
+      fullWidth
+      color="primary"
+      disabled={!isFormValid}
+      sx={{
+        mt: 3,
+        textTransform: "none",
+        fontWeight: "bold",
+        py: 1.5,
+        borderRadius: 2,
+      }}
+    >
+      Register
+    </Button>
+  </Box>
+</Paper>
+
+
     );
 };
 
