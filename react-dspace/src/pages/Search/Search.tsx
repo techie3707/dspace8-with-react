@@ -643,7 +643,7 @@ const Search: React.FC = () => {
                                     };
 
                                     return (
-                                        <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+                                         <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
                                             <div
                                                 className="grid_main"
                                                 onClick={handleTitleClick}
@@ -653,7 +653,7 @@ const Search: React.FC = () => {
                                                     padding: '10px',
                                                     position: 'relative',
                                                     cursor: 'pointer',
-                                                    height: '300px',
+                                                    height: '100%'
                                                 }}
                                             >
                                                 {/* Title */}
@@ -663,13 +663,13 @@ const Search: React.FC = () => {
 
                                                 {/* Year */}
                                                 {date && (
-                                                    <p className='item_date' style={{ margin: '0', color: '#666', fontSize: '14px' }}>
+                                                    <p className='item_date' style={{ marginLeft: '10px', color: '#666', fontSize: '14px' }}>
                                                         {date}
                                                     </p>
                                                 )}
 
                                                 {/* Thumbnail */}
-                                                <div style={{ display: 'flex', justifyContent: 'center', }}>
+                                                <div style={{ display: 'flex', justifyContent: 'center', margin: '10px 0', height: '200px' }}>
                                                     {thumbnailsByItem[result._embedded?.indexableObject?.uuid]
                                                         ?.filter(bitstream => /\.(jpe?g|png)$/i.test(bitstream.name))
                                                         .slice(0, 1)
@@ -677,20 +677,19 @@ const Search: React.FC = () => {
                                                             <SecureImage
                                                                 key={bitstream.uuid}
                                                                 uuid={bitstream.uuid}
-                                                                className="thumbnail-img_list img-fluid"
-                                                                style={{ height: '250px', maxWidth: '210px' }}
+                                                                className="thumbnail-img img-fluid"
+                                                                style={{ maxHeight: '300px' }}
                                                                 alt="Thumbnail"
                                                             />
                                                         ))}
-
                                                 </div>
 
                                                 {/* Abstract */}
-                                                {abstract && (
+                                                {/* {abstract && (
                                                     <p style={{ margin: '10px 0', color: '#666', fontSize: '14px' }}>
                                                         {abstract}
                                                     </p>
-                                                )}
+                                                )} */}
 
                                                 {/* Navigation Arrow */}
                                                 <IconButton

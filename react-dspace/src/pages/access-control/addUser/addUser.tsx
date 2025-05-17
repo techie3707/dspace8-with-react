@@ -8,6 +8,8 @@ import { addUser } from "../../../api/usermanagement";
 import Loader from "../../loader/loader";
 import AccessManagement from "../accessManagement/accessManagement";
 import { addMemberToGroup } from "../../../api/group";
+import { showToast } from "../../../contexts/ToastProvider";
+
 interface AddUserProps {
     open: boolean;
     onClose: () => void;
@@ -15,6 +17,8 @@ interface AddUserProps {
 }
 
 const AddUser: React.FC<AddUserProps> = ({ open, onClose, fetchUsers }) => {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
     const [formData, setFormData] = useState({
         firstname: "",
         lastname: "",
@@ -23,22 +27,58 @@ const AddUser: React.FC<AddUserProps> = ({ open, onClose, fetchUsers }) => {
     const [loading, setLoading] = useState(false)
     const [accessModalOpen, setAccessModalOpen] = useState<boolean>(false);
     const [selectedGroups, setSelectedGroups] = useState<{ uuid: string; groupName: string }[]>([]);
-    const [formValid, setFormValid] = useState(false);
+    const [errors, setErrors] = useState({
+        firstname: false,
+        lastname: false,
+        email: false,
+        emailFormat: false,
+    });
 
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
 
-     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const newFormData = { ...formData, [e.target.name]: e.target.value };
-        setFormData(newFormData);
-        
-        setFormValid(
-            newFormData.firstname.trim() !== "" && 
-            newFormData.lastname.trim() !== "" && 
-            newFormData.email.trim() !== ""
-        );
+        // Validate field
+        if (name === "email") {
+            setErrors(prev => ({
+                ...prev,
+                email: value.trim() === "",
+                emailFormat: !emailRegex.test(value) && value.trim() !== ""
+            }));
+        } else {
+            setErrors(prev => ({
+                ...prev,
+                [name]: value.trim() === ""
+            }));
+        }
+    };
+
+    const validateForm = () => {
+        const newErrors = {
+            firstname: formData.firstname.trim() === "",
+            lastname: formData.lastname.trim() === "",
+            email: formData.email.trim() === "",
+            emailFormat: !emailRegex.test(formData.email) && formData.email.trim() !== ""
+        };
+        setErrors(newErrors);
+        return !Object.values(newErrors).some(error => error);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Validate all fields
+        const isValid = validateForm();
+        if (!isValid) {
+            const errorMessage = errors.emailFormat
+                ? "Please enter a valid email address"
+                : "Please fill all required fields before submitting.";
+            showToast(errorMessage, 'error');
+            return;
+        }
 
         const userData = {
             name: formData.email,
@@ -70,7 +110,7 @@ const AddUser: React.FC<AddUserProps> = ({ open, onClose, fetchUsers }) => {
             }
             fetchUsers();
             onClose();
-             setFormData({
+            setFormData({
                 firstname: "",
                 lastname: "",
                 email: "",
@@ -93,6 +133,7 @@ const AddUser: React.FC<AddUserProps> = ({ open, onClose, fetchUsers }) => {
         }
         setAccessModalOpen(false);
     };
+
     return (
         <Modal open={open} onClose={onClose}>
             <Paper className="modal-paper">
@@ -103,7 +144,7 @@ const AddUser: React.FC<AddUserProps> = ({ open, onClose, fetchUsers }) => {
                     </IconButton>
                 </div>
                 {loading && <Loader />}
-                <Box component="form" onSubmit={handleSubmit} className="modal-form">
+                <Box component="form" className="modal-form">
                     <TextField
                         label="First Name"
                         name="firstname"
@@ -112,6 +153,8 @@ const AddUser: React.FC<AddUserProps> = ({ open, onClose, fetchUsers }) => {
                         fullWidth
                         required
                         className="custom-textfield"
+                        error={errors.firstname}
+                        helperText={errors.firstname ? "First name is required" : ""}
                     />
 
                     <TextField
@@ -122,6 +165,8 @@ const AddUser: React.FC<AddUserProps> = ({ open, onClose, fetchUsers }) => {
                         fullWidth
                         required
                         className="custom-textfield"
+                        error={errors.lastname}
+                        helperText={errors.lastname ? "Last name is required" : ""}
                     />
 
                     <TextField
@@ -133,13 +178,17 @@ const AddUser: React.FC<AddUserProps> = ({ open, onClose, fetchUsers }) => {
                         fullWidth
                         required
                         className="custom-textfield"
+                        error={errors.email || errors.emailFormat}
+                        helperText={
+                            errors.email ? "Email is required" : ''
+                        }
                     />
-                    <Box sx={{ display: 'flex'}}>
+                    <Box sx={{ display: 'flex' }}>
                         <button
                             type="button"
                             onClick={handleAccess}
                             className="add-user-btn"
-                            style={{  position: 'relative',right:'12px', marginTop: '30px'}} 
+                            style={{ position: 'relative', right: '12px', marginTop: '30px' }}
                         >
                             <span className="btn-text">Collection Wise Permission</span>
                         </button>
@@ -148,7 +197,7 @@ const AddUser: React.FC<AddUserProps> = ({ open, onClose, fetchUsers }) => {
                             type="button"
                             onClick={handleSubmit}
                             className="add-user-btn"
-                            style={{  position: 'relative', left:'12px', marginTop: '30px',transition: 'none'}}>
+                            style={{ position: 'relative', left: '12px', marginTop: '30px' }}>
                             <span className="btn-text">Add User</span>
                             <span className="btn-icon">→</span>
                         </button>
@@ -160,7 +209,6 @@ const AddUser: React.FC<AddUserProps> = ({ open, onClose, fetchUsers }) => {
                     userId={null}
                 />
             </Paper>
-
         </Modal>
     );
 };
