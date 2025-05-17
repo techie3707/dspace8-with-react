@@ -124,7 +124,7 @@ const BatchImport: React.FC = () => {
       </label>
 
       <Box display="flex" justifyContent="space-between" alignItems="center" marginTop={3}>
-        <Button variant="contained" color="secondary" disabled={isLoading}>
+        <Button variant="contained" color="secondary" onClick={() => navigate(-1)} disabled={isLoading}>
           Back
         </Button>
 

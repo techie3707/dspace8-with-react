@@ -782,47 +782,116 @@ const AdvanceSearch: React.FC = () => {
 
                                     return (
                                         <Grid item xs={12} key={index}>
-                                            <div style={{ display: 'flex', alignItems: 'center', padding: '10px', border: '1px solid #ddd', borderRadius: '6px' }}>
-                                                {thumbnailsByItem[result._embedded?.indexableObject?.uuid]
-                                                    ?.filter(bitstream => /\.(jpe?g|png)$/i.test(bitstream.name))
-                                                    .slice(0, 1)
-                                                    .map(bitstream => (
-                                                        <SecureImage
-                                                            key={bitstream.uuid}
-                                                            uuid={bitstream.uuid}
-                                                            className="thumbnail-img img-fluid"
-                                                            style={{ maxHeight: '300px' }}
-                                                            alt="Thumbnail"
-                                                        />
-                                                    ))}
-                                                <div>
-                                                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-                                                        <span style={{
-                                                            backgroundColor: '#eee', padding: '2px 5px', borderRadius: '3px', marginRight: '10px'
-                                                        }}>
-                                                            {displayType}
-                                                        </span>
-                                                        <h3 style={{ margin: '0', cursor: 'pointer' }} onClick={handleTitleClick}>
-                                                            {title}
-                                                        </h3>
-                                                    </div>
-                                                    {date && (
-                                                        <p style={{ margin: '0', color: '#666' }}>
-                                                            ({publisher}, {date}) {author}
-                                                        </p>
-                                                    )}
-                                                    {abstract && (
-                                                        <>
-                                                            <p style={{ margin: '10px 0', color: '#666' }}>{abstract}</p>
-                                                            <button style={{
-                                                                padding: '5px 10px', backgroundColor: '#f0f0f0', border: 'none', borderRadius: '4px'
-                                                            }}>
-                                                                Show more
-                                                            </button>
-                                                        </>
-                                                    )}
-                                                </div>
-                                            </div>
+                             <div style={{
+                               display: 'flex',
+                               borderRadius: '8px',
+                               boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                               marginBottom: '20px',
+                               overflow: 'hidden',
+                               backgroundColor: '#fff',
+                             }}>
+                               {/* Colored Sidebar */}
+                               <div style={{
+                                 width: '100px',
+                                 backgroundColor: '#f97316', // Change per step color
+                                 display: 'flex',
+                                 flexDirection: 'column',
+                                 alignItems: 'center',
+                                 justifyContent: 'center',
+                                 color: '#fff',
+                                 fontWeight: 'bold',
+                                 position: 'relative'
+                               }}>
+                                 <div style={{
+                                   backgroundColor: '#fff',
+                                   color: '#f97316',
+                                   borderRadius: '50%',
+                                   width: '48px',
+                                   height: '48px',
+                                   display: 'flex',
+                                   alignItems: 'center',
+                                   justifyContent: 'center',
+                                   fontSize: '20px',
+                                   marginBottom: '5px'
+                                 }}>
+                                   <i className="fas fa-cube"></i> {/* Replace icon as needed */}
+                                 </div>
+                           
+                               </div>
+                           
+                               {/* Thumbnail & Content */}
+                               <div style={{ display: 'flex', alignItems: 'center', padding: '15px', flex: 1 }}>
+                                 {thumbnailsByItem[result._embedded?.indexableObject?.uuid]
+                                   ?.filter(bitstream => /\.(jpe?g|png)$/i.test(bitstream.name))
+                                   .slice(0, 1)
+                                   .map(bitstream => (
+                                     <SecureImage
+                                       key={bitstream.uuid}
+                                       uuid={bitstream.uuid}
+                                       className="thumbnail-img_list img-fluid"
+                                       style={{
+                                         maxHeight: '100px',
+                                         maxWidth: '100px',
+                                         marginRight: '20px',
+                                         borderRadius: '8px',
+                                         objectFit: 'cover'
+                                       }}
+                                       alt="Thumbnail"
+                                     />
+                                   ))}
+                           
+                                 {/* Right Text Section */}
+                                 <div style={{ flex: 1 }}>
+                                   <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+                                     <span style={{
+                                       backgroundColor: '#f0f0f0',
+                                       padding: '4px 8px',
+                                       borderRadius: '4px',
+                                       marginRight: '10px',
+                                       fontSize: '13px'
+                                     }}>
+                                       {displayType}
+                                     </span>
+                                     <h3
+                                       style={{
+                                         margin: '0',
+                                         cursor: 'pointer',
+                                         fontSize: '18px',
+                                         fontWeight: 600,
+                                         color: '#333'
+                                       }}
+                                       onClick={handleTitleClick}
+                                     >
+                                       {title}
+                                     </h3>
+                                   </div>
+                           
+                                   {date && (
+                                     <p style={{ margin: '0 0 10px 0', color: '#666', fontSize: '14px' }}>
+                                       ({publisher}, {date}) {author}
+                                     </p>
+                                   )}
+                           
+                                   {abstract && (
+                                     <>
+                                       <p style={{ margin: '10px 0', color: '#555', fontSize: '14px' }}>
+                                         {abstract}
+                                       </p>
+                                       <button style={{
+                                         padding: '6px 12px',
+                                         backgroundColor: '#e0e0e0',
+                                         border: 'none',
+                                         borderRadius: '4px',
+                                         fontSize: '13px',
+                                         cursor: 'pointer'
+                                       }}>
+                                         Show more
+                                       </button>
+                                     </>
+                                   )}
+                                 </div>
+                               </div>
+                             </div>
                                         </Grid>
                                     );
                                 })
@@ -866,13 +935,13 @@ const AdvanceSearch: React.FC = () => {
 
                                                 {/* Year */}
                                                 {date && (
-                                                    <p className='item_date' style={{ margin: '0', color: '#666', fontSize: '14px' }}>
+                                                    <p className='item_date' style={{ marginLeft: '10px', color: '#666', fontSize: '14px' }}>
                                                         {date}
                                                     </p>
                                                 )}
 
                                                 {/* Thumbnail */}
-                                                <div style={{ display: 'flex', justifyContent: 'center', margin: '10px 0' }}>
+                                                <div style={{ display: 'flex', justifyContent: 'center', margin: '10px 0', height: '200px' }}>
                                                     {thumbnailsByItem[result._embedded?.indexableObject?.uuid]
                                                         ?.filter(bitstream => /\.(jpe?g|png)$/i.test(bitstream.name))
                                                         .slice(0, 1)
@@ -888,11 +957,11 @@ const AdvanceSearch: React.FC = () => {
                                                 </div>
 
                                                 {/* Abstract */}
-                                                {abstract && (
+                                                {/* {abstract && (
                                                     <p style={{ margin: '10px 0', color: '#666', fontSize: '14px' }}>
                                                         {abstract}
                                                     </p>
-                                                )}
+                                                )} */}
 
                                                 {/* Navigation Arrow */}
                                                 <IconButton
