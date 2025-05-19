@@ -1,11 +1,13 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import HTMLFlipBook from "react-pageflip";
 import * as pdfjsLib from "pdfjs-dist";
 import "pdfjs-dist/build/pdf.worker.entry";
-import { Box, CircularProgress, Container } from "@mui/material";
+import { Box, CircularProgress, Container, IconButton } from "@mui/material";
 import { getPDFUrl } from "../../api/bitstream";
 import { showToast } from "../../contexts/ToastProvider";
+import Loader from "../loader/loader";
+import { ChevronLeft, ChevronRight } from "@mui/icons-material";
 
 const getAuthHeaders = (): Record<string, string> => {
   const authToken = localStorage.getItem("authToken") || "";
@@ -29,10 +31,49 @@ const PDFFlipBook: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [numPages, setNumPages] = useState<number>(0);
   const [isBlocked, setIsBlocked] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
   const bookRef = useRef<React.ElementRef<typeof HTMLFlipBook>>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const pageBatchSize = 10;
   let blurTimeout: NodeJS.Timeout;
+
+  const updateCurrentPage = useCallback(() => {
+    if (bookRef.current) {
+      const flipbook = bookRef.current.pageFlip();
+      setCurrentPage(flipbook.getCurrentPageIndex());
+    }
+  }, []);
+
+  const goNext = useCallback(() => {
+    if (bookRef.current) {
+      const flipbook = bookRef.current.pageFlip();
+      flipbook.flipNext();
+    }
+  }, [updateCurrentPage]);
+
+  const goPrev = useCallback(() => {
+    if (bookRef.current) {
+      const flipbook = bookRef.current.pageFlip();
+      flipbook.flipPrev();
+    }
+  }, [updateCurrentPage]);
+
+  useEffect(() => {
+    const flipbook = bookRef.current?.pageFlip();
+    if (flipbook) {
+      const handleFlip = (e: { data: number }) => {
+        setCurrentPage(e.data);
+      };
+
+      flipbook.on('flip', handleFlip);
+      setIsInitialized(true);
+
+      return () => {
+        flipbook.off('flip', handleFlip);
+      };
+    }
+  }, [bookRef.current]);
 
   useEffect(() => {
     if (uuid) {
@@ -114,6 +155,14 @@ const PDFFlipBook: React.FC = () => {
         setTimeout(() => setIsBlocked(false), 3000);
       }
 
+      if (key === "arrowright") {
+        event.preventDefault();
+        goNext();
+      } else if (key === "arrowleft") {
+        event.preventDefault();
+        goPrev();
+      }
+
       if (event.key === "Meta" || event.key === "OS") {
         setIsBlocked(true);
         setTimeout(() => setIsBlocked(false), 5000);
@@ -147,10 +196,16 @@ const PDFFlipBook: React.FC = () => {
       window.removeEventListener("blur", handleBlur);
       window.removeEventListener("focus", handleFocus);
     };
-  }, []);
+  }, [currentPage, numPages]);
 
   return (
-    <Container>
+    <Container sx={{
+      padding: 4, 
+      position: 'relative',
+      width: '100%',
+      maxWidth: '900px', 
+      mx: 'auto',
+    }}>
       <style>
         {`
           @media print {
@@ -172,66 +227,108 @@ const PDFFlipBook: React.FC = () => {
         <p style={{ color: "red" }}>{error}</p>
       ) : pages.length > 0 ? (
         <Box sx={{
-          boxShadow: 6,
-          borderRadius: 2,
-          overflow: "hidden",
-          backgroundColor: "#fff",
-          position: "relative",
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          gap: 2, 
         }}>
-          {isBlocked && (
-            <div style={{
-              position: "absolute",
-              top: 0, left: 0, width: "100%", height: "100%",
-              backgroundColor: "black",
-              zIndex: 10,
-              opacity: 1,
-              transition: "opacity 0.3s ease-in-out",
-            }} />
-          )}
 
-          <HTMLFlipBook
-            ref={bookRef}
-            width={window.innerWidth > 768 ? 500 : 300}
-            height={window.innerWidth > 768 ? 700 : 450}
-            className="my-flipbook"
-            style={{
-              margin: "auto",
-              maxWidth: "100%",
-              maxHeight: "100%",
+          <IconButton
+            onClick={goPrev}
+            sx={{
+              display: { xs: 'none', sm: 'flex' },
+              zIndex: 10,
+              backgroundColor: 'background.paper',
+              boxShadow: 2,
+              '&:hover': { backgroundColor: 'action.hover' },
+              '&.Mui-disabled': { opacity: 0.5 },
             }}
-            startPage={0}
-            size="stretch"
-            minWidth={250}
-            maxWidth={800}
-            minHeight={350}
-            maxHeight={1200}
-            drawShadow={true}
-            flippingTime={1000}
-            usePortrait={true}
-            showPageCorners={true}
-            startZIndex={0}
-            autoSize={true}
-            maxShadowOpacity={0.5}
-            mobileScrollSupport={true}
-            clickEventForward={true}
-            useMouseEvents={true}
-            swipeDistance={30}
-            showCover={true}
-            disableFlipByClick={false}
+            size="large"
+            disabled={currentPage <= 0 || !isInitialized}
           >
-            {Array.from({ length: numPages }).map((_, index) => (
-              <div key={index} className="page">
-                {pages[index] ? (
-                  <img src={pages[index]} alt={`Page ${index + 1}`} style={{ width: "100%", height: "100%" }} />
-                ) : (
-                  <p>Loading...</p>
-                )}
-              </div>
-            ))}
-          </HTMLFlipBook>
+            <ChevronLeft fontSize="large" />
+          </IconButton>
+          <Box sx={{
+            flexGrow: 1,
+            boxShadow: 6,
+            borderRadius: 2,
+            overflow: "hidden",
+            backgroundColor: "#fff",
+            position: "relative",
+            maxWidth: '100%',
+          }}>
+            {isBlocked && (
+              <div style={{
+                position: "absolute",
+                top: 0, left: 0, width: "100%", height: "100%",
+                backgroundColor: "black",
+                zIndex: 10,
+                opacity: 1,
+                transition: "opacity 0.3s ease-in-out",
+              }} />
+            )}
+
+            <HTMLFlipBook
+              ref={bookRef}
+              width={window.innerWidth > 768 ? 500 : 300}
+              height={window.innerWidth > 768 ? 700 : 450}
+              className="my-flipbook"
+              style={{
+                margin: "auto",
+                maxWidth: "100%",
+                maxHeight: "100%",
+              }}
+              onFlip={(e) => setCurrentPage(e.data)}
+              startPage={0}
+              size="stretch"
+              minWidth={250}
+              maxWidth={800}
+              minHeight={350}
+              maxHeight={1200}
+              drawShadow={true}
+              flippingTime={1000}
+              usePortrait={true}
+              showPageCorners={true}
+              startZIndex={0}
+              autoSize={true}
+              maxShadowOpacity={0.5}
+              mobileScrollSupport={true}
+              clickEventForward={true}
+              useMouseEvents={true}
+              swipeDistance={30}
+              showCover={true}
+              disableFlipByClick={false}
+            >
+              {Array.from({ length: numPages }).map((_, index) => (
+                <div key={index} className="page">
+                  {pages[index] ? (
+                    <img src={pages[index]} alt={`Page ${index + 1}`} style={{ width: "100%", height: "100%" }} />
+                  ) : (
+                    <p>Loading...</p>
+                  )}
+                </div>
+              ))}
+            </HTMLFlipBook>
+          </Box>
+
+          <IconButton
+            onClick={goNext}
+            sx={{
+              display: { xs: 'none', sm: 'flex' },
+              zIndex: 10,
+              backgroundColor: 'background.paper',
+              boxShadow: 2,
+              '&:hover': { backgroundColor: 'action.hover' },
+              '&.Mui-disabled': { opacity: 0.5 },
+            }}
+            size="large"
+            disabled={currentPage >= numPages - 2 || !isInitialized}
+          >
+            <ChevronRight fontSize="large" />
+          </IconButton>
         </Box>
       ) : (
-        <CircularProgress />
+        <Loader />
       )}
     </Container>
   );
