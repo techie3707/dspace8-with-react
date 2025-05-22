@@ -66,11 +66,11 @@ const PDFFlipBook: React.FC = () => {
         setCurrentPage(e.data);
       };
 
-      flipbook.on('flip', handleFlip);
+      flipbook.on("flip", handleFlip);
       setIsInitialized(true);
 
       return () => {
-        flipbook.off('flip', handleFlip);
+        flipbook.off("flip", handleFlip);
       };
     }
   }, [bookRef.current]);
@@ -109,7 +109,7 @@ const PDFFlipBook: React.FC = () => {
             await page.render({ canvasContext: context, viewport }).promise;
             pageImages.push(canvas.toDataURL("image/png"));
           }
-          setPages(prevPages => [...prevPages, ...pageImages]);
+          setPages((prevPages) => [...prevPages, ...pageImages]);
         };
 
         await loadPages(0, pageBatchSize);
@@ -199,13 +199,21 @@ const PDFFlipBook: React.FC = () => {
   }, [currentPage, numPages]);
 
   return (
-    <Container sx={{
-      padding: 4, 
-      position: 'relative',
-      width: '100%',
-      maxWidth: '900px', 
-      mx: 'auto',
-    }}>
+    <Container
+      sx={{
+        position: "fixed",
+        top: 0,
+        left: 40,
+        width: "100vw",
+        height: "100vh",
+        padding: 0,
+        margin: 0,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        overflow: "hidden",
+      }}
+    >
       <style>
         {`
           @media print {
@@ -219,6 +227,13 @@ const PDFFlipBook: React.FC = () => {
             -moz-user-select: none;
             -ms-user-select: none;
             user-select: none;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+          }
+
+          html {
+            overflow: hidden;
           }
         `}
       </style>
@@ -226,46 +241,65 @@ const PDFFlipBook: React.FC = () => {
       {error ? (
         <p style={{ color: "red" }}>{error}</p>
       ) : pages.length > 0 ? (
-        <Box sx={{
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center', 
-          gap: 2, 
-        }}>
-
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 2,
+            width: "100vw",
+            height: "100vh",
+            overflow: "hidden",
+            backgroundColor: "#fff",
+            position: "relative",
+          }}
+        >
           <IconButton
             onClick={goPrev}
             sx={{
-              display: { xs: 'none', sm: 'flex' },
+              display: { xs: "none", sm: "flex" },
               zIndex: 10,
-              backgroundColor: 'background.paper',
+              backgroundColor: "background.paper",
               boxShadow: 2,
-              '&:hover': { backgroundColor: 'action.hover' },
-              '&.Mui-disabled': { opacity: 0.5 },
+              "&:hover": { backgroundColor: "action.hover" },
+              "&.Mui-disabled": { opacity: 0.5 },
+              position: "absolute",
+              left: 10,
             }}
             size="large"
             disabled={currentPage <= 0 || !isInitialized}
           >
             <ChevronLeft fontSize="large" />
           </IconButton>
-          <Box sx={{
-            flexGrow: 1,
-            boxShadow: 6,
-            borderRadius: 2,
-            overflow: "hidden",
-            backgroundColor: "#fff",
-            position: "relative",
-            maxWidth: '100%',
-          }}>
+          <Box
+            sx={{
+              
+              flexGrow: 1,
+              boxShadow: 6,
+              borderRadius: 2,
+              overflow: "hidden",
+              backgroundColor: "#fff",
+              position: "relative",
+              width: "100%",
+              height: "100%",
+              border: "5px solid #ebc979",
+            }}
+            
+          >
             {isBlocked && (
-              <div style={{
-                position: "absolute",
-                top: 0, left: 0, width: "100%", height: "100%",
-                backgroundColor: "black",
-                zIndex: 10,
-                opacity: 1,
-                transition: "opacity 0.3s ease-in-out",
-              }} />
+              <div
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                  backgroundColor: "black",
+                  zIndex: 10,
+                  opacity: 1,
+                  transition: "opacity 0.3s ease-in-out",
+                }}
+              />
             )}
 
             <HTMLFlipBook
@@ -302,7 +336,11 @@ const PDFFlipBook: React.FC = () => {
               {Array.from({ length: numPages }).map((_, index) => (
                 <div key={index} className="page">
                   {pages[index] ? (
-                    <img src={pages[index]} alt={`Page ${index + 1}`} style={{ width: "100%", height: "100%" }} />
+                    <img
+                      src={pages[index]}
+                      alt={`Page ${index + 1}`}
+                      style={{ width: "100%", height: "100%" }}
+                    />
                   ) : (
                     <p>Loading...</p>
                   )}
@@ -314,12 +352,14 @@ const PDFFlipBook: React.FC = () => {
           <IconButton
             onClick={goNext}
             sx={{
-              display: { xs: 'none', sm: 'flex' },
+              display: { xs: "none", sm: "flex" },
               zIndex: 10,
-              backgroundColor: 'background.paper',
+              backgroundColor: "background.paper",
               boxShadow: 2,
-              '&:hover': { backgroundColor: 'action.hover' },
-              '&.Mui-disabled': { opacity: 0.5 },
+              "&:hover": { backgroundColor: "action.hover" },
+              "&.Mui-disabled": { opacity: 0.5 },
+              position: "absolute",
+              right: 10,
             }}
             size="large"
             disabled={currentPage >= numPages - 2 || !isInitialized}

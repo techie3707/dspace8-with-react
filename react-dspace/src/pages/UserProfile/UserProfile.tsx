@@ -121,6 +121,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId }) => {
         minHeight: 430,
         mx: 'auto',
         mt: 6,
+        mb:6,
         borderRadius: 4,
         overflow: 'hidden',
         position: 'relative',

@@ -79,7 +79,7 @@ const Policies = () => {
     };
 
     return (
-        <Container>
+        <Container className='policy_main_div'>
             <TableContainer>
                 <Box sx={{ display: "flex", justifyContent: "end", mb: 2, gap: 2,mt: 2 }}>
                     <Button

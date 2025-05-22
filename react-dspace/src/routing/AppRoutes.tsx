@@ -43,7 +43,7 @@ import CreateResourcePolicy from "../pages/workflow/createResourcePolicy";
 import Policies from "../pages/collection/policy";
 import CreatePolicy from "../pages/collection/createPolicy";
 import MyCart from "../pages/my-cart/MyCart";
-
+import SystemInformation from "../pages/system-information/system-information";
 
 
 const ProtectedRoute = ({ element }: { element: React.ReactElement }) => {
@@ -115,6 +115,7 @@ const AppRoutes = () => {
         <Route path="/edit-group" element={<ProtectedRoute element={<EditGroup />} />} />
         <Route path="/batchImport" element={<ProtectedRoute element={<BatchImport />} />} />
         <Route path="/collections/:collectionId/create-item" element={<ProtectedRoute element={<CreateItemWrapper />} />} />
+        <Route path="/system-information" element={<ProtectedRoute element={<SystemInformation />} />} />
       </Routes>
     </>
   );
