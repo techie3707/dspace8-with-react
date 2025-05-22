@@ -16,6 +16,7 @@ import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import { getUserById } from '../../api/usermanagement';
 import { downloadPDF } from '../../api/bitstream';
 import { siteConfig } from '../../data/data';
+import { getAuthHeaders } from '../../api/searchApi';
 
 type MyCartProps = {
     userId: string;
@@ -25,11 +26,20 @@ type CartItemInfo = {
     fullUuid: string;
     uuid: string;
     name: string;
+    date: string;
+    pages: string | null;
+
+};
+type SortKey = 'name' | 'date' | null;
+type SortConfig = {
+    key: SortKey;
+    direction: 'asc' | 'desc';
 };
 
 const MyCart: React.FC<MyCartProps> = ({ userId }) => {
     const [cartItems, setCartItems] = useState<CartItemInfo[]>([]);
     const [loading, setLoading] = useState(false);
+    const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'date', direction: 'desc' });
 
     useEffect(() => {
         if (userId) {
@@ -48,15 +58,27 @@ const MyCart: React.FC<MyCartProps> = ({ userId }) => {
 
             const detailedItems: CartItemInfo[] = await Promise.all(
                 rawCartValues.map(async (item: string) => {
-                    const [uuid] = item.split('_');
+                    const parts = item.split('_');
+                    const uuid = parts[0];
+                    const date = parts[1] || 'N/A';
+                    const pages = parts.length > 2 ? parts.slice(2).join('_') : null;
+
                     try {
-                        const response = await fetch(`${siteConfig.apiEndpoint}/api/core/bitstreams/${uuid}`);
+                        const headers = getAuthHeaders();
+                        const response = await fetch(
+                            `${siteConfig.apiEndpoint}/api/core/bitstreams/${uuid}`,
+                            {
+                                method: 'GET',
+                                headers: headers,
+                            }
+                        );
                         const data = await response.json();
                         const name = data.metadata?.['dc.title']?.[0]?.value || 'Unknown';
-                        return { fullUuid: item, uuid, name };
+
+                        return { fullUuid: item, uuid, name, date, pages };
                     } catch (err) {
                         console.error(`Failed to fetch bitstream info for ${uuid}:`, err);
-                        return { fullUuid: item, uuid, name: 'Unknown' };
+                        return { fullUuid: item, uuid, name: 'Unknown', date, pages };
                     }
                 })
             );
@@ -68,6 +90,32 @@ const MyCart: React.FC<MyCartProps> = ({ userId }) => {
             setLoading(false);
         }
     };
+
+    const handleSort = (key: SortKey) => {
+        setSortConfig((prev) => {
+            if (prev.key === key) {
+                return { key, direction: prev.direction === 'asc' ? 'desc' : 'asc' };
+            }
+            return { key, direction: 'asc' };
+        });
+    };
+
+    const sortedItems = [...cartItems].sort((a, b) => {
+        if (!sortConfig.key) return 0;
+
+        const aVal = a[sortConfig.key];
+        const bVal = b[sortConfig.key];
+
+        if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+        return 0;
+    });
+
+    const getSortSymbol = (key: SortKey) => {
+        if (sortConfig.key !== key) return '';
+        return sortConfig.direction === 'asc' ? ' 🔼' : ' 🔽';
+    };
+
 
     if (loading) {
         return (
@@ -109,26 +157,37 @@ const MyCart: React.FC<MyCartProps> = ({ userId }) => {
                         <TableHead>
                             <TableRow>
                                 <TableCell><strong>#</strong></TableCell>
-                                <TableCell><strong>Document Name</strong></TableCell>
+                                <TableCell onClick={() => handleSort('name')} style={{ cursor: 'pointer' }}>
+                                    <strong>Document Name{getSortSymbol('name')}</strong>
+                                </TableCell>
+                                <TableCell onClick={() => handleSort('date')} style={{ cursor: 'pointer' }}>
+                                    <strong>Date Added{getSortSymbol('date')}</strong>
+                                </TableCell>
                                 <TableCell><strong>Action</strong></TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {cartItems.map((item, index) => (
+                            {sortedItems.map((item, index) => (
                                 <TableRow key={item.fullUuid}>
                                     <TableCell>{index + 1}</TableCell>
                                     <TableCell>{item.name}</TableCell>
+                                    <TableCell>{item.date}</TableCell>
                                     <TableCell>
-                                        <button
-                                            onClick={() => downloadPDF(item.fullUuid, item.name)}
+                                        <Button
+                                            onClick={() =>
+                                                item.pages
+                                                    ? downloadPDF(item.uuid, item.name, item.pages)
+                                                    : downloadPDF(item.uuid, item.name)
+                                            }
                                         >
                                             Download
-                                        </button>
+                                        </Button>
                                     </TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
                     </Table>
+
                 </TableContainer>
             )}
         </Paper>
