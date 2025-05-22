@@ -63,16 +63,16 @@ const PDFViewer: React.FC = () => {
         const fetchPDF = async () => {
             try {
                 setLoading(true);
-        
+
                 const headers = getAuthHeaders();
                 const response = await axios.get(
                     `${siteConfig.apiEndpoint}/api/core/bitstreams/${uuid}/content`,
                     {
                         responseType: "blob",
-                        headers, // include auth headers
+                        headers,
                     }
                 );
-        
+
                 const pdfBlobUrl = URL.createObjectURL(response.data as Blob);
                 setPdfUrl(pdfBlobUrl);
                 setLoading(false);
@@ -126,15 +126,16 @@ const PDFViewer: React.FC = () => {
                         variant="outlined"
                         value={pageInput}
                         onChange={(e) => setPageInput(e.target.value)}
+                        autoFocus
                         sx={{ mb: 2 }}
                     />
                     <Button
                         fullWidth
                         variant="contained"
                         onClick={async () => {
-                            const pages = parsePages(pageInput);
-                            if (!pages || pages.length === 0) {
-                                console.error("No valid pages entered.");
+                            const trimmedInput = pageInput.trim();
+                            if (!trimmedInput) {
+                                console.error("Please enter valid pages.");
                                 return;
                             }
 
@@ -144,9 +145,13 @@ const PDFViewer: React.FC = () => {
                                     console.error("User not authenticated or no user ID found.");
                                     return;
                                 }
-                                await updateUserCart(userID, uuid!);
+
+                                const today = new Date().toISOString().split("T")[0];
+                                const bitstreamValue = `${uuid}_${today}_${trimmedInput}`;
+                                await updateUserCart(userID, bitstreamValue);
+
                                 setShowForm(false);
-                                setPageInput("");
+                                setPageInput(""); // Reset *after* successful submission
                             } catch (error) {
                                 console.error("Error in Add to List operation:", error);
                             }
@@ -154,10 +159,10 @@ const PDFViewer: React.FC = () => {
                     >
                         Add to List
                     </Button>
-
-
                 </Paper>
             </Slide>
+
+
         </Box>
     );
 
