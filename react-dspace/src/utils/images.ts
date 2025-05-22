@@ -21,8 +21,8 @@ import edit from "../assets/icons/edit.png";
 import remove from "../assets/icons/delete.png";
 import access from "../assets/icons/access-control.png";
 import person_one from "../assets/images/person_one.jpg";
-import brand_one from "../assets/images/Techbets.png";
-import brand_two from "../assets/images/Techbets1.png";
+import brand_one from "../assets/images/rav-logo.png";
+import brand_two from "../assets/images/rav-logo-2.png";
 import home_main from "../assets/images/homepage.svg";
 import grid from "../assets/icons/grid.png";
 import list from "../assets/icons/list.png";
@@ -45,7 +45,9 @@ import preview from "../assets/images/about1.webp";
 import person from "../assets/images/person.png";
 import business_person from "../assets/images/business_person.png";
 import aboutBack from "../assets/images/aboutBack.avif";
-
+import slide1 from "../assets/images/slider1.jpg";
+import slide2 from "../assets/images/slider2.jpg";
+import slide3 from "../assets/images/slider3.jpg";
 
 
 
@@ -104,7 +106,11 @@ interface About_US{
     person: string;
     business_person: string;
 }
-
+export const ImageSlider: string[] = [
+  slide1,
+  slide2,
+  slide3
+];
 // Export typed objects
 export const iconsImgs: IconsImages = {
     alert, bell, bills, budget, card, check, empty_check, gears, home, menu, plane, plus, report, search, searchLight, user, wallet, wealth, login, edit, remove, access, list, grid, arrow, back_btn, batchimport, group, epople, registries, collection, community , collectionname, save, cancel, add ,minus,whiteEditIcon,group_icon_black,aboutBack

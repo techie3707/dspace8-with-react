@@ -13,7 +13,7 @@ export interface NavigationLink {
 
 
 export const siteConfig = {
-    name: "TechBets",
+    name: "RAV",
     logo: "/assets/logo.png",
     apiEndpoint: "http://localhost:8080/server"
 };
@@ -61,12 +61,13 @@ export const generateNavigationLinks = (
     { id: 5, title: "Batch Import", image: iconsImgs.batchimport, path: "/batchImport" },
     { id: 6, title: "Admin Search", image: iconsImgs.searchLight, path: "/adminSearch" },
     { id: 7, title: "Edit Community", image: iconsImgs.whiteEditIcon, path: "/edit-Community-Collection" },
-    { id: 8, title: "Workflow", image: iconsImgs.group, path: "/workflowSearch" },
+    { id: 8, title: "systemInformation", image: iconsImgs.group, path: "/system-information" },
+    // { id: 8, title: "Workflow", image: iconsImgs.group, path: "/workflowSearch" },
   ];
 
 
 export const footerData = {
-    companyName: "TechBets",
+    companyName: "RAV",
     contacts: {
         phone: "+1 234 567 890",
         email: "info@example.com",

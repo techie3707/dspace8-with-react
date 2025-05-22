@@ -659,11 +659,14 @@ button {
   color: rgb(129, 20, 246);
 }
 .main-content-holder{
-  margin-top: 43px;
+  margin-top: 60px;
 }
 .main_search.MuiTextField-root {
   margin-bottom: 0 !important;
 }
 .login-container{
   margin-bottom: 20px;
+}
+.policy_main_div{
+  margin-top: 20px;
 }

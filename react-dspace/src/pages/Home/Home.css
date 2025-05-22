@@ -62,9 +62,7 @@
     }
   }
 
-  .home-container {
-    padding: 40px 0;
-}
+
 
 .feature-card {
     border-radius: 12px;
@@ -120,7 +118,7 @@ padding: 20px 20px 130px 20px;
   background: linear-gradient(to bottom, #cce1ed, #ebc979);
 }
 
-.card_d {
+.card_a {
   position: relative !important;
   border-radius: 10px !important;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
@@ -128,12 +126,12 @@ padding: 20px 20px 130px 20px;
   cursor: pointer !important;
   text-decoration: none !important;
   color: white !important;
-  background: url('../../assets/images/card.webp') center/cover no-repeat !important;
-  height: 300px !important;
+  background: url('../../assets/images/academics.jpg') center/cover no-repeat !important;
+  height: 150px !important;
   transition: transform 0.2s ease !important;
 }
 
-.card_h{
+.card_b{
   position: relative !important;
   border-radius: 10px !important;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
@@ -141,8 +139,8 @@ padding: 20px 20px 130px 20px;
   cursor: pointer !important;
   text-decoration: none !important;
   color: white !important;
-  background: url('../../assets/images/card.webp') center/cover no-repeat !important;
-  height: 300px !important;
+  background: url('../../assets/images/accountscard.jpg') center/cover no-repeat !important;
+  height: 150px !important;
   transition: transform 0.2s ease !important;
 }
 .card_c{
@@ -153,11 +151,11 @@ padding: 20px 20px 130px 20px;
   cursor: pointer !important;
   text-decoration: none !important;
   color: white !important;
-  background: url('../../assets/images/card.webp') center/cover no-repeat !important;
-  height: 300px !important;
+  background: url('../../assets/images/administrativecard.jpg') center/cover no-repeat !important;
+  height: 150px !important;
   transition: transform 0.2s ease !important;
 }
-.card_k{
+.card_d{
   position: relative !important;
   border-radius: 10px !important;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
@@ -165,10 +163,71 @@ padding: 20px 20px 130px 20px;
   cursor: pointer !important;
   text-decoration: none !important;
   color: white !important;
-  background: url('../../assets/images/card.webp') center/cover no-repeat !important;
-  height: 300px !important;
+  background: url('../../assets/images/atabcard.jpg') center/cover no-repeat !important;
+  height: 150px !important;
   transition: transform 0.2s ease !important;
 }
+.card_e{
+  position: relative !important;
+  border-radius: 10px !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+  overflow: hidden !important;
+  cursor: pointer !important;
+  text-decoration: none !important;
+  color: white !important;
+  background: url('../../assets/images/cmecard.jpg') center/cover no-repeat !important;
+  height: 150px !important;
+  transition: transform 0.2s ease !important;
+}
+.card_f{
+  position: relative !important;
+  border-radius: 10px !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+  overflow: hidden !important;
+  cursor: pointer !important;
+  text-decoration: none !important;
+  color: white !important;
+  background: url('../../assets/images/General-Administration.jpg') center/cover no-repeat !important;
+  height: 150px !important;
+  transition: transform 0.2s ease !important;
+}
+.card_g{
+  position: relative !important;
+  border-radius: 10px !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+  overflow: hidden !important;
+  cursor: pointer !important;
+  text-decoration: none !important;
+  color: white !important;
+  background: url('../../assets/images/librarycard.jpg') center/cover no-repeat !important;
+  height: 150px !important;
+  transition: transform 0.2s ease !important;
+}
+.card_h{
+  position: relative !important;
+  border-radius: 10px !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+  overflow: hidden !important;
+  cursor: pointer !important;
+  text-decoration: none !important;
+  color: white !important;
+  background: url('../../assets/images/projectcard.jpg') center/cover no-repeat !important;
+  height: 150px !important;
+  transition: transform 0.2s ease !important;
+}
+.card_i{
+  position: relative !important;
+  border-radius: 10px !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+  overflow: hidden !important;
+  cursor: pointer !important;
+  text-decoration: none !important;
+  color: white !important;
+  background: url('../../assets/images/publicationcard.jpg') center/cover no-repeat !important;
+  height: 150px !important;
+  transition: transform 0.2s ease !important;
+}
+
 .card:hover {
   transform: scale(1.05) !important;
 }
@@ -262,7 +321,7 @@ display: block !important;
 
 @media (min-width: 1024px) {
   .card {
-    height: 400px !important;
+    height: 300px !important;
   }
 }
 @media (min-width: 1249px) {
@@ -306,3 +365,4 @@ display: block !important;
 .home-container{
   background: linear-gradient(to bottom, #ffffff, #ebc979);
 }
+

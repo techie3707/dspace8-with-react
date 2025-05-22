@@ -1,8 +1,26 @@
 import React from "react";
 import { Container, Grid, Typography, Link, IconButton } from "@mui/material";
 import { Facebook, Twitter, Instagram, LinkedIn } from "@mui/icons-material";
-import { footerData } from "../../data/data";
 import "./ContentBottom.css";
+
+const footerData = {
+  companyName: "RAV Delhi",
+  services: [
+    { id: 1, title: "Service 1", path: "/service1" },
+    { id: 2, title: "Service 2", path: "/service2" },
+    { id: 3, title: "Service 3", path: "/service3" },
+  ],
+  contacts: {
+    phone: "+91 123 456 7890",
+    email: "contact@ravdelhi.com",
+    address: "Delhi, India",
+  },
+  socialMedia: [
+    { id: 1, title: "Facebook", link: "https://www.facebook.com/ravdelhi" },
+    { id: 2, title: "Instagram", link: "https://www.instagram.com/ravdelhi/" },
+    { id: 3, title: "Twitter", link: "https://x.com/RAVDelhi?t=oJ1Y3m7pqJd5UC7T2MTTug&s=08" },
+  ],
+};
 
 const ContentBottom: React.FC = () => {
   return (
@@ -35,7 +53,6 @@ const ContentBottom: React.FC = () => {
             <Typography>Address: {footerData.contacts.address}</Typography>
           </Grid>
 
-        
           <Grid item xs={12} sm={6} md={3}>
             <Typography variant="h6" fontWeight="bold" gutterBottom>
               Social Media
