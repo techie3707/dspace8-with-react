@@ -11,6 +11,8 @@ import { iconsImgs } from '../../utils/images';
 import { IconButton } from '@mui/material';
 import Loader from '../loader/loader';
 import SecureImage from '../Search/SecureImage';
+import { useUserGroups } from '../../contexts/groupTypeContext';
+import { getowningCollection } from '../../api/item';
 
 
 
@@ -24,6 +26,36 @@ const BookDetails: React.FC = () => {
     const [thumbnailBitstreams, setThumbnailBitstreams] = useState<Bitstream[]>([]);
     const navigate = useNavigate();
     const { isAuthenticated } = useAuth();
+    const {isAdministrator, groupCategories} = useUserGroups();
+    const[collection, setCollection] = useState<any>(null);
+    const fetchOwningCollection = async (itemId: string) => {
+        try {
+            const collection = await getowningCollection(itemId);
+            setCollection(collection);
+        }catch (error) {
+            console.error("Error fetching owning collection:", error);
+        }
+    }
+    useEffect(() => {
+        fetchOwningCollection(id || '');
+    },[])
+    
+
+    const displayEditButton = () => {
+    const uploadGroups = groupCategories.upload.map(group => 
+      group.name.replace('_Upload', '')
+    );
+    
+    const adminGroups = groupCategories.admin.map(group =>
+      group.name.replace('_Admin', '')
+    );
+
+const allAccessGroups = Array.from(new Set([...uploadGroups, ...adminGroups]));    
+    return allAccessGroups.includes(collection)
+  };
+
+  const isAccess = displayEditButton();
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -165,7 +197,7 @@ const BookDetails: React.FC = () => {
                                                         </ul>
                                                     </td>
                                                 </tr>
-                                                {isAuthenticated && (
+                                                {isAuthenticated && (isAdministrator || isAccess) && (
                                                     <tr>
                                                         <td colSpan={2} className="text-end">
                                                             <button className='custom-btn' style={{ width: '100%' }} onClick={() => navigate(`/edit-item/${id}`)}>
