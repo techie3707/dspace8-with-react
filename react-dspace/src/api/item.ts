@@ -90,6 +90,28 @@ export const createItem = async (
     }
 };
 
+interface OwningCollection{
+    id: string,
+    name: string
+}
+//http://localhost:8080/server/api/core/items/149a4996-2ea6-467b-be7a-fbc93a6ce6b3/owningCollection
+export const getowningCollection = async (itemId: string) => {
+    const apiUrl = `${siteConfig.apiEndpoint}/api/core/items/${itemId}/owningCollection`;
+    try {
+        const response = await axios.get<OwningCollection>(apiUrl, {
+            headers: {
+                "Content-Type": "application/json",
+                "X-XSRF-TOKEN": csrfToken,
+                "Authorization": authToken,
+            },
+            withCredentials: true,
+        });
+        return response.data.name;
+    } catch (error) {
+        console.log("error", error)
+    }
+}
+
 
 export const fetchWorkspaceItems = async (collectionId: string) => {
       const csrfToken = await fetchCsrfToken();

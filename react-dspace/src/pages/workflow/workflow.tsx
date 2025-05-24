@@ -640,7 +640,7 @@ const Workflow = () => {
 
                                     const handleEditClick = () => {
                                         if (uuid) {
-                                            navigate(`/resourcePolicy/${uuid}`);
+                                            navigate(`/policies/${uuid}`);
                                         }
                                     }
                                     const handleSupervisionClick = () => {

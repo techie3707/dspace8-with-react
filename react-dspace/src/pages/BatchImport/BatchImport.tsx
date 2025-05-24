@@ -14,6 +14,7 @@ import { uploadBatchImport } from "../../api/batchImport";
 import { fetchCollections } from "../../api/collection";
 import { useNavigate } from "react-router-dom";
 import { showToast } from "../../contexts/ToastProvider";
+import { useUserGroups } from "../../contexts/groupTypeContext";
 
 const BatchImport: React.FC = () => {
   const [collections, setCollections] = useState<{ id: string; name: string }[]>([]);
@@ -21,6 +22,29 @@ const BatchImport: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const navigate = useNavigate();
+  
+  const { groupCategories, isAdministrator } = useUserGroups();
+
+  const getCollectionsToDisplay = () => {
+    if (isAdministrator) {
+      return collections;
+    }
+
+    const uploadGroups = groupCategories.upload.map(group => 
+      group.name.replace('_Upload', '')
+    );
+    
+    const adminGroups = groupCategories.admin.map(group =>
+      group.name.replace('_Admin', '')
+    );
+
+const allAccessGroups = Array.from(new Set([...uploadGroups, ...adminGroups]));    
+    return collections.filter(collection => 
+      allAccessGroups.includes(collection.name)
+    );
+  };
+
+  const collectionsToDisplay = getCollectionsToDisplay();
 
   useEffect(() => {
     fetchCollections()
@@ -42,7 +66,6 @@ const BatchImport: React.FC = () => {
     }
   };
 
-
   const handleSubmit = async () => {
     if (!selectedCollection || !selectedFile) {
       showToast("Please select a collection and a ZIP file.", "error");
@@ -55,10 +78,8 @@ const BatchImport: React.FC = () => {
       const response = await uploadBatchImport(selectedCollection, selectedFile);
 
       if (response.status === 202) {
-        showToast("Batch import uploaded successfully!", "success");
+        alert("ZIP file uploaded successfully!");
         navigate("/");
-      } else {
-        showToast("Upload completed but did not return 202.", "info");
       }
     } catch (error) {
       showToast("Upload failed. Please try again.", "error");
@@ -83,17 +104,18 @@ const BatchImport: React.FC = () => {
           displayEmpty
           renderValue={
             selectedCollection !== ''
-              ? () => collections.find(col => col.id === selectedCollection)?.name
+              ? () => collectionsToDisplay.find(col => col.id === selectedCollection)?.name
               : () => <span style={{ color: '#aaa' }}>Select Collection</span>
           }
         >
-          {collections.map((collection) => (
+          {collectionsToDisplay.map((collection) => (
             <MenuItem key={collection.id} value={collection.id}>
               {collection.name}
             </MenuItem>
           ))}
         </Select>
       </FormControl>
+      
       <label htmlFor="file-upload" className="b_import_label">
         <Box
           className="upload-container"

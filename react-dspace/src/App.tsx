@@ -7,6 +7,7 @@ import { SidebarProvider } from "./contexts/sidebarContext";
 import { CsrfProvider } from "./contexts/CsrfContext";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { AuthTokenProvider } from "./contexts/AuthTokenContext";
+import { UserGroupProvider } from "./contexts/groupTypeContext";
 
 const AppContent: React.FC = () => {
   const { isAuthenticated } = useAuth(); 
@@ -27,9 +28,11 @@ const App: React.FC = () => {
       <CsrfProvider>
         <AuthTokenProvider>
           <AuthProvider>
+             <UserGroupProvider>
             <Router> 
               <AppContent />
             </Router>
+            </UserGroupProvider>
           </AuthProvider>
         </AuthTokenProvider>
       </CsrfProvider>
