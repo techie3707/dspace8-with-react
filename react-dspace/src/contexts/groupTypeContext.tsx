@@ -2,17 +2,17 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { fetchUserGroupsList } from '../api/accessManagement';
 import { getAuthStatus } from '../api/authApi';
 
-type Group = {
+export type Group = {
   name: string;
 };
 
-type GroupCategories = {
+export type GroupCategories = {
   read: Group[];
   upload: Group[];
   admin: Group[];
 };
 
-type UserGroupContextType = {
+export type UserGroupContextType = {
   allGroups: Group[];
   groupCategories: GroupCategories;
   isAdministrator: boolean;

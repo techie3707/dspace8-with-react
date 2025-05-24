@@ -1,4 +1,7 @@
 import { iconsImgs } from "../utils/images";
+import type { Group, GroupCategories } from "../contexts/groupTypeContext";
+
+
 
 export interface NavigationLink {
   id: number;
@@ -13,7 +16,7 @@ export interface NavigationLink {
 
 
 export const siteConfig = {
-  name: "RAV",
+  name: "TechBets",
   logo: "/assets/logo.png",
   apiEndpoint: "http://localhost:8080/server"
 };
@@ -53,40 +56,58 @@ export const generateNavigationLinks = (
   }));
 };
 
-export const getNavigationLinks = (isAdmin: boolean): NavigationLink[] => {
+export const getNavigationLinks = (
+  isAdministrator: boolean,
+  groupCategories: GroupCategories
+): NavigationLink[] => {
   const links: NavigationLink[] = [
     { id: 1, title: "Home", image: iconsImgs.home, path: "/" },
     { id: 2, title: "User Management", image: iconsImgs.epople, path: "/UserManagement" },
     { id: 4, title: "Groups", image: iconsImgs.group, path: "/groups" },
-    { id: 5, title: "Batch Import", image: iconsImgs.batchimport, path: "/batchImport" },
     { id: 6, title: "Admin Search", image: iconsImgs.searchLight, path: "/adminSearch" },
     { id: 8, title: "systemInformation", image: iconsImgs.group, path: "/system-information" },
-    // { id: 8, title: "Workflow", image: iconsImgs.group, path: "/workflowSearch" },
   ];
 
-  if (isAdmin) {
+  const isUploadAdminGroup =
+    groupCategories.upload.some((group: Group) =>
+      group.name.toLowerCase().includes('upload')
+    ) ||
+    groupCategories.admin.some((group: Group) =>
+      group.name.toLowerCase().includes('admin')
+    );
+
+  if (isAdministrator || isUploadAdminGroup) {
+    links.splice(3, 0, {
+      id: 5,
+      title: "Batch Import",
+      image: iconsImgs.batchimport,
+      path: "/batchImport",
+    });
+  }
+
+  if (isAdministrator) {
     links.splice(2, 0, {
       id: 3,
       title: "Metadata Schemas",
       image: iconsImgs.registries,
-      path: "/metadataSchemas"
+      path: "/metadataSchemas",
     });
 
     links.splice(links.length - 1, 0, {
       id: 7,
       title: "Edit Community",
       image: iconsImgs.whiteEditIcon,
-      path: "/edit-Community-Collection"
+      path: "/edit-Community-Collection",
     });
   }
 
-  return links;
+  return links; 
 };
 
 
 
 export const footerData = {
-  companyName: "RAV",
+  companyName: "TechBets",
   contacts: {
     phone: "+1 234 567 890",
     email: "info@example.com",
