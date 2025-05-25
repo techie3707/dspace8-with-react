@@ -26,35 +26,30 @@ const BookDetails: React.FC = () => {
     const [thumbnailBitstreams, setThumbnailBitstreams] = useState<Bitstream[]>([]);
     const navigate = useNavigate();
     const { isAuthenticated } = useAuth();
-    const {isAdministrator, groupCategories} = useUserGroups();
-    const[collection, setCollection] = useState<any>(null);
+    const { isAdministrator, groupCategories } = useUserGroups();
+    const [collection, setCollection] = useState<any>(null);
     const fetchOwningCollection = async (itemId: string) => {
         try {
             const collection = await getowningCollection(itemId);
             setCollection(collection);
-        }catch (error) {
+        } catch (error) {
             console.error("Error fetching owning collection:", error);
         }
     }
     useEffect(() => {
         fetchOwningCollection(id || '');
-    },[])
-    
+    }, [])
+
 
     const displayEditButton = () => {
-    const uploadGroups = groupCategories.upload.map(group => 
-      group.name.replace('_Upload', '')
-    );
-    
-    const adminGroups = groupCategories.admin.map(group =>
-      group.name.replace('_Admin', '')
-    );
+        const adminGroups = groupCategories.admin.map(group =>
+            group.name.replace('_Admin', '')
+        );
 
-const allAccessGroups = Array.from(new Set([...uploadGroups, ...adminGroups]));    
-    return allAccessGroups.includes(collection)
-  };
+        return adminGroups.includes(collection)
+    };
 
-  const isAccess = displayEditButton();
+    const isAdmin = displayEditButton();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -166,11 +161,13 @@ const allAccessGroups = Array.from(new Set([...uploadGroups, ...adminGroups]));
                                     <th>Date</th>
                                     <td>{dateIssued}</td>
                                 </tr>
-                                {originalBitstreams.length > 0 && (() => {
+                                {(() => {
                                     const pdfBitstreams = originalBitstreams.filter(bitstream => /.pdf$/i.test(bitstream.name));
-
-                                    //  If only one PDF, show simple list format
-                                    if (pdfBitstreams.length === 1 || pdfBitstreams.length === 0) {
+                                    if (pdfBitstreams.length === 0) {
+                                        return null; 
+                                    }
+                                    // If only one PDF, show simple list format
+                                    if (pdfBitstreams.length === 1) {
                                         return (
                                             <>
                                                 <tr>
@@ -186,18 +183,16 @@ const allAccessGroups = Array.from(new Set([...uploadGroups, ...adminGroups]));
                                                                         View In Flip PDF
                                                                     </button>
                                                                     {isAuthenticated && (
-                                                                        <>
-                                                                            <button className='custom-btn' onClick={() => downloadPDF(bitstream.uuid, bitstream.name)}>
-                                                                                Download PDF
-                                                                            </button>
-                                                                        </>
+                                                                        <button className='custom-btn' onClick={() => downloadPDF(bitstream.uuid, bitstream.name)}>
+                                                                            Download PDF
+                                                                        </button>
                                                                     )}
                                                                 </li>
                                                             ))}
                                                         </ul>
                                                     </td>
                                                 </tr>
-                                                {isAuthenticated && (isAdministrator || isAccess) && (
+                                                {isAuthenticated && (isAdministrator || isAdmin) && (
                                                     <tr>
                                                         <td colSpan={2} className="text-end">
                                                             <button className='custom-btn' style={{ width: '100%' }} onClick={() => navigate(`/edit-item/${id}`)}>
@@ -238,7 +233,6 @@ const allAccessGroups = Array.from(new Set([...uploadGroups, ...adminGroups]));
                                                     </td>
                                                 </tr>
                                             ))}
-
                                             {isAuthenticated && (
                                                 <tr>
                                                     <td colSpan={2} className="text-end">
