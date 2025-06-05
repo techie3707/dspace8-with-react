@@ -7,11 +7,10 @@ import { CreateItemProps, FormField, formFields } from "../../data/itemFormData"
 import { createItem, createWorkflowItem, fetchWorkspaceItems, InsertImage } from "../../api/item";
 import Loader from "../loader/loader";
 import { showToast } from "../../contexts/ToastProvider";
-import { error } from "console";
 import { useSearchParams } from 'react-router-dom';
 import { useNavigate } from "react-router-dom";
-
-
+import * as pdfjsLib from "pdfjs-dist";
+import pdfjsWorker from "pdfjs-dist/build/pdf.worker.entry";
 
 const CreateItem: React.FC<CreateItemProps> = ({ collectionId }) => {
     const [formData, setFormData] = useState<Record<string, string | Date | null>>({});
@@ -28,6 +27,7 @@ const CreateItem: React.FC<CreateItemProps> = ({ collectionId }) => {
         searchParams.get('workspaceId') || undefined
     );
     const navigate = useNavigate()
+    pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
     useEffect(() => {
         if (!workspaceId) {
@@ -57,8 +57,7 @@ const CreateItem: React.FC<CreateItemProps> = ({ collectionId }) => {
             [name]: value,
         }));
     };
-
-
+   
 
     const handleDateChange = (type: "year" | "month" | "day", value: number) => {
         setDateParts((prevDateParts) => {
@@ -74,10 +73,47 @@ const CreateItem: React.FC<CreateItemProps> = ({ collectionId }) => {
         });
     };
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
-            setSelectedFile(e.target.files[0]);
+            const file = e.target.files[0];
+            setSelectedFile(file);
+
+            if (file.type === "application/pdf") {
+                try {
+                    const thumbnailBlob = await generateThumbnailFromPDF(file);
+                    const renamedFile = new File([thumbnailBlob], "Thumbnail_TIT_01.jpg", { type: "image/jpeg" });
+                    if (workspaceId) {
+                        await InsertImage(workspaceId, renamedFile);
+                    }
+                } catch (error) {
+                    console.error("Error generating/uploading thumbnail:", error);
+                }
+            }
         }
+    };
+    const generateThumbnailFromPDF = async (pdfFile: File): Promise<Blob> => {
+        const arrayBuffer = await pdfFile.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        const page = await pdf.getPage(1);
+
+        const canvas = document.createElement("canvas");
+        const viewport = page.getViewport({ scale: 2 });
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+
+        const context = canvas.getContext("2d");
+        if (!context) {
+            throw new Error("Canvas context not available.");
+        }
+
+        await page.render({ canvasContext: context, viewport }).promise;
+
+        return new Promise((resolve, reject) => {
+            canvas.toBlob((blob) => {
+                if (blob) resolve(blob);
+                else reject(new Error("Failed to convert canvas to blob."));
+            }, "image/jpeg", 0.9);
+        });
     };
 
 
@@ -94,15 +130,15 @@ const CreateItem: React.FC<CreateItemProps> = ({ collectionId }) => {
 
         try {
             setLoading(true);
-        
+
             if (selectedFile && workspaceId) {
                 try {
                     const uploadedFileUri = await InsertImage(workspaceId, selectedFile);
                     setFileUri(uploadedFileUri);
-        
-                    if (!workspaceId) return; 
+
+                    if (!workspaceId) return;
                     await createItem(workspaceId, formData);
-        
+
                     console.log('File URI:', uploadedFileUri);
                     if (uploadedFileUri) {
                         await createWorkflowItem(uploadedFileUri);

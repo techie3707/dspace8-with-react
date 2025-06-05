@@ -28,9 +28,6 @@ import Error403 from "../pages/error/error403";
 import Error422 from "../pages/error/error422";
 import Error404 from "../pages/error/error404";
 import Error500 from "../pages/error/error500";
-import TopCommunity from "../pages/community/topCommunity";
-import SelectCommunity from "../pages/collection/selectCommunity";
-import CreateCollection from "../pages/collection/createCollection";
 import UserProfile from "../pages/UserProfile/UserProfile";
 import EditItem from "../pages/Item/editItem";
 import AddBitstream from "../pages/addBitstream/addBitstream";
@@ -44,6 +41,7 @@ import Policies from "../pages/collection/policy";
 import CreatePolicy from "../pages/collection/createPolicy";
 import MyCart from "../pages/my-cart/MyCart";
 import SystemInformation from "../pages/system-information/system-information";
+import UserListTable from "../pages/reports/UserListWithGroups";
 
 
 const ProtectedRoute = ({ element }: { element: React.ReactElement }) => {
@@ -107,6 +105,7 @@ const AppRoutes = () => {
         <Route path="/supervisionSelecter/:uuid" element={<SupervisionSelecter />} />
         <Route path="/createResourcePolicy/:uuid" element={<CreateResourcePolicy />} />
         <Route path="/usermanagement" element={<ProtectedRoute element={<UserManagement />} />} />
+        <Route path="/report/user" element={<ProtectedRoute element={<UserListTable />} />} />
         <Route path="/userProfile/:userId" element={<ProtectedRoute element={<UserProfileWrapper />} />}/>
         <Route path="/userCart/:userId" element={<ProtectedRoute element={<UserCartWrapper />} />}/>
         <Route path="/metadataSchemas" element={<ProtectedRoute element={<MetadataSchemas />} />} />
