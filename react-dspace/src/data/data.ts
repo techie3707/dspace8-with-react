@@ -66,6 +66,16 @@ export const getNavigationLinks = (
     { id: 4, title: "Groups", image: iconsImgs.group, path: "/groups" },
     { id: 6, title: "Admin Search", image: iconsImgs.searchLight, path: "/adminSearch" },
     { id: 8, title: "systemInformation", image: iconsImgs.group, path: "/system-information" },
+     { 
+      id: 9, 
+      title: "Reports", 
+      image: iconsImgs.report, 
+      path: "/reports",
+      submenu: [
+        { id: 91, title: "User Report", path: "/report/user" },
+        { id: 92, title: "Item Report", path: "/report/item" }
+      ]
+    }
   ];
 
   const isUploadAdminGroup =
