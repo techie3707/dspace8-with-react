@@ -42,6 +42,7 @@ import CreatePolicy from "../pages/collection/createPolicy";
 import MyCart from "../pages/my-cart/MyCart";
 import SystemInformation from "../pages/system-information/system-information";
 import UserListTable from "../pages/reports/UserListWithGroups";
+import ItemReportTable from "../pages/reports/ItemListTable";
 
 
 const ProtectedRoute = ({ element }: { element: React.ReactElement }) => {
@@ -106,6 +107,7 @@ const AppRoutes = () => {
         <Route path="/createResourcePolicy/:uuid" element={<CreateResourcePolicy />} />
         <Route path="/usermanagement" element={<ProtectedRoute element={<UserManagement />} />} />
         <Route path="/report/user" element={<ProtectedRoute element={<UserListTable />} />} />
+        <Route path="/report/item" element={<ProtectedRoute element={<ItemReportTable />} />} />
         <Route path="/userProfile/:userId" element={<ProtectedRoute element={<UserProfileWrapper />} />}/>
         <Route path="/userCart/:userId" element={<ProtectedRoute element={<UserCartWrapper />} />}/>
         <Route path="/metadataSchemas" element={<ProtectedRoute element={<MetadataSchemas />} />} />
