@@ -6,6 +6,7 @@ import { PDFDocument, rgb } from 'pdf-lib';
 import { getAuthHeaders } from "./searchApi";
 import html2canvas from 'html2canvas';
 import ravLogo from '../assets/images/rav-logo.png';
+import { fetchItemInfo } from "./item";
 
 
 const authToken = localStorage.getItem("authToken") || "";
@@ -34,8 +35,12 @@ function parsePages(pageString: string): number[] {
 
   return Array.from(pages).sort((a, b) => a - b);
 }
-
-export const downloadPDF = async (uuid: string, name: string, pagesStr?: string | null) => {
+export const downloadPDF = async (
+  uuid: string,
+  name: string,
+  itemId?: string | null,
+  pagesStr?: string | null
+) => {
   try {
     const headers: Record<string, string> = {};
 
@@ -49,37 +54,68 @@ export const downloadPDF = async (uuid: string, name: string, pagesStr?: string 
     const pdfBytes = await response.arrayBuffer();
     const fullPdf = await PDFDocument.load(pdfBytes);
     const pageCount = fullPdf.getPageCount();
-
     const newPdf = await PDFDocument.create();
 
-    const htmlContent = document.createElement('div');
-    htmlContent.style.width = '800px';
-    htmlContent.style.height = '1120px';
-    htmlContent.style.display = 'flex';
-    htmlContent.style.justifyContent = 'center';
-    htmlContent.style.alignItems = 'center';
-    htmlContent.innerHTML = `
-      <div style="text-align: center;">
-        <h1>Welcome to the Document</h1>
-        <p>This is the first page added dynamically.</p>
-      </div>`;
-    document.body.appendChild(htmlContent);
+    if (itemId) {
+      const itemResp = await fetch(`${siteConfig.apiEndpoint}/api/core/items/${itemId}`);
+      const itemData = await itemResp.json();
 
-    const canvas = await html2canvas(htmlContent, { backgroundColor: "#fff" });
-    const imageDataUrl = canvas.toDataURL('image/png');
-    document.body.removeChild(htmlContent);
+      const metadataFields: { [key: string]: string } = {
+        "dc.title": "Title",
+        "dc.contributor.author": "Author",
+        "dc.date.issued": "Date Issued",
+        "dc.publisher": "Publisher",
+        "dc.identifier.uri": "Link",
+      };
 
-    const htmlImageBytes = await fetch(imageDataUrl).then(res => res.arrayBuffer());
-    const htmlImage = await newPdf.embedPng(htmlImageBytes);
-    const htmlPage = newPdf.addPage([htmlImage.width, htmlImage.height]);
-    htmlPage.drawImage(htmlImage, {
-      x: 0,
-      y: 0,
-      width: htmlImage.width,
-      height: htmlImage.height,
-    });
+      const metadataHtmlRows = Object.entries(metadataFields).map(([key, label]) => {
+        const valArr = itemData.metadata[key];
+        if (valArr && valArr.length > 0) {
+          const value = valArr[0].value;
+          return `<tr>
+            <th style="text-align:left; padding: 8px;">${label}</th>
+            <td style="padding: 8px;">
+              ${key === 'dc.identifier.uri' ? `<a href="${value}" target="_blank">${value}</a>` : value}
+            </td>
+          </tr>`;
+        }
+        return '';
+      }).join('');
 
-    let pagesToCopy: number[];
+      const htmlContent = document.createElement('div');
+      htmlContent.style.width = '1123px';  
+      htmlContent.style.height = '1587px'; 
+      htmlContent.style.padding = '40px';
+      htmlContent.style.boxSizing = 'border-box';
+      htmlContent.style.backgroundColor = 'white';
+      htmlContent.style.fontFamily = 'Arial, sans-serif';
+
+      htmlContent.innerHTML = `
+        <div style="text-align: center; margin-bottom: 40px;">
+          <h1 style="font-size: 28px;">Rashtriya Ayurveda Vidyapeeth</h1>
+        </div>
+        <table style="width: 100%; font-size: 16px; border-collapse: collapse;">
+          ${metadataHtmlRows}
+        </table>
+      `;
+
+      document.body.appendChild(htmlContent);
+      const canvas = await html2canvas(htmlContent, { backgroundColor: "#fff" });
+      const imageDataUrl = canvas.toDataURL('image/png');
+      document.body.removeChild(htmlContent);
+
+      const htmlImageBytes = await fetch(imageDataUrl).then(res => res.arrayBuffer());
+      const htmlImage = await newPdf.embedPng(htmlImageBytes);
+      const htmlPage = newPdf.addPage([htmlImage.width, htmlImage.height]);
+      htmlPage.drawImage(htmlImage, {
+        x: 0,
+        y: 0,
+        width: htmlImage.width,
+        height: htmlImage.height,
+      });
+    }
+
+    let pagesToCopy: number[] = [];
     if (pagesStr) {
       const parsed = parsePages(pagesStr);
       pagesToCopy = parsed.filter(i => i >= 1 && i <= pageCount).map(i => i - 1);
@@ -94,11 +130,11 @@ export const downloadPDF = async (uuid: string, name: string, pagesStr?: string 
 
     const watermarkBytes = await fetch(ravLogo).then(res => res.arrayBuffer());
     const watermarkImage = await newPdf.embedPng(watermarkBytes);
-    const watermarkDims = watermarkImage.scale(0.5); 
+    const watermarkDims = watermarkImage.scale(0.5);
+
     const copiedPages = await newPdf.copyPages(fullPdf, pagesToCopy);
     copiedPages.forEach((pdfPage) => {
       const { width, height } = pdfPage.getSize();
-
       pdfPage.drawImage(watermarkImage, {
         x: (width - watermarkDims.width) / 2,
         y: (height - watermarkDims.height) / 2,
@@ -106,9 +142,9 @@ export const downloadPDF = async (uuid: string, name: string, pagesStr?: string 
         height: watermarkDims.height,
         opacity: 0.5,
       });
-
       newPdf.addPage(pdfPage);
     });
+
     const newPdfBytes = await newPdf.save();
     const blob = new Blob([newPdfBytes], { type: 'application/pdf' });
     const url = URL.createObjectURL(blob);
@@ -121,12 +157,14 @@ export const downloadPDF = async (uuid: string, name: string, pagesStr?: string 
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    showToast(`Pages ${pagesStr || 'All'} downloaded with first page and watermark!`, 'success');
+    showToast(`Pages ${pagesStr || 'All'} downloaded!`, 'success');
   } catch (error) {
     console.error(error);
     showToast('Failed to download PDF', 'error');
   }
 };
+
+
 
 export const getPDFUrl = (uuid: string): string => {
   const authToken = localStorage.getItem("authToken");
