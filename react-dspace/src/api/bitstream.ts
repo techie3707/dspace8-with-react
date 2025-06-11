@@ -2,8 +2,12 @@ import { showToast } from "../contexts/ToastProvider";
 import { Bitstream, BitstreamsResponse, BitstreamUploadResponse, Bundle, BundlesResponse, PatchOperation } from "../data/bookDetail";
 import { siteConfig } from "../data/data";
 import axios from "axios";
-import { PDFDocument } from 'pdf-lib';
+import { PDFDocument, rgb } from 'pdf-lib';
 import { getAuthHeaders } from "./searchApi";
+import html2canvas from 'html2canvas';
+import ravLogo from '../assets/images/rav-logo.png';
+
+
 const authToken = localStorage.getItem("authToken") || "";
 const csrfToken = localStorage.getItem("csrfToken") || "";
 
@@ -33,21 +37,14 @@ function parsePages(pageString: string): number[] {
 
 export const downloadPDF = async (uuid: string, name: string, pagesStr?: string | null) => {
   try {
-    const authToken = localStorage.getItem("authToken");
-    const csrfToken = localStorage.getItem("csrfToken");
-
     const headers: Record<string, string> = {};
-    if (authToken) headers["Authorization"] = authToken;
-    if (csrfToken) headers["X-XSRF-TOKEN"] = csrfToken;
 
     const response = await fetch(`${siteConfig.apiEndpoint}/api/core/bitstreams/${uuid}/content`, {
       method: 'GET',
       headers,
     });
 
-    if (!response.ok) {
-      throw new Error("Failed to fetch PDF");
-    }
+    if (!response.ok) throw new Error("Failed to fetch PDF");
 
     const pdfBytes = await response.arrayBuffer();
     const fullPdf = await PDFDocument.load(pdfBytes);
@@ -55,13 +52,39 @@ export const downloadPDF = async (uuid: string, name: string, pagesStr?: string 
 
     const newPdf = await PDFDocument.create();
 
-    let pagesToCopy: number[];
+    const htmlContent = document.createElement('div');
+    htmlContent.style.width = '800px';
+    htmlContent.style.height = '1120px';
+    htmlContent.style.display = 'flex';
+    htmlContent.style.justifyContent = 'center';
+    htmlContent.style.alignItems = 'center';
+    htmlContent.innerHTML = `
+      <div style="text-align: center;">
+        <h1>Welcome to the Document</h1>
+        <p>This is the first page added dynamically.</p>
+      </div>`;
+    document.body.appendChild(htmlContent);
 
+    const canvas = await html2canvas(htmlContent, { backgroundColor: "#fff" });
+    const imageDataUrl = canvas.toDataURL('image/png');
+    document.body.removeChild(htmlContent);
+
+    const htmlImageBytes = await fetch(imageDataUrl).then(res => res.arrayBuffer());
+    const htmlImage = await newPdf.embedPng(htmlImageBytes);
+    const htmlPage = newPdf.addPage([htmlImage.width, htmlImage.height]);
+    htmlPage.drawImage(htmlImage, {
+      x: 0,
+      y: 0,
+      width: htmlImage.width,
+      height: htmlImage.height,
+    });
+
+    let pagesToCopy: number[];
     if (pagesStr) {
       const parsed = parsePages(pagesStr);
       pagesToCopy = parsed.filter(i => i >= 1 && i <= pageCount).map(i => i - 1);
     } else {
-      pagesToCopy = Array.from({ length: pageCount }, (_, i) => i); 
+      pagesToCopy = Array.from({ length: pageCount }, (_, i) => i);
     }
 
     if (pagesToCopy.length === 0) {
@@ -69,22 +92,36 @@ export const downloadPDF = async (uuid: string, name: string, pagesStr?: string 
       return;
     }
 
+    const watermarkBytes = await fetch(ravLogo).then(res => res.arrayBuffer());
+    const watermarkImage = await newPdf.embedPng(watermarkBytes);
+    const watermarkDims = watermarkImage.scale(0.5); 
     const copiedPages = await newPdf.copyPages(fullPdf, pagesToCopy);
-    copiedPages.forEach((page) => newPdf.addPage(page));
+    copiedPages.forEach((pdfPage) => {
+      const { width, height } = pdfPage.getSize();
 
+      pdfPage.drawImage(watermarkImage, {
+        x: (width - watermarkDims.width) / 2,
+        y: (height - watermarkDims.height) / 2,
+        width: watermarkDims.width,
+        height: watermarkDims.height,
+        opacity: 0.5,
+      });
+
+      newPdf.addPage(pdfPage);
+    });
     const newPdfBytes = await newPdf.save();
-
     const blob = new Blob([newPdfBytes], { type: 'application/pdf' });
-    const url = window.URL.createObjectURL(blob);
+    const url = URL.createObjectURL(blob);
+
     const a = document.createElement('a');
     a.href = url;
     a.download = name;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
+    URL.revokeObjectURL(url);
 
-    showToast(`Pages ${pagesStr || 'All'} downloaded!`, 'success');
+    showToast(`Pages ${pagesStr || 'All'} downloaded with first page and watermark!`, 'success');
   } catch (error) {
     console.error(error);
     showToast('Failed to download PDF', 'error');
@@ -124,13 +161,13 @@ export const fetchItemBundles = async (id: string): Promise<Bundle[]> => {
 
   const headers = authToken
     ? {
-        "Content-Type": "application/json",
-        "X-XSRF-TOKEN": localStorage.getItem("csrfToken") || "",
-        Authorization: authToken,
-      }
+      "Content-Type": "application/json",
+      "X-XSRF-TOKEN": localStorage.getItem("csrfToken") || "",
+      Authorization: authToken,
+    }
     : {
-        "Content-Type": "application/json",
-      };
+      "Content-Type": "application/json",
+    };
 
   const response = await axios.get<BundlesResponse>(`${siteConfig.apiEndpoint}/api/core/items/${id}/bundles?size=9999`, {
     headers: headers,
@@ -144,12 +181,12 @@ export const fetchItemBundles = async (id: string): Promise<Bundle[]> => {
 
 export const fetchBitstreams = async (bundleId: string): Promise<Bitstream[]> => {
   const headers = authToken
-  ? {
+    ? {
       "Content-Type": "application/json",
       "X-XSRF-TOKEN": localStorage.getItem("csrfToken") || "",
       Authorization: authToken,
     }
-  : {
+    : {
       "Content-Type": "application/json",
     };
   const response = await axios.get<BitstreamsResponse>(`${siteConfig.apiEndpoint}/api/core/bundles/${bundleId}/bitstreams?page=0&size=5`, {
