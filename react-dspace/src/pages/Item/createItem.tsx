@@ -57,7 +57,7 @@ const CreateItem: React.FC<CreateItemProps> = ({ collectionId }) => {
             [name]: value,
         }));
     };
-   
+
 
     const handleDateChange = (type: "year" | "month" | "day", value: number) => {
         setDateParts((prevDateParts) => {
@@ -92,29 +92,51 @@ const CreateItem: React.FC<CreateItemProps> = ({ collectionId }) => {
         }
     };
     const generateThumbnailFromPDF = async (pdfFile: File): Promise<Blob> => {
-        const arrayBuffer = await pdfFile.arrayBuffer();
-        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        const url = URL.createObjectURL(pdfFile);
+
+        const loadingTask = pdfjsLib.getDocument({
+            url,
+            maxImageSize: 1024 * 1024 * 10,
+            disableFontFace: true,
+        });
+
+        const pdf = await loadingTask.promise;
         const page = await pdf.getPage(1);
 
+        const scale = 1.0;
+        const viewport = page.getViewport({ scale });
+
         const canvas = document.createElement("canvas");
-        const viewport = page.getViewport({ scale: 2 });
+        const context = canvas.getContext("2d");
+        if (!context) throw new Error("Canvas context not available.");
+
         canvas.width = viewport.width;
         canvas.height = viewport.height;
 
-        const context = canvas.getContext("2d");
-        if (!context) {
-            throw new Error("Canvas context not available.");
+        await page.render({ canvasContext: context, viewport }).promise;
+        const thumbCanvas = document.createElement("canvas");
+        const thumbContext = thumbCanvas.getContext("2d");
+        const thumbWidth = 300;
+        const thumbHeight = (thumbWidth / canvas.width) * canvas.height;
+
+        thumbCanvas.width = thumbWidth;
+        thumbCanvas.height = thumbHeight;
+
+        if (thumbContext) {
+            thumbContext.drawImage(canvas, 0, 0, thumbWidth, thumbHeight);
         }
 
-        await page.render({ canvasContext: context, viewport }).promise;
+        URL.revokeObjectURL(url); 
 
         return new Promise((resolve, reject) => {
-            canvas.toBlob((blob) => {
-                if (blob) resolve(blob);
-                else reject(new Error("Failed to convert canvas to blob."));
-            }, "image/jpeg", 0.9);
+            thumbCanvas.toBlob(
+                (blob) => (blob ? resolve(blob) : reject(new Error("Failed to convert canvas to blob."))),
+                "image/jpeg",
+                0.9
+            );
         });
     };
+ 
 
 
     const handleSubmit = async (e: React.FormEvent) => {
