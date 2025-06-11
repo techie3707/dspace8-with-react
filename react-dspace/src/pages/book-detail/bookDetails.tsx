@@ -187,7 +187,7 @@ const allAccessGroups = Array.from(new Set([...uploadGroups, ...adminGroups]));
                                                                     </button>
                                                                     {isAuthenticated && (
                                                                         <>
-                                                                            <button className='custom-btn' onClick={() => downloadPDF(bitstream.uuid, bitstream.name)}>
+                                                                            <button className='custom-btn' onClick={() => downloadPDF(bitstream.uuid, bitstream.name, id || '')}>
                                                                                 Download PDF
                                                                             </button>
                                                                         </>
@@ -230,7 +230,7 @@ const allAccessGroups = Array.from(new Set([...uploadGroups, ...adminGroups]));
                                                                 Flip PDF
                                                             </button>
                                                             {isAuthenticated && (
-                                                                <button className='custom-btn' onClick={() => downloadPDF(bitstream.uuid, bitstream.name)}>
+                                                                <button className='custom-btn' onClick={() => downloadPDF(bitstream.uuid, bitstream.name, id || '')}>
                                                                     Download
                                                                 </button>
                                                             )}
