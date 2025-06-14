@@ -114,6 +114,7 @@ const Sidebar: React.FC = () => {
                   "Create Community",
                   "Create Collection",
                   "Reports",
+                  "Processes",
                 ].includes(link.title)
             );
 

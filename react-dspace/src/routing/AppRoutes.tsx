@@ -43,6 +43,7 @@ import MyCart from "../pages/my-cart/MyCart";
 import SystemInformation from "../pages/system-information/system-information";
 import UserListTable from "../pages/reports/UserListWithGroups";
 import ItemReportTable from "../pages/reports/ItemListTable";
+import Processes from "../pages/processes/processes";
 
 
 const ProtectedRoute = ({ element }: { element: React.ReactElement }) => {
@@ -103,6 +104,7 @@ const AppRoutes = () => {
         <Route path="/workflowSearch" element={<Workflow />} />
         <Route path="/removeWorkflowItem/:id" element={<RemoveItem />} />
         <Route path="/resourcePolicy/:id" element={<ResourcePolicy />} />
+        <Route path="/processes" element={<Processes />} />
         <Route path="/supervisionSelecter/:uuid" element={<SupervisionSelecter />} />
         <Route path="/createResourcePolicy/:uuid" element={<CreateResourcePolicy />} />
         <Route path="/usermanagement" element={<ProtectedRoute element={<UserManagement />} />} />

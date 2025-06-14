@@ -1,4 +1,4 @@
-const metadataFields: { [key: string]: string } = {
+export const metadataFields: { [key: string]: string } = {
   "dc.title": "Title",
   "dc.contributor.author": "Author",
   "dc.date.issued": "Date Issued",
