@@ -66,8 +66,9 @@ export const getNavigationLinks = (
     { id: 4, title: "Groups", image: iconsImgs.group, path: "/groups" },
     { id: 6, title: "Admin Search", image: iconsImgs.searchLight, path: "/adminSearch" },
     { id: 8, title: "systemInformation", image: iconsImgs.group, path: "/system-information" },
-     { 
-      id: 9, 
+    {id: 9, title: "Processes", image: iconsImgs.report, path: "/processes"},
+     {  
+      id: 10, 
       title: "Reports", 
       image: iconsImgs.report, 
       path: "/reports",

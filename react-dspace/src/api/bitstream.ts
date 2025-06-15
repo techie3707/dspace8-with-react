@@ -100,7 +100,7 @@ export const downloadPDF = async (
       `;
 
       document.body.appendChild(htmlContent);
-      const canvas = await html2canvas(htmlContent, { backgroundColor: "#fff" });
+      const canvas = await html2canvas(htmlContent, { background: "#fff" });
       const imageDataUrl = canvas.toDataURL('image/png');
       document.body.removeChild(htmlContent);
 
