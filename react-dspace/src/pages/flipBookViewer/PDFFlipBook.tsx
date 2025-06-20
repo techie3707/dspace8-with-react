@@ -8,6 +8,7 @@ import { getPDFUrl } from "../../api/bitstream";
 import { showToast } from "../../contexts/ToastProvider";
 import Loader from "../loader/loader";
 import { ChevronLeft, ChevronRight } from "@mui/icons-material";
+import type { TextItem } from "pdfjs-dist/types/src/display/api";
 
 const getAuthHeaders = (): Record<string, string> => {
   const authToken = localStorage.getItem("authToken") || "";
@@ -34,6 +35,13 @@ const PDFFlipBook: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const bookRef = useRef<React.ElementRef<typeof HTMLFlipBook>>(null);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const [matches, setMatches] = useState<
+    { pageIndex: number; left: number; top: number; width: number; height: number }[]
+  >([]);
+  const [matchIdx, setMatchIdx] = useState(0);
+
+  const pdfDocRef = useRef<pdfjsLib.PDFDocumentProxy | null>(null);
 
   const pageBatchSize = 10;
   let blurTimeout: NodeJS.Timeout;
@@ -92,6 +100,7 @@ const PDFFlipBook: React.FC = () => {
         });
 
         const pdf = await loadingTask.promise;
+        pdfDocRef.current = pdf;
         setNumPages(pdf.numPages);
 
         const loadPages = async (start: number, count: number) => {
@@ -131,6 +140,76 @@ const PDFFlipBook: React.FC = () => {
 
     loadPDF();
   }, [fileUrl]);
+  // jump FlipBook to a specific page
+  const jumpToPage = (page: number) => {
+    bookRef.current?.pageFlip().flip(page);
+  };
+
+  // run a brand‑new search
+  const runSearch = async () => {
+    const term = searchText.trim().toLowerCase();
+    if (!term || !pdfDocRef.current) {
+      setMatches([]);
+      setMatchIdx(0);
+      return;
+    }
+
+    const pdf = pdfDocRef.current;
+    const newHits: typeof matches = [];
+
+    // walk every page, collect bounding boxes of matches
+    for (let n = 1; n <= pdf.numPages; n++) {
+      const page = await pdf.getPage(n);
+      const viewport = page.getViewport({ scale: 2 });
+      const text = await page.getTextContent();
+
+      (text.items as TextItem[]).forEach((item) => {
+        const str = item.str;
+        const norm = str.toLowerCase();
+        let from = norm.indexOf(term);
+
+        // the same text item can contain several matches
+        while (from !== -1) {
+          /* ----- position math -----
+           * transform matrix: [ a b c d e f ]
+           * canvas x = e, y = f  (PDF origin bottom‑left)
+          */
+          const [, , , , x, y] = item.transform;
+          const w = (item.width * term.length) / str.length;
+          const h = item.height;
+
+          newHits.push({
+            pageIndex: n - 1,
+            left: (x / viewport.width) * 100,                 // %
+            top: ((viewport.height - y) / viewport.height) * 100,
+            width: (w / viewport.width) * 100,
+            height: (h / viewport.height) * 100,
+          });
+
+          from = norm.indexOf(term, from + term.length);      // find next in same item
+        }
+      });
+    }
+
+    setMatches(newHits);
+    setMatchIdx(0);
+    if (newHits.length) jumpToPage(newHits[0].pageIndex);
+  };
+
+  const gotoNext = () => {
+    if (!matches.length) return;
+    const next = (matchIdx + 1) % matches.length;
+    setMatchIdx(next);
+    jumpToPage(matches[next].pageIndex);
+  };
+
+  const gotoPrev = () => {
+    if (!matches.length) return;
+    const prev = (matchIdx - 1 + matches.length) % matches.length;
+    setMatchIdx(prev);
+    jumpToPage(matches[prev].pageIndex);
+  };
+
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -273,7 +352,39 @@ const PDFFlipBook: React.FC = () => {
           </IconButton>
           <Box
             sx={{
-              
+              position: "absolute",
+              top: 8,
+              left: "50%",
+              transform: "translateX(-50%)",
+              zIndex: 50,
+              display: "flex",
+              gap: 1,
+              backgroundColor: "background.paper",
+              p: 1,
+              borderRadius: 1,
+              boxShadow: 3,
+            }}
+          >
+            <input
+              style={{ padding: "4px 8px", width: 220 }}
+              placeholder="Search…"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && runSearch()}
+            />
+            <button onClick={runSearch}>Find</button>
+            <button onClick={gotoPrev} disabled={!matches.length}>‹</button>
+            <button onClick={gotoNext} disabled={!matches.length}>›</button>
+            {!!matches.length && (
+              <span style={{ minWidth: 60, textAlign: "right" }}>
+                {matchIdx + 1}/{matches.length}
+              </span>
+            )}
+          </Box>
+
+          <Box
+            sx={{
+
               flexGrow: 1,
               boxShadow: 6,
               borderRadius: 2,
@@ -284,7 +395,7 @@ const PDFFlipBook: React.FC = () => {
               height: "100%",
               border: "5px solid #ebc979",
             }}
-            
+
           >
             {isBlocked && (
               <div
@@ -336,11 +447,39 @@ const PDFFlipBook: React.FC = () => {
               {Array.from({ length: numPages }).map((_, index) => (
                 <div key={index} className="page">
                   {pages[index] ? (
-                    <img
-                      src={pages[index]}
-                      alt={`Page ${index + 1}`}
-                      style={{ width: "100%", height: "100%" }}
-                    />
+                    <div style={{ position: "relative", width: "100%", height: "100%" }}>
+                      <img
+                        ref={(el) => {
+                          if (el) {
+                            el.dataset.pageIndex = index.toString();
+                          }
+                        }}
+                        src={pages[index]}
+                        alt={`Page ${index + 1}`}
+                        style={{ width: "100%", height: "100%", display: "block" }}
+                      />
+
+                      {matches
+                        .filter((m) => m.pageIndex === index)
+                        .map((m, i) => (
+                          <span
+                            key={i}
+                            style={{
+                              position: "absolute",
+                              left: `${m.left}%`,
+                              top: `${m.top}%`,
+                              width: `${m.width}%`,
+                              height: `${m.height}%`,
+                              backgroundColor: "yellow",
+                              opacity: 0.6,
+                              borderRadius: 2,
+                              pointerEvents: "none",
+                            }}
+                          />
+                        ))}
+                    </div>
+
+
                   ) : (
                     <p>Loading...</p>
                   )}

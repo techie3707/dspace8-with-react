@@ -45,10 +45,17 @@ const PDFViewer: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [searchParams] = useSearchParams();
     const uuid = searchParams.get("uuid");
+    const itemId = searchParams.get("itemId");
+
 
     const [showForm, setShowForm] = useState(false);
     const [pageInput, setPageInput] = useState("");
-
+    const pageInputRef = React.useRef<HTMLInputElement>(null);
+    useEffect(() => {
+        if (showForm && pageInputRef.current) {
+            pageInputRef.current.focus();
+        }
+    }, [showForm]);
     const defaultLayoutPluginInstance = defaultLayoutPlugin({
         renderToolbar: (Toolbar) => (
             <>
@@ -125,6 +132,7 @@ const PDFViewer: React.FC = () => {
                         label="e.g. 1,2,5-8"
                         variant="outlined"
                         value={pageInput}
+                        inputRef={pageInputRef}
                         onChange={(e) => setPageInput(e.target.value)}
                         autoFocus
                         sx={{ mb: 2 }}
@@ -147,11 +155,11 @@ const PDFViewer: React.FC = () => {
                                 }
 
                                 const today = new Date().toISOString().split("T")[0];
-                                const bitstreamValue = `${uuid}_${today}_${trimmedInput}`;
+                                const bitstreamValue = `${itemId}_${uuid}_${today}_${trimmedInput}`;
                                 await updateUserCart(userID, bitstreamValue);
 
                                 setShowForm(false);
-                                setPageInput(""); // Reset *after* successful submission
+                                setPageInput("");
                             } catch (error) {
                                 console.error("Error in Add to List operation:", error);
                             }
