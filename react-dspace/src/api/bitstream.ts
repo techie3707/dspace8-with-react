@@ -36,133 +36,132 @@ function parsePages(pageString: string): number[] {
   return Array.from(pages).sort((a, b) => a - b);
 }
 export const downloadPDF = async (
-  uuid: string,
-  name: string,
+  bitstreamId: string,     
+  fileName: string,       
   itemId?: string | null,
-  pagesStr?: string | null
+  pagesStr?: string | null 
 ) => {
   try {
-    const headers: Record<string, string> = {};
+    const headers: Record<string, string> = {
+      Accept: 'application/json',
+      ...getAuthHeaders(),     
+    };
 
-    const response = await fetch(`${siteConfig.apiEndpoint}/api/core/bitstreams/${uuid}/content`, {
-      method: 'GET',
-      headers,
-    });
+    const pdfResp = await fetch(
+      `${siteConfig.apiEndpoint}/api/core/bitstreams/${bitstreamId}/content`,
+      { method: 'GET', headers }
+    );
+    if (!pdfResp.ok) throw new Error('Failed to fetch PDF');
 
-    if (!response.ok) throw new Error("Failed to fetch PDF");
-
-    const pdfBytes = await response.arrayBuffer();
-    const fullPdf = await PDFDocument.load(pdfBytes);
-    const pageCount = fullPdf.getPageCount();
-    const newPdf = await PDFDocument.create();
+    const pdfBytes   = await pdfResp.arrayBuffer();
+    const sourcePdf  = await PDFDocument.load(pdfBytes);
+    const pageCount  = sourcePdf.getPageCount();
+    const outPdf     = await PDFDocument.create();
 
     if (itemId) {
-      const itemResp = await fetch(`${siteConfig.apiEndpoint}/api/core/items/${itemId}`);
-      const itemData = await itemResp.json();
+      const itemResp = await fetch(
+        `${siteConfig.apiEndpoint}/api/core/items/${itemId}`,
+        { headers }
+      );
+      if (itemResp.ok) {
+        const itemData = await itemResp.json();
 
-      const metadataFields: { [key: string]: string } = {
-        "dc.title": "Title",
-        "dc.contributor.author": "Author",
-        "dc.date.issued": "Date Issued",
-        "dc.publisher": "Publisher",
-        "dc.identifier.uri": "Link",
-      };
+        const map: Record<string, string> = {
+          'dc.title':             'Title',
+          'dc.contributor.author':'Author',
+          'dc.date.issued':       'Date Issued',
+          'dc.publisher':         'Publisher',
+          'dc.identifier.uri':    'Link',
+        };
 
-      const metadataHtmlRows = Object.entries(metadataFields).map(([key, label]) => {
-        const valArr = itemData.metadata[key];
-        if (valArr && valArr.length > 0) {
-          const value = valArr[0].value;
+        const rows = Object.entries(map).map(([k, label]) => {
+          const v = itemData?.metadata?.[k]?.[0]?.value;
+          if (!v) return '';
           return `<tr>
-            <th style="text-align:left; padding: 8px;">${label}</th>
-            <td style="padding: 8px;">
-              ${key === 'dc.identifier.uri' ? `<a href="${value}" target="_blank">${value}</a>` : value}
-            </td>
-          </tr>`;
-        }
-        return '';
-      }).join('');
+                    <th style="text-align:left;padding:8px;">${label}</th>
+                    <td style="padding:8px;">
+                      ${k === 'dc.identifier.uri'
+                        ? `<a href="${v}" target="_blank">${v}</a>`
+                        : v}
+                    </td>
+                  </tr>`;
+        }).join('');
 
-      const htmlContent = document.createElement('div');
-      htmlContent.style.width = '1123px';  
-      htmlContent.style.height = '1587px'; 
-      htmlContent.style.padding = '40px';
-      htmlContent.style.boxSizing = 'border-box';
-      htmlContent.style.backgroundColor = 'white';
-      htmlContent.style.fontFamily = 'Arial, sans-serif';
+        const html = document.createElement('div');
+        html.style.width  = '1123px';
+        html.style.height = '1587px';
+        html.style.padding = '40px';
+        html.style.fontFamily = 'Arial, sans-serif';
+        html.style.background = '#fff';
+        html.innerHTML = `
+          <h1 style="text-align:center;margin-bottom:40px;">
+            Rashtriya Ayurveda Vidyapeeth
+          </h1>
+          <table style="width:100%;border-collapse:collapse;font-size:16px;">
+            ${rows}
+          </table>
+        `;
 
-      htmlContent.innerHTML = `
-        <div style="text-align: center; margin-bottom: 40px;">
-          <h1 style="font-size: 28px;">Rashtriya Ayurveda Vidyapeeth</h1>
-        </div>
-        <table style="width: 100%; font-size: 16px; border-collapse: collapse;">
-          ${metadataHtmlRows}
-        </table>
-      `;
+        document.body.appendChild(html);
+        const canvas   = await html2canvas(html, { backgroundColor: '#fff' });
+        const imgBytes = await fetch(canvas.toDataURL('image/png')).then(r => r.arrayBuffer());
+        document.body.removeChild(html);
 
-      document.body.appendChild(htmlContent);
-      const canvas = await html2canvas(htmlContent, { background: "#fff" });
-      const imageDataUrl = canvas.toDataURL('image/png');
-      document.body.removeChild(htmlContent);
-
-      const htmlImageBytes = await fetch(imageDataUrl).then(res => res.arrayBuffer());
-      const htmlImage = await newPdf.embedPng(htmlImageBytes);
-      const htmlPage = newPdf.addPage([htmlImage.width, htmlImage.height]);
-      htmlPage.drawImage(htmlImage, {
-        x: 0,
-        y: 0,
-        width: htmlImage.width,
-        height: htmlImage.height,
-      });
+        const imgEmbed  = await outPdf.embedPng(imgBytes);
+        const page      = outPdf.addPage([imgEmbed.width, imgEmbed.height]);
+        page.drawImage(imgEmbed, { x: 0, y: 0, width: imgEmbed.width, height: imgEmbed.height });
+      }
     }
 
-    let pagesToCopy: number[] = [];
+    let indices: number[];
     if (pagesStr) {
-      const parsed = parsePages(pagesStr);
-      pagesToCopy = parsed.filter(i => i >= 1 && i <= pageCount).map(i => i - 1);
+      const wanted = parsePages(pagesStr);       
+      indices = wanted.filter(n => n >= 1 && n <= pageCount).map(n => n - 1);
     } else {
-      pagesToCopy = Array.from({ length: pageCount }, (_, i) => i);
+      indices = Array.from(Array(pageCount), (_, i) => i);    
     }
 
-    if (pagesToCopy.length === 0) {
-      showToast("No valid pages to extract!", "error");
+    if (indices.length === 0) {
+      showToast('No valid pages to extract', 'error');
       return;
     }
 
-    const watermarkBytes = await fetch(ravLogo).then(res => res.arrayBuffer());
-    const watermarkImage = await newPdf.embedPng(watermarkBytes);
-    const watermarkDims = watermarkImage.scale(0.5);
+    const wmBytes   = await fetch(ravLogo).then(r => r.arrayBuffer());
+    const wmImg     = await outPdf.embedPng(wmBytes);
+    const wmScaled  = wmImg.scale(0.5);
 
-    const copiedPages = await newPdf.copyPages(fullPdf, pagesToCopy);
-    copiedPages.forEach((pdfPage) => {
-      const { width, height } = pdfPage.getSize();
-      pdfPage.drawImage(watermarkImage, {
-        x: (width - watermarkDims.width) / 2,
-        y: (height - watermarkDims.height) / 2,
-        width: watermarkDims.width,
-        height: watermarkDims.height,
+    const pages = await outPdf.copyPages(sourcePdf, indices);
+    pages.forEach(p => {
+      const { width, height } = p.getSize();
+      p.drawImage(wmImg, {
+        x: (width  - wmScaled.width)  / 2,
+        y: (height - wmScaled.height) / 2,
+        width:  wmScaled.width,
+        height: wmScaled.height,
         opacity: 0.5,
       });
-      newPdf.addPage(pdfPage);
+      outPdf.addPage(p);
     });
 
-    const newPdfBytes = await newPdf.save();
-    const blob = new Blob([newPdfBytes], { type: 'application/pdf' });
-    const url = URL.createObjectURL(blob);
+    const outBytes = await outPdf.save();
+    const blob     = new Blob([outBytes], { type: 'application/pdf' });
+    const url      = URL.createObjectURL(blob);
 
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = name;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    const anchor   = document.createElement('a');
+    anchor.href    = url;
+    anchor.download = fileName.endsWith('.pdf') ? fileName : `${fileName}.pdf`;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
     URL.revokeObjectURL(url);
 
-    showToast(`Pages ${pagesStr || 'All'} downloaded!`, 'success');
-  } catch (error) {
-    console.error(error);
+    showToast(`Pages ${pagesStr ?? 'All'} downloaded`, 'success');
+  } catch (err) {
+    console.error(err);
     showToast('Failed to download PDF', 'error');
   }
 };
+
 
 
 

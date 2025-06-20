@@ -26,35 +26,35 @@ const BookDetails: React.FC = () => {
     const [thumbnailBitstreams, setThumbnailBitstreams] = useState<Bitstream[]>([]);
     const navigate = useNavigate();
     const { isAuthenticated } = useAuth();
-    const {isAdministrator, groupCategories} = useUserGroups();
-    const[collection, setCollection] = useState<any>(null);
+    const { isAdministrator, groupCategories } = useUserGroups();
+    const [collection, setCollection] = useState<any>(null);
     const fetchOwningCollection = async (itemId: string) => {
         try {
             const collection = await getowningCollection(itemId);
             setCollection(collection);
-        }catch (error) {
+        } catch (error) {
             console.error("Error fetching owning collection:", error);
         }
     }
     useEffect(() => {
         fetchOwningCollection(id || '');
-    },[])
-    
+    }, [])
+
 
     const displayEditButton = () => {
-    const uploadGroups = groupCategories.upload.map(group => 
-      group.name.replace('_Upload', '')
-    );
-    
-    const adminGroups = groupCategories.admin.map(group =>
-      group.name.replace('_Admin', '')
-    );
+        const uploadGroups = groupCategories.upload.map(group =>
+            group.name.replace('_Upload', '')
+        );
 
-const allAccessGroups = Array.from(new Set([...uploadGroups, ...adminGroups]));    
-    return allAccessGroups.includes(collection)
-  };
+        const adminGroups = groupCategories.admin.map(group =>
+            group.name.replace('_Admin', '')
+        );
 
-  const isAccess = displayEditButton();
+        const allAccessGroups = Array.from(new Set([...uploadGroups, ...adminGroups]));
+        return allAccessGroups.includes(collection)
+    };
+
+    const isAccess = displayEditButton();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -179,9 +179,18 @@ const allAccessGroups = Array.from(new Set([...uploadGroups, ...adminGroups]));
                                                         <ul className='list-unstyled'>
                                                             {pdfBitstreams.map(bitstream => (
                                                                 <li key={bitstream.uuid} className='mb-2'>
-                                                                    <button className='custom-btn' onClick={() => window.open(`/pdf-viewer?uuid=${bitstream.uuid}`, '_blank')}>
+                                                                    <button
+                                                                        className="custom-btn"
+                                                                        onClick={() =>
+                                                                            window.open(
+                                                                                `/pdf-viewer?uuid=${encodeURIComponent(bitstream.uuid)}&itemId=${encodeURIComponent(id ?? '')}`,
+                                                                                '_blank'
+                                                                            )
+                                                                        }
+                                                                    >
                                                                         View PDF
                                                                     </button>
+
                                                                     <button className='custom-btn' onClick={() => window.open(`/flip-book-viewer?uuid=${bitstream.uuid}`, '_blank')}>
                                                                         View In Flip PDF
                                                                     </button>
