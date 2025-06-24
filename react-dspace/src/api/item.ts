@@ -253,3 +253,20 @@ export const fetchItemDetails = async (id: string): Promise<BookDetailsData> => 
   };
   
 
+export const deleteItem = async (uuid:string) =>{
+   try {
+     const response = await axios.delete( `${siteConfig.apiEndpoint}/api/core/items/${uuid}`,{
+        headers:{
+            'Content-Type': 'application/json',
+            'X-XSRF-TOKEN': csrfToken,
+            'Authorization': authToken,
+        },
+        withCredentials: true,
+    })
+    if( response.status === 204) {
+        showToast("Item deleted successfully", "success");
+    }
+}catch (error: any) {
+    console.error("Error deleting item:", error);
+}
+}
