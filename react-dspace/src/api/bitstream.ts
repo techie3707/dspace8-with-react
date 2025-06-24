@@ -7,6 +7,7 @@ import { getAuthHeaders } from "./searchApi";
 import html2canvas from 'html2canvas';
 import ravLogo from '../assets/images/rav-logo.png';
 import { fetchItemInfo } from "./item";
+import { personsImgs } from "../utils/images";
 
 
 const authToken = localStorage.getItem("authToken") || "";
@@ -67,25 +68,53 @@ export const downloadPDF = async (
         const itemData = await itemResp.json();
 
         const map: Record<string, string> = {
-          'dc.title':             'Title',
-          'dc.contributor.author':'Author',
-          'dc.date.issued':       'Date Issued',
-          'dc.publisher':         'Publisher',
-          'dc.identifier.uri':    'Link',
+          "dc.filename": "File Name",
+          "dc.boxnumber": "Box Number",
+          "dc.yearrange": "Year",
+          "dc.sectionname": "sectionname",
+          "dc.guruname": "Guru Name",
+          "dc.shishyaname": "Shishya Name",
+          "dc.subject": "Subject",
+          "dc.Studentname": "Student Name",
+          "dc.filenumber": "File Number",
+          "dc.month": "Month",
+          "dc.identifier.uri": "Link"
         };
 
-        const rows = Object.entries(map).map(([k, label]) => {
+        const rows = Object.entries(map).reduce((html, [k, label]) => {
           const v = itemData?.metadata?.[k]?.[0]?.value;
-          if (!v) return '';
-          return `<tr>
-                    <th style="text-align:left;padding:8px;">${label}</th>
-                    <td style="padding:8px;">
-                      ${k === 'dc.identifier.uri'
-                        ? `<a href="${v}" target="_blank">${v}</a>`
-                        : v}
-                    </td>
-                  </tr>`;
-        }).join('');
+          if (!v) return html;
+
+          const valueCell =
+            k === 'dc.identifier.uri'
+              ? `<a href="${v}" target="_blank" style="color:#3f51b5;text-decoration:none;">${v}</a>`
+              : v;
+
+          return (
+            html +
+            `<tr>
+               <th
+                 style="
+                   width: 200px;
+                   background:#e6e6e6;
+                   padding:12px 16px;
+                   text-align:left;
+                   font-weight:600;
+                   border-bottom:1px solid #dcdcdc;
+                 ">
+                 ${label}
+               </th>
+               <td
+                 style="
+                   padding:12px 16px;
+                   background:#ffffff;
+                   border-bottom:1px solid #dcdcdc;
+                 ">
+                 ${valueCell}
+               </td>
+             </tr>`
+          );
+        }, '');
 
         const html = document.createElement('div');
         html.style.width  = '1123px';
@@ -94,16 +123,26 @@ export const downloadPDF = async (
         html.style.fontFamily = 'Arial, sans-serif';
         html.style.background = '#fff';
         html.innerHTML = `
-          <h1 style="text-align:center;margin-bottom:40px;">
-            Rashtriya Ayurveda Vidyapeeth
-          </h1>
-          <table style="width:100%;border-collapse:collapse;font-size:16px;">
-            ${rows}
-          </table>
-        `;
+          <div style="text-align:center;margin-bottom:32px;">
+            <img src="${personsImgs.brand_one}" alt="Logo" style="max-height:100px;margin-bottom:12px;" />
+          </div>
+
+          <table
+            style="
+              width:100%;
+              border-collapse:collapse;
+              border-radius:10px;
+              overflow:hidden;
+              font-size:16px;
+              box-shadow:0 0 10px rgba(0,0,0,0.1);
+            ">
+            <tbody>
+              ${rows}
+            </tbody>
+          </table>`;
 
         document.body.appendChild(html);
-        const canvas   = await html2canvas(html, { background: '#fff' });
+        const canvas = await html2canvas(html, { backgroundColor: '#fff' });
         const imgBytes = await fetch(canvas.toDataURL('image/png')).then(r => r.arrayBuffer());
         document.body.removeChild(html);
 
@@ -113,7 +152,7 @@ export const downloadPDF = async (
       }
     }
 
-    let indices: number[];
+    let indices: number[] = [];
     if (pagesStr) {
       const wanted = parsePages(pagesStr);       
       indices = wanted.filter(n => n >= 1 && n <= pageCount).map(n => n - 1);

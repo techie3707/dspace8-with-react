@@ -4,11 +4,14 @@ import { siteConfig } from "../../data/data";
 import { useNavigate } from "react-router-dom";
 import "./SignUp.css";
 import { register } from "../../api/authApi";
+import Loader from "../loader/loader";
 
 const SignUp: React.FC = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState<string>("");
   const [isValidEmail, setIsValidEmail] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   const validateEmail = (email: string): boolean => {
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -22,16 +25,37 @@ const SignUp: React.FC = () => {
   };
 
   const handleSignUp = async () => {
-     await register(email);
-     window.location.href = "/"; 
+    setLoading(true);
+    setError(null);
+    try {
+      await register(email);
+      window.location.href = "/";
+    } catch (err: any) {
+      setError("Failed to register. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <Container maxWidth="sm" className="signup-container">
       <Box className="signup-box">
-        <Typography variant="h4" className="signup-title">
+        <Typography variant="h4" className="signup-title item_header">
           Create an {siteConfig.name} Account
         </Typography>
+
+        {loading && (
+          <Typography align="center" style={{ marginTop: 16 }}>
+            <Loader />
+          </Typography>
+        )}
+
+        {error && (
+          <Typography color="error" align="center" style={{ marginTop: 16 }}>
+            {error}
+          </Typography>
+        )}
+
         <TextField
           fullWidth
           label="Email Address"
@@ -48,7 +72,7 @@ const SignUp: React.FC = () => {
           color="primary"
           className="signup-button"
           onClick={handleSignUp}
-          disabled={!isValidEmail}
+          disabled={!isValidEmail || loading}
         >
           Sign Up →
         </Button>

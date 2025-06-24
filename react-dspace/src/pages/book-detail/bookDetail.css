@@ -66,7 +66,7 @@
 }
 .bdtl_title{
     color: rgb(129, 20, 246);
-    font-size: 2rem;
+    font-size: 1.2rem;
 }
 .custom-btn{
     background-color: white;
@@ -117,7 +117,7 @@
 
 @media (max-width: 576px) {
     .bdtl_title {
-        font-size: 1.5rem;
+        font-size: 1rem;
     }
     .back_btn {
         bottom: 10px;

@@ -24,55 +24,49 @@ const footerData = {
 
 const ContentBottom: React.FC = () => {
   return (
-    <footer className="footer">
-      <Container maxWidth="lg">
-        <Grid container spacing={4} justifyContent="center">
-          <Grid item xs={12} sm={6} md={3}>
-            <Typography variant="h6" fontWeight="bold">
-              {footerData.companyName}
-            </Typography>
-          </Grid>
+ <footer className="custom-footer">
+  <Container maxWidth="lg">
+    <Grid
+      container
+      spacing={2}
+      alignItems="center"
+      justifyContent="space-between"
+      wrap="nowrap"
+      className="footer-grid"
+    >
+      {/* Left side: Copyright Text */}
+      <Grid item xs="auto">
+        <p tabIndex={0} style={{ margin: 0, whiteSpace: 'nowrap' }}>
+          © Copyright 2025 <b>TechBetsinfotech</b> All Rights Reserved.
+        </p>
+      </Grid>
 
-          <Grid item xs={12} sm={6} md={3}>
-            <Typography variant="h6" fontWeight="bold" gutterBottom>
-              Services
-            </Typography>
-            {footerData.services.map((service) => (
-              <Link key={service.id} href={service.path} color="inherit" display="block" underline="hover">
-                {service.title}
-              </Link>
-            ))}
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={3}>
-            <Typography variant="h6" fontWeight="bold" gutterBottom>
-              Contacts
-            </Typography>
-            <Typography>Phone: {footerData.contacts.phone}</Typography>
-            <Typography>Email: {footerData.contacts.email}</Typography>
-            <Typography>Address: {footerData.contacts.address}</Typography>
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={3}>
-            <Typography variant="h6" fontWeight="bold" gutterBottom>
-              Social Media
-            </Typography>
-            <Grid container spacing={1}>
-              {footerData.socialMedia.map((social) => (
-                <Grid item key={social.id}>
-                  <IconButton href={social.link} target="_blank" color="inherit">
-                    {social.title === "Facebook" && <Facebook />}
-                    {social.title === "Twitter" && <Twitter />}
-                    {social.title === "Instagram" && <Instagram />}
-                    {social.title === "LinkedIn" && <LinkedIn />}
-                  </IconButton>
-                </Grid>
-              ))}
+      {/* Right side: Social Media Icons */}
+      <Grid item xs>
+        <Grid
+          container
+          spacing={1}
+          justifyContent="flex-end"
+          wrap="nowrap"
+          className="social-icons"
+        >
+          {footerData.socialMedia.map((social) => (
+            <Grid item key={social.id}>
+              <IconButton href={social.link} target="_blank" color="inherit">
+                {social.title === "Facebook" && <Facebook />}
+                {social.title === "Twitter" && <Twitter />}
+                {social.title === "Instagram" && <Instagram />}
+                {social.title === "LinkedIn" && <LinkedIn />}
+              </IconButton>
             </Grid>
-          </Grid>
+          ))}
         </Grid>
-      </Container>
-    </footer>
+      </Grid>
+    </Grid>
+  </Container>
+</footer>
+
+
   );
 };
 

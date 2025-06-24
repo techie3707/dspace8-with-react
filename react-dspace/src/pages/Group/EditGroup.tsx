@@ -126,7 +126,7 @@ const EditGroup = () => {
     };
     if (laoding) return <Loader />
     return (
-        <Container>
+        <Container className="top_padding">
             <Grid container justifyContent="space-between" alignItems="center" className="header_group">
                 <Typography variant="h4">Edit Group</Typography>
             </Grid>

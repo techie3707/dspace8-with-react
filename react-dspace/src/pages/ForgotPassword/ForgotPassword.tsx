@@ -33,7 +33,7 @@ const ForgotPassword = () => {
         <Container maxWidth="sm" className="forgot-password-container">
              {loading && <Loader />}
             <Box className="forgot-password-box">
-                <Typography variant="h4" className="forgot-password-title">
+                <Typography variant="h4" className="forgot-password-title item_header">
                     Forgot Password
                 </Typography>
                 <Typography variant="body1" color="textSecondary" className="forgot-password-text">

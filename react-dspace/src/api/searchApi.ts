@@ -2,10 +2,10 @@ import axios from "axios";
 import { siteConfig } from "../data/data";
 import { FacetResult, ObjectSearchResult, SearchParams, filterSections, FilterOption, SearchFilters, AdvancedFilter, advancedSearchFields } from "../data/searchData";
 
-
+const authToken = localStorage.getItem("authToken") || "";
+const csrfToken = localStorage.getItem("csrfToken") || "";
 export const getAuthHeaders = (): Record<string, string> => {
-  const authToken = localStorage.getItem("authToken") || "";
-  const csrfToken = localStorage.getItem("csrfToken") || "";
+
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -105,7 +105,7 @@ export const parseSearchParamsFromUrl = (): SearchParams => {
 
   return {
     page: parseInt(params.get('page') || '0'),
-    size: parseInt(params.get('size') || '10'),
+    size: parseInt(params.get('size') || '20'),
     query: params.get('query') || undefined,
     sort: params.get('sort') || undefined,
     scope: params.get('scope') || undefined,

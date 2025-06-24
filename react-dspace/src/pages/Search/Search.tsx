@@ -6,21 +6,15 @@ import PaginationComponent from '../../components/Pagination/PaginationComponent
 import YearRangeSlider from '../Search/YearRangeSlider';
 import { sortOptions, resultsPerPageOptions, filterSections, metadataFields, FilterSection, SearchParams, FilterOption, } from '../../data/searchData';
 import { useNavigate } from 'react-router-dom';
-import { Box, Button, Grid, IconButton, TextField } from '@mui/material';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, IconButton, TextField } from '@mui/material';
 import { iconsImgs } from '../../utils/images';
+import { siteConfig } from '../../data/data';
 import { Bitstream } from '../../data/bookDetail';
 import Loader from '../loader/loader';
 import SecureImage from './SecureImage';
-import {
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogContentText,
-    DialogActions,
-} from "@mui/material";
+import { Group } from '../../api/group';
 import { deleteItem } from '../../api/item';
-import { Group, useUserGroups } from '../../contexts/groupTypeContext';
-
+import { useUserGroups } from '../../contexts/groupTypeContext';
 
 const Search: React.FC = () => {
     const initialParams = parseSearchParamsFromUrl();
@@ -64,9 +58,10 @@ const Search: React.FC = () => {
 
     const { groupCategories, isAdministrator } = useUserGroups();
 
-    const isAdmingroup = groupCategories.admin.some((group: Group) =>
-        group.name.toLowerCase().includes('admin')
-    );
+  const isAdmingroup = (groupCategories.admin as Group[]).some((group: Group) =>
+  group.name.toLowerCase().includes('admin')
+);
+
 
     const toggleItemSelection = (uuid: string) => {
         setSelectedItems(prev => {
@@ -427,15 +422,30 @@ const Search: React.FC = () => {
                             const shouldShowSection =
                                 section.filterType === 'range' ||
                                 (section.filterType === 'checkbox' && facets[section.id]?.length > 0) ||
-                                (section.filterType === 'boolean' && (hasFileCounts.hasFileCount > 0));
+                                (section.filterType === 'boolean' && hasFileCounts.hasFileCount > 0);
+
                             if (!shouldShowSection) return null;
+                            if (section.id === 'subject' && Array.isArray(facets[section.id])) {
+                                facets[section.id] = facets[section.id].map(f => {
+                                    const maxLength = 15;
+                                    const label = f.label.trim();
+                                    const trimmed = label.length > maxLength ? label.slice(0, maxLength) + '...' : label;
+                                    return {
+                                        ...f,
+                                        label: trimmed
+                                    };
+                                });
+                            }
+
+
+
                             return (
                                 <div key={section.id}>
-                                    <div className={`filter_name ${expandedSections[section.id] ? '' : 'border-bottom'}`}>
+                                    <div className={`filter_name ${expandedSections[section.id] ? '' : 'border-bottom'}`} onClick={() => toggleSection(section.id)}>
                                         <h2 className='ZF0dQe'>{section.label}</h2>
                                         <button
                                             className={`toggle-button ${expandedSections[section.id] ? 'up' : 'down'}`}
-                                            onClick={() => toggleSection(section.id)}
+                                            
                                         ></button>
                                     </div>
                                     {expandedSections[section.id] && (
@@ -444,8 +454,9 @@ const Search: React.FC = () => {
                                         </div>
                                     )}
                                 </div>
-                            )
+                            );
                         })}
+
 
                     </div>
                     <div className='filter_reset'>
@@ -539,7 +550,7 @@ const Search: React.FC = () => {
                         <Grid container alignItems="center" className="results-header">
                             <Grid item xs={8.5} sm={8.5} lg={11}>
                                 {loadingTime && (
-                                    <h4 style={{ margin: '0px' }}>
+                                    <h4 style={{ margin: '0px', fontSize: 'calc(1rem + .3vw)' }}>
                                         {totalData} Items found in{" "}
                                         {Math.max(
                                             parseFloat(loadingTime) > 0.80
@@ -586,7 +597,7 @@ const Search: React.FC = () => {
                                     searchResults.map((result, index) => {
                                         const metadata = result._embedded?.indexableObject?.metadata;
                                         const type = result._embedded?.indexableObject?.type;
-                                        const title = metadata?.['dc.title']?.[0]?.value || 'Unknown Title';
+                                    const title = metadata?.['dc.filenumber']?.[0]?.value || metadata?.['dc.filename']?.[0]?.value || metadata?.['dc.guruname']?.[0]?.value || 'Unknown Title';
                                         const uuid = result._embedded?.indexableObject?.uuid;
                                         const abstract = metadata?.['dc.description.abstract']?.[0]?.value;
                                         const date = metadata?.['dc.date.issued']?.[0]?.value;
@@ -732,7 +743,7 @@ const Search: React.FC = () => {
                                     searchResults.map((result, index) => {
                                         const metadata = result._embedded?.indexableObject?.metadata;
                                         const type = result._embedded?.indexableObject?.type;
-                                        const title = getMetadataValue(metadata, metadataFields.title);
+                                    const title = metadata?.['dc.filenumber']?.[0]?.value || metadata?.['dc.filename']?.[0]?.value || metadata?.['dc.guruname']?.[0]?.value || 'Unknown Title';
                                         const uuid = result._embedded?.indexableObject?.uuid;
                                         const abstract = getMetadataValue(metadata, metadataFields.abstract);
                                         const date = getMetadataValue(metadata, metadataFields.date);

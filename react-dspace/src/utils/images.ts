@@ -44,7 +44,7 @@ import group_icon_black from "../assets/icons/group_icon_black.png";
 import preview from "../assets/images/about1.webp";
 import person from "../assets/images/person.png";
 import business_person from "../assets/images/business_person.png";
-import aboutBack from "../assets/images/aboutBack.avif";
+import aboutBack from "../assets/images/aboutBack.jpg";
 import slide1 from "../assets/images/slider1.jpg";
 import slide2 from "../assets/images/slider2.jpg";
 import slide3 from "../assets/images/slider3.jpg";
