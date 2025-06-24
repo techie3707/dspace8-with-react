@@ -766,7 +766,7 @@ const AdvanceSearch: React.FC = () => {
                                 searchResults.map((result, index) => {
                                     const metadata = result._embedded?.indexableObject?.metadata;
                                     const type = result._embedded?.indexableObject?.type;
-                                    const title = metadata?.['dc.title']?.[0]?.value || 'Unknown Title';
+                                    const title = metadata?.['dc.filenumber']?.[0]?.value || metadata?.['dc.filename']?.[0]?.value || metadata?.['dc.guruname']?.[0]?.value || 'Unknown Title';
                                     const uuid = result._embedded?.indexableObject?.uuid;
                                     const abstract = metadata?.['dc.description.abstract']?.[0]?.value;
                                     const date = metadata?.['dc.date.issued']?.[0]?.value;
@@ -899,7 +899,7 @@ const AdvanceSearch: React.FC = () => {
                                 searchResults.map((result, index) => {
                                     const metadata = result._embedded?.indexableObject?.metadata;
                                     const type = result._embedded?.indexableObject?.type;
-                                    const title = getMetadataValue(metadata, metadataFields.title);
+                                    const title = metadata?.['dc.filenumber']?.[0]?.value || metadata?.['dc.filename']?.[0]?.value || metadata?.['dc.guruname']?.[0]?.value || 'Unknown Title';
                                     const uuid = result._embedded?.indexableObject?.uuid;
                                     const abstract = getMetadataValue(metadata, metadataFields.abstract);
                                     const date = getMetadataValue(metadata, metadataFields.date);

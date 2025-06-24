@@ -89,13 +89,18 @@ const BookDetails: React.FC = () => {
         return metadataField && metadataField.length > 0 ? metadataField[0].value : null;
     };
 
-    const title = getMetadataValue('dc.title');
-    const author = getMetadataValue('dc.contributor.author');
-    const description = getMetadataValue('dc.description');
-    const abstract = getMetadataValue('dc.description.abstract');
-    const dateIssued = getMetadataValue('dc.date.issued');
+    const title = getMetadataValue('dc.filenumber') || getMetadataValue('dc.filename');
+    const subject = getMetadataValue('dc.subject');
+    const sectionname = getMetadataValue('dc.sectionname');
+    const Boxnumber = getMetadataValue('dc.boxnumber');
+    const Year = getMetadataValue('dc.yearrange');
     const uri = getMetadataValue('dc.identifier.uri');
-    const publisher = getMetadataValue('dc.publisher');
+    const guruname = getMetadataValue('dc.guruname');
+    const month = getMetadataValue('dc.month');
+    const filetype = getMetadataValue('dc.filetype');
+    const Studentname = getMetadataValue('dc.studentname');
+    const shishyaname = getMetadataValue('dc.shishyaname');
+
 
     if (isLoading) return <Loader />;
     if (error) return <h3>{error}</h3>;
@@ -130,61 +135,85 @@ const BookDetails: React.FC = () => {
                     <div className='col-lg-8 col-md-12 col-12'>
                         <table className='modern-table w-100'>
                             <tbody>
-                                {abstract && (
+                                {Boxnumber && (
                                     <tr>
-                                        <th>Abstract</th>
-                                        <td>{abstract}</td>
+                                        <th>Box Number</th>
+                                        <td>{Boxnumber}</td>
                                     </tr>
                                 )}
-                                <tr>
-                                    <th>URI</th>
-                                    <td>
-                                        <a href={uri || ''} target="_blank" rel="noopener noreferrer">
-                                            {uri}
-                                        </a>
-                                    </td>
-                                </tr>
-                                {description && (
+
+                                {uri && (
                                     <tr>
-                                        <th>Description</th>
-                                        <td>{description}</td>
+                                        <th>URI</th>
+                                        <td>
+                                            <a href={uri} target="_blank" rel="noopener noreferrer">
+                                                {uri}
+                                            </a>
+                                        </td>
                                     </tr>
                                 )}
-                                {author && (
+
+                                {sectionname && (
                                     <tr>
-                                        <th>Author</th>
-                                        <td>{author}</td>
+                                        <th>Section Name</th>
+                                        <td>{sectionname}</td>
                                     </tr>
                                 )}
-                                {publisher && (
+
+                                {subject && (
                                     <tr>
-                                        <th>Publisher</th>
-                                        <td>{publisher}</td>
+                                        <th>Subject</th>
+                                        <td>{subject}</td>
                                     </tr>
                                 )}
-                                <tr>
-                                    <th>Date</th>
-                                    <td>{dateIssued}</td>
-                                </tr>
-                                 {(() => {
+
+                                {guruname && (
+                                    <tr>
+                                        <th>Guru Name</th>
+                                        <td>{guruname}</td>
+                                    </tr>
+                                )}
+
+                                {Year && (
+                                    <tr>
+                                        <th>Year</th>
+                                        <td>{Year}</td>
+                                    </tr>
+                                )}
+
+                                {month && (
+                                    <tr>
+                                        <th>Month</th>
+                                        <td>{month}</td>
+                                    </tr>
+                                )}
+
+                                {shishyaname && (
+                                    <tr>
+                                        <th>Shishya Name</th>
+                                        <td>{shishyaname}</td>
+                                    </tr>
+                                )}
+
+                                {filetype && (
+                                    <tr>
+                                        <th>File Type</th>
+                                        <td>{filetype}</td>
+                                    </tr>
+                                )}
+
+                                {Studentname && (
+                                    <tr>
+                                        <th>Student Name</th>
+                                        <td>{Studentname}</td>
+                                    </tr>
+                                )}
+
+                                {originalBitstreams.length > 0 && (() => {
                                     const pdfBitstreams = originalBitstreams.filter(bitstream => /.pdf$/i.test(bitstream.name));
 
-                                     if (pdfBitstreams.length === 0) {
-                                        return (
-                                            <>
-                                             {isAuthenticated && (isAdministrator || isAccess) && (
-                                                    <tr>
-                                                        <td colSpan={2} className="text-end">
-                                                            <button className='custom-btn' style={{ width: '100%' }} onClick={() => navigate(`/edit-item/${id}`)}>
-                                                                Edit Item
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                )}
-                                        </>
-                                        );
-                                    }
-                                   if (pdfBitstreams.length === 1) {
+                                    //  If only one PDF, show simple list format
+                                    if (pdfBitstreams.length === 1 || pdfBitstreams.length === 0) {
                                         return (
                                             <>
                                                 <tr>

@@ -39,7 +39,7 @@ const Login = () => {
   return (
     <Container maxWidth="sm" className="login-container">
       <Box className="login-box">
-        <Typography variant="h4" className="login-title">
+        <Typography variant="h4" className="login-title item_header">
           Log in to {siteConfig.name}
         </Typography>
         {error && <Typography color="error">{error}</Typography>}

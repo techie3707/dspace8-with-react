@@ -6,11 +6,7 @@ const About: React.FC = () => {
   return (
     <>
       <div className="career-container">
-        <img
-          className="career-background"
-          src={iconsImgs.aboutBack}
-          alt="Career Background"
-        />
+     
         <div className="career-content">
           <h5>About Us</h5>
           <h1>Rashtriya Ayurveda Vidyapeeth (RAV)</h1>

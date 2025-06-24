@@ -494,6 +494,7 @@ button {
   box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   margin-bottom: 2rem !important;
+  margin-top: 50px !important;
 }
 
 .create-item-title {
@@ -654,7 +655,33 @@ button {
   font-weight: bold;
   margin-right: 8px;
 }
+.item_header {
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    position: relative;
+    bottom: 10px;
+    font-size: 24px;
+    font-weight: bold;
+}
 
+.item_header::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40%;
+    height: 3px;
+    background: linear-gradient(
+        to right,
+        rgba(255, 126, 95, 0) 0%,
+        #ff7e5f 40%,
+        #feb47b 60%,
+        rgba(254, 180, 123, 0) 100%
+    );
+    border-radius: 0;
+}
 .item-name {
   color: rgb(129, 20, 246);
 }
@@ -669,4 +696,8 @@ button {
 }
 .policy_main_div{
   margin-top: 20px;
+}
+
+.filter_name{
+  cursor: pointer;
 }

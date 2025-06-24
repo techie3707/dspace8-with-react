@@ -57,7 +57,7 @@ const CreateItem: React.FC<CreateItemProps> = ({ collectionId }) => {
             [name]: value,
         }));
     };
-
+   
 
     const handleDateChange = (type: "year" | "month" | "day", value: number) => {
         setDateParts((prevDateParts) => {
@@ -91,7 +91,7 @@ const CreateItem: React.FC<CreateItemProps> = ({ collectionId }) => {
             }
         }
     };
-    const generateThumbnailFromPDF = async (pdfFile: File): Promise<Blob> => {
+ const generateThumbnailFromPDF = async (pdfFile: File): Promise<Blob> => {
         const url = URL.createObjectURL(pdfFile);
 
         const loadingTask = pdfjsLib.getDocument({
@@ -136,7 +136,6 @@ const CreateItem: React.FC<CreateItemProps> = ({ collectionId }) => {
             );
         });
     };
- 
 
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -254,7 +253,6 @@ const CreateItem: React.FC<CreateItemProps> = ({ collectionId }) => {
                         )}
                     </Box>
                 ))}
-
 
                 <Box className="upload-container" onClick={() => document.getElementById('fileInput')?.click()}>
                     <input type="file" id="fileInput" hidden onChange={handleFileChange} />

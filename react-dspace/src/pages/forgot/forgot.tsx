@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import { TextField, Button, Box, Typography, Paper, Alert } from "@mui/material";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import CloseIcon from "@mui/icons-material/Close";
 import { fetchUserByEmail, resetPassword } from "../../api/forgotPassword";
 import { login } from "../../api/authApi";
 import Loader from "../loader/loader";
@@ -80,7 +79,6 @@ const Forgot: React.FC = () => {
       <ToastContainer />
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Typography variant="h5">Reset Password</Typography>
-        <CloseIcon />
       </Box>
 
       <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>

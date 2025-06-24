@@ -19,14 +19,27 @@ export interface FilterOption {
   label: string;
   count: number;
 }
+export const formatSubjects = (subjects?: string[]): string[] => {
+  if (!subjects) return [];
+
+  return subjects.map((subject) => {
+    const firstPart = subject.split(/[&,_]/)[0].trim();
+    return firstPart.length > 25 ? firstPart.slice(0, 25) + '...' : firstPart;
+  });
+};
 
 export interface SearchFilters {
   [key: string]: string[] | boolean | null | undefined;
-  author?: string[];
+  sectionname?: string[];
   subject?: string[];
   date?: string[];
-  itemType?: string[];
+  fileType?: string[];
   hasFile?: boolean | null;
+  yearrange?: string[];
+  boxnumber?: string [];
+  guruname?: string [];
+  shishyaname?: string [];
+  studentname?: string [];
 }
 
 export interface SortOption {
@@ -49,7 +62,7 @@ export interface FilterSection {
 }
 
 export const metadataFields = {
-  title: 'dc.title',
+  title: 'dc.filenumber',
   abstract: 'dc.description.abstract',
   date: 'dc.date.issued',
   author: 'dc.contributor.author',
@@ -59,10 +72,8 @@ export const metadataFields = {
 
 export const sortOptions: SortOption[] = [
   { value: 'relevant', label: 'Most Relevant', apiValue: 'score,DESC' },
-  { value: 'title-asc', label: 'Title Ascending', apiValue: 'dc.title,ASC' },
-  { value: 'title-desc', label: 'Title Descending', apiValue: 'dc.title,DESC' },
-  { value: 'date-asc', label: 'Date Issued Ascending', apiValue: 'dc.date.issued,ASC' },
-  { value: 'date-desc', label: 'Date Issued Descending', apiValue: 'dc.date.issued,DESC' },
+  { value: 'title-asc', label: 'Title Ascending', apiValue: 'dc.guruname,ASC' },
+  { value: 'title-desc', label: 'Title Descending', apiValue: 'dc.guruname,DESC' },
   { value: 'accessioned-asc', label: 'Accessioned Date Ascending', apiValue: 'dc.date.accessioned,ASC' },
   { value: 'accessioned-desc', label: 'Accessioned Date Descending', apiValue: 'dc.date.accessioned,DESC' }
 ];
@@ -77,10 +88,10 @@ export const resultsPerPageOptions: ResultsPerPageOption[] = [
 
 export const filterSections: FilterSection[] = [
   {
-    id: 'author',
-    label: 'Author',
-    defaultExpanded: true,
-    fieldName: 'author',
+    id: 'SectionName',
+    label: 'SectionName',
+    defaultExpanded: false,
+    fieldName: 'sectionname',
     filterType: 'checkbox'
   },
   {
@@ -91,10 +102,10 @@ export const filterSections: FilterSection[] = [
     filterType: 'checkbox'
   },
   {
-    id: 'itemType',
-    label: 'Item Type',
+    id: 'fileType',
+    label: 'File Type',
     defaultExpanded: false,
-    fieldName: 'entityType',
+    fieldName: 'filetype',
     filterType: 'checkbox'
   },
   {
@@ -104,13 +115,49 @@ export const filterSections: FilterSection[] = [
     fieldName: 'dateIssued',
     filterType: 'range'
   },
-  {
-    id: 'hasFiles',
-    label: 'Has File',
+  // {
+  //   id: 'hasFiles',
+  //   label: 'Has File',
+  //   defaultExpanded: false,
+  //   fieldName: 'has_content_in_original_bundle',
+  //   filterType: 'boolean'
+  // },
+   {
+    id: 'YearRange',
+    label: 'Year Range',
     defaultExpanded: false,
-    fieldName: 'has_content_in_original_bundle',
-    filterType: 'boolean'
-  }
+    fieldName: 'yearrange',
+    filterType: 'checkbox'
+  },
+    {
+    id: 'BoxNumber',
+    label: 'Box Number',
+    defaultExpanded: false,
+    fieldName: 'boxnumber',
+    filterType: 'checkbox'
+  },
+    {
+    id: 'guruname',
+    label: 'Guru Name',
+    defaultExpanded: false,
+    fieldName: 'guruname',
+    filterType: 'checkbox'
+  },
+    {
+    id: 'shishyaname',
+    label: 'Shishya Name',
+    defaultExpanded: false,
+    fieldName: 'shishyaname',
+    filterType: 'checkbox'
+  },
+    {
+    id: 'studentname',
+    label: 'Student Name',
+    defaultExpanded: false,
+    fieldName: 'studentname',
+    filterType: 'checkbox'
+  },
+ 
 ];
 
 export interface ObjectSearchResult {
@@ -188,9 +235,15 @@ export const advancedSearchFields: AdvancedSearchField[] = [
     operators: commonOperators
   },
   {
-    id: 'itemType',
-    label: 'Item Type',
-    fieldName: 'entityType',
+    id: 'fileType',
+    label: 'File Type',
+    fieldName: 'filetype',
+    operators: commonOperators
+  },
+    {
+    id: 'fileType',
+    label: 'File Type',
+    fieldName: 'filetype',
     operators: commonOperators
   }
 ];
