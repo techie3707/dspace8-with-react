@@ -6,12 +6,21 @@ import PaginationComponent from '../../components/Pagination/PaginationComponent
 import YearRangeSlider from '../Search/YearRangeSlider';
 import { sortOptions, resultsPerPageOptions, filterSections, metadataFields, FilterSection, SearchParams, FilterOption, } from '../../data/searchData';
 import { useNavigate } from 'react-router-dom';
-import { Button, Grid, IconButton, TextField } from '@mui/material';
+import { Box, Button, Grid, IconButton, TextField } from '@mui/material';
 import { iconsImgs } from '../../utils/images';
-import { siteConfig } from '../../data/data';
 import { Bitstream } from '../../data/bookDetail';
 import Loader from '../loader/loader';
 import SecureImage from './SecureImage';
+import {
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogContentText,
+    DialogActions,
+} from "@mui/material";
+import { deleteItem } from '../../api/item';
+import { Group, useUserGroups } from '../../contexts/groupTypeContext';
+
 
 const Search: React.FC = () => {
     const initialParams = parseSearchParamsFromUrl();
@@ -50,7 +59,48 @@ const Search: React.FC = () => {
             return acc;
         }, {} as Record<string, { page: number, size: number }>)
     );
+    const [selectedItems, setSelectedItems] = useState<string[]>([]);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
+    const { groupCategories, isAdministrator } = useUserGroups();
+
+    const isAdmingroup = groupCategories.admin.some((group: Group) =>
+        group.name.toLowerCase().includes('admin')
+    );
+
+    const toggleItemSelection = (uuid: string) => {
+        setSelectedItems(prev => {
+             if (prev.includes(uuid)) {
+            return prev.filter(id => id !== uuid);
+        }
+            return [...prev, uuid];
+        });
+    };
+
+    const handleConfirmDelete = async () => {
+        if (selectedItems.length === 0) return;
+
+        try {
+            const deletePromises = selectedItems.map(uuid => deleteItem(uuid));
+            await Promise.all(deletePromises);
+
+            await handleSearch(filters, page, size, false, getSortParam());
+            setSelectedItems([]);
+        } catch (error) {
+            console.error('Error deleting items:', error);
+        } finally {
+            setDeleteModalOpen(false);
+        }
+    };
+
+    const handleDiscard = () => {
+        setSelectedItems([]);
+    }
+
+
+    const handleCancelDelete = () => {
+        setDeleteModalOpen(false);
+    }
 
     const getSortParam = (): string => {
         const option = sortOptions.find(opt => opt.value === sortOption);
@@ -330,6 +380,42 @@ const Search: React.FC = () => {
                 return null;
         }
     };
+
+    const deleteAction = (
+        <div className="bulk-actions" 
+        style={{
+            margin: '10px 0',
+            padding: '10px',
+            backgroundColor: '#f5f5f5',
+            borderRadius: '4px',
+            display: selectedItems.length > 0 ? 'flex' : 'none',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+        }}>
+            <div>
+                <span>{selectedItems.length} item(s) selected</span>
+            </div>
+            <div>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleDiscard}
+                    style={{ marginRight: '3px' }}
+                >
+                    Discard
+                </Button>
+                <Button
+                    variant="contained"
+                    color="error"
+                    onClick={() => setDeleteModalOpen(true)}
+                    startIcon={<img className="sresult_icon" src={iconsImgs.remove} alt="Delete" />}
+                >
+                    Delete Selected
+                </Button>
+            </div>
+        </div>
+    );
+
     if (isLoading) return <Loader />;
     return (
         <div className="search-container row">
@@ -487,237 +573,327 @@ const Search: React.FC = () => {
                     {isLoading ? (
                         <div className="loading-indicator">Loading results...</div>
                     ) : (
-                        <Grid container spacing={2} className="results-body">
-                            {viewMode === 'list' ? (
-                                searchResults.map((result, index) => {
-                                    const metadata = result._embedded?.indexableObject?.metadata;
-                                    const type = result._embedded?.indexableObject?.type;
-                                    const title = metadata?.['dc.title']?.[0]?.value || 'Unknown Title';
-                                    const uuid = result._embedded?.indexableObject?.uuid;
-                                    const abstract = metadata?.['dc.description.abstract']?.[0]?.value;
-                                    const date = metadata?.['dc.date.issued']?.[0]?.value;
-                                    const author = metadata?.['dc.contributor.author']?.[0]?.value;
-                                    const publisher = metadata?.['dc.publisher']?.[0]?.value;
-                                    const displayType = metadata?.['dc.type']?.[0]?.value || type;
+                        <>
+                            {selectedItems.length > 0 && (
+                                <Grid container>
+                                    <Grid item xs={12}>
+                                        {deleteAction}
+                                    </Grid>
+                                </Grid>
+                            )}
+                            <Grid container spacing={2} className="results-body">
+                                {viewMode === 'list' ? (
+                                    searchResults.map((result, index) => {
+                                        const metadata = result._embedded?.indexableObject?.metadata;
+                                        const type = result._embedded?.indexableObject?.type;
+                                        const title = metadata?.['dc.title']?.[0]?.value || 'Unknown Title';
+                                        const uuid = result._embedded?.indexableObject?.uuid;
+                                        const abstract = metadata?.['dc.description.abstract']?.[0]?.value;
+                                        const date = metadata?.['dc.date.issued']?.[0]?.value;
+                                        const author = metadata?.['dc.contributor.author']?.[0]?.value;
+                                        const publisher = metadata?.['dc.publisher']?.[0]?.value;
+                                        const displayType = metadata?.['dc.type']?.[0]?.value || type;
 
-                                    const handleTitleClick = () => {
-                                        if (uuid) {
-                                            navigate(`/items/${uuid}`);
-                                        }
-                                    };
+                                        const handleTitleClick = () => {
+                                            if (uuid) {
+                                                navigate(`/items/${uuid}`);
+                                            }
+                                        };
 
-                                    return (
-                                        <Grid item xs={12} key={index}>
-                                            <div style={{
-                                                display: 'flex',
-                                                borderRadius: '8px',
-                                                boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-                                                marginBottom: '20px',
-                                                overflow: 'hidden',
-                                                backgroundColor: '#fff',
-                                            }}>
-                                                {/* Colored Sidebar */}
+                                        const isSelected = uuid && selectedItems.includes(uuid);
+
+                                        return (
+                                            <Grid item xs={12} key={index}>
                                                 <div style={{
-                                                    width: '100px',
-                                                    backgroundColor: '#f97316', // Change per step color
                                                     display: 'flex',
-                                                    flexDirection: 'column',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    color: '#fff',
-                                                    fontWeight: 'bold',
+                                                    borderRadius: '8px',
+                                                    boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                                                    marginBottom: '20px',
+                                                    overflow: 'hidden',
+                                                    backgroundColor: isSelected ? '#e3f2fd' : '#fff',
+                                                    border: isSelected ? '2px solid #1976d2' : 'none',
                                                     position: 'relative'
                                                 }}>
+
+                                                    {/* Colored Sidebar */}
                                                     <div style={{
-                                                        backgroundColor: '#fff',
-                                                        color: '#f97316',
-                                                        borderRadius: '50%',
-                                                        width: '48px',
-                                                        height: '48px',
+                                                        width: '100px',
+                                                        backgroundColor: '#f97316',
                                                         display: 'flex',
+                                                        flexDirection: 'column',
                                                         alignItems: 'center',
                                                         justifyContent: 'center',
-                                                        fontSize: '20px',
-                                                        marginBottom: '5px'
+                                                        color: '#fff',
+                                                        fontWeight: 'bold',
+                                                        position: 'relative'
                                                     }}>
-                                                        <i className="fas fa-cube"></i> {/* Replace icon as needed */}
-                                                    </div>
-
-                                                </div>
-
-                                                {/* Thumbnail & Content */}
-                                                <div style={{ display: 'flex', alignItems: 'center', padding: '15px', flex: 1 }}>
-                                                    {thumbnailsByItem[result._embedded?.indexableObject?.uuid]
-                                                        ?.filter(bitstream => /\.(jpe?g|png)$/i.test(bitstream.name))
-                                                        .slice(0, 1)
-                                                        .map(bitstream => (
-                                                            <SecureImage
-                                                                key={bitstream.uuid}
-                                                                uuid={bitstream.uuid}
-                                                                className="thumbnail-img_list img-fluid"
-                                                                style={{
-                                                                    maxHeight: '100px',
-                                                                    maxWidth: '100px',
-                                                                    marginRight: '20px',
-                                                                    borderRadius: '8px',
-                                                                    objectFit: 'cover'
-                                                                }}
-                                                                alt="Thumbnail"
-                                                            />
-                                                        ))}
-
-                                                    {/* Right Text Section */}
-                                                    <div style={{ flex: 1 }}>
-                                                        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-                                                            <span style={{
-                                                                backgroundColor: '#f0f0f0',
-                                                                padding: '4px 8px',
-                                                                borderRadius: '4px',
-                                                                marginRight: '10px',
-                                                                fontSize: '13px'
-                                                            }}>
-                                                                {displayType}
-                                                            </span>
-                                                            <h3
-                                                                style={{
-                                                                    margin: '0',
-                                                                    cursor: 'pointer',
-                                                                    fontSize: '18px',
-                                                                    fontWeight: 600,
-                                                                    color: '#333'
-                                                                }}
-                                                                onClick={handleTitleClick}
-                                                            >
-                                                                {title}
-                                                            </h3>
+                                                        <div style={{
+                                                            backgroundColor: '#fff',
+                                                            color: '#f97316',
+                                                            borderRadius: '50%',
+                                                            width: '48px',
+                                                            height: '48px',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            fontSize: '20px',
+                                                            marginBottom: '5px'
+                                                        }}>
+                                                            <i className="fas fa-cube"></i> {/* Replace icon as needed */}
                                                         </div>
 
-                                                        {date && (
-                                                            <p style={{ margin: '0 0 10px 0', color: '#666', fontSize: '14px' }}>
-                                                                ({publisher}, {date}) {author}
-                                                            </p>
-                                                        )}
+                                                    </div>
 
-                                                        {abstract && (
-                                                            <>
+                                                    {/* Thumbnail & Content */}
+                                                    <div style={{ display: 'flex', alignItems: 'center', padding: '15px', flex: 1 }}>
+                                                        {thumbnailsByItem[result._embedded?.indexableObject?.uuid]
+                                                            ?.filter(bitstream => /\.(jpe?g|png)$/i.test(bitstream.name))
+                                                            .slice(0, 1)
+                                                            .map(bitstream => (
+                                                                <SecureImage
+                                                                    key={bitstream.uuid}
+                                                                    uuid={bitstream.uuid}
+                                                                    className="thumbnail-img_list img-fluid"
+                                                                    style={{
+                                                                        maxHeight: '100px',
+                                                                        maxWidth: '100px',
+                                                                        marginRight: '20px',
+                                                                        borderRadius: '8px',
+                                                                        objectFit: 'cover'
+                                                                    }}
+                                                                    alt="Thumbnail"
+                                                                />
+                                                            ))}
+
+                                                        {/* Right Text Section */}
+                                                        <div style={{ flex: 1 }}>
+                                                            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+                                                                <span style={{
+                                                                    backgroundColor: '#f0f0f0',
+                                                                    padding: '4px 8px',
+                                                                    borderRadius: '4px',
+                                                                    marginRight: '10px',
+                                                                    fontSize: '13px'
+                                                                }}>
+                                                                    {displayType}
+                                                                </span>
+                                                                <h3
+                                                                    style={{
+                                                                        margin: '0',
+                                                                        cursor: 'pointer',
+                                                                        fontSize: '18px',
+                                                                        fontWeight: 600,
+                                                                        color: '#333'
+                                                                    }}
+                                                                    onClick={isSelected ? undefined : handleTitleClick}
+                                                                >
+                                                                    {title}
+                                                                </h3>
+                                                            </div>
+
+                                                            {date && (
+                                                                <p style={{ margin: '0 0 10px 0', color: '#666', fontSize: '14px' }}>
+                                                                    ({publisher}, {date}) {author}
+                                                                </p>
+                                                            )}
+
+                                                            {abstract && (
                                                                 <p style={{ margin: '10px 0', color: '#555', fontSize: '14px' }}>
                                                                     {abstract}
                                                                 </p>
-                                                                <button style={{
-                                                                    padding: '6px 12px',
-                                                                    backgroundColor: '#e0e0e0',
-                                                                    border: 'none',
-                                                                    borderRadius: '4px',
-                                                                    fontSize: '13px',
-                                                                    cursor: 'pointer'
-                                                                }}>
-                                                                    Show more
-                                                                </button>
-                                                            </>
-                                                        )}
+                                                            )}
+                                                        </div>
+                                                        {/*Delete Button*/}
+                                                        {(isAdministrator || isAdmingroup) && <Box sx={{ display: 'flex', justifyContent: 'end', alignItems: 'center', marginLeft: '5px' }}>
+                                                            <IconButton
+                                                                // className='btn_table'
+                                                                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                                                                    e.stopPropagation();
+                                                                    uuid && toggleItemSelection(uuid);
+                                                                }}
+                                                                color="primary"
+                                                                style={{
+                                                                    fontSize: '18px',
+                                                                    cursor: 'pointer',
+                                                                    padding: '5px',
+                                                                    background: 'none',
+                                                                }}
+                                                                title='Delete'
+                                                            >
+                                                                <img className="itemh_icon" src={iconsImgs.remove} alt="Delete" />
+                                                            </IconButton>
+                                                        </Box>}
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </Grid>
+                                            </Grid>
+                                        );
+                                    })
+                                ) : (
+                                    searchResults.map((result, index) => {
+                                        const metadata = result._embedded?.indexableObject?.metadata;
+                                        const type = result._embedded?.indexableObject?.type;
+                                        const title = getMetadataValue(metadata, metadataFields.title);
+                                        const uuid = result._embedded?.indexableObject?.uuid;
+                                        const abstract = getMetadataValue(metadata, metadataFields.abstract);
+                                        const date = getMetadataValue(metadata, metadataFields.date);
+                                        const author = getMetadataValue(metadata, metadataFields.author);
+                                        const entity = getMetadataValue(metadata, metadataFields.entityType);
+                                        const publisher = getMetadataValue(metadata, metadataFields.publisher);
+                                        const displayType = entity || type;
 
+                                        const handleTitleClick = () => {
+                                            if (uuid) {
+                                                navigate(`/items/${uuid}`);
+                                            }
+                                        };
 
-                                    );
-                                })
-                            ) : (
-                                searchResults.map((result, index) => {
-                                    const metadata = result._embedded?.indexableObject?.metadata;
-                                    const type = result._embedded?.indexableObject?.type;
-                                    const title = getMetadataValue(metadata, metadataFields.title);
-                                    const uuid = result._embedded?.indexableObject?.uuid;
-                                    const abstract = getMetadataValue(metadata, metadataFields.abstract);
-                                    const date = getMetadataValue(metadata, metadataFields.date);
-                                    const author = getMetadataValue(metadata, metadataFields.author);
-                                    const entity = getMetadataValue(metadata, metadataFields.entityType);
-                                    const publisher = getMetadataValue(metadata, metadataFields.publisher);
-                                    const displayType = entity || type;
+                                        const isSelected = uuid && selectedItems.includes(uuid);
+                                        return (
+                                            <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+                                                <div
+                                                    className="grid_main"
+                                                    onClick={isSelected
+                                                        ? (e: React.MouseEvent<HTMLDivElement>) => {
+                                                            e.stopPropagation();
+                                                            uuid && toggleItemSelection(uuid);
+                                                        }
+                                                        : handleTitleClick
+                                                    }
+                                                    style={{
+                                                        border: isSelected ? '2px solid #1976d2' : '1px solid #ddd',
+                                                        borderRadius: '8px',
+                                                        padding: '10px',
+                                                        position: 'relative',
+                                                        cursor: 'pointer',
+                                                        height: '100%',
+                                                        backgroundColor: isSelected ? '#e3f2fd' : '#fff',
+                                                    }}
+                                                >
+                                                    {isSelected && (
+                                                        <div style={{
+                                                            position: 'absolute',
+                                                            top: '5px',
+                                                            right: '5px',
+                                                            width: '20px',
+                                                            height: '20px',
+                                                            backgroundColor: '#1976d2',
+                                                            borderRadius: '50%',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            color: 'white',
+                                                            fontSize: '12px'
+                                                        }}>
+                                                            ✓
+                                                        </div>
+                                                    )}
+                                                    {/* Title */}
+                                                    <h3 className='item_title' style={{ cursor: 'pointer' }}>
+                                                        {title}
+                                                    </h3>
 
-                                    const handleTitleClick = () => {
-                                        if (uuid) {
-                                            navigate(`/items/${uuid}`);
-                                        }
-                                    };
+                                                    {/* Year */}
+                                                    {date && (
+                                                        <p className='item_date' style={{ marginLeft: '10px', color: '#666', fontSize: '14px' }}>
+                                                            {date}
+                                                        </p>
+                                                    )}
 
-                                    return (
-                                         <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
-                                            <div
-                                                className="grid_main"
-                                                onClick={handleTitleClick}
-                                                style={{
-                                                    border: '1px solid #ddd',
-                                                    borderRadius: '8px',
-                                                    padding: '10px',
-                                                    position: 'relative',
-                                                    cursor: 'pointer',
-                                                    height: '100%'
-                                                }}
-                                            >
-                                                {/* Title */}
-                                                <h3 className='item_title' style={{ cursor: 'pointer' }}>
-                                                    {title}
-                                                </h3>
+                                                    {/* Thumbnail */}
+                                                    <div style={{ display: 'flex', justifyContent: 'center', margin: '10px 0', height: '200px' }}>
+                                                        {thumbnailsByItem[result._embedded?.indexableObject?.uuid]
+                                                            ?.filter(bitstream => /\.(jpe?g|png)$/i.test(bitstream.name))
+                                                            .slice(0, 1)
+                                                            .map(bitstream => (
+                                                                <SecureImage
+                                                                    key={bitstream.uuid}
+                                                                    uuid={bitstream.uuid}
+                                                                    className="thumbnail-img img-fluid"
+                                                                    style={{ maxHeight: '300px' }}
+                                                                    alt="Thumbnail"
+                                                                />
+                                                            ))}
+                                                    </div>
 
-                                                {/* Year */}
-                                                {date && (
-                                                    <p className='item_date' style={{ marginLeft: '10px', color: '#666', fontSize: '14px' }}>
-                                                        {date}
-                                                    </p>
-                                                )}
-
-                                                {/* Thumbnail */}
-                                                <div style={{ display: 'flex', justifyContent: 'center', margin: '10px 0', height: '200px' }}>
-                                                    {thumbnailsByItem[result._embedded?.indexableObject?.uuid]
-                                                        ?.filter(bitstream => /\.(jpe?g|png)$/i.test(bitstream.name))
-                                                        .slice(0, 1)
-                                                        .map(bitstream => (
-                                                            <SecureImage
-                                                                key={bitstream.uuid}
-                                                                uuid={bitstream.uuid}
-                                                                className="thumbnail-img img-fluid"
-                                                                style={{ maxHeight: '300px' }}
-                                                                alt="Thumbnail"
-                                                            />
-                                                        ))}
-                                                </div>
-
-                                                {/* Abstract */}
-                                                {/* {abstract && (
+                                                    {/* Abstract */}
+                                                    {/* {abstract && (
                                                     <p style={{ margin: '10px 0', color: '#666', fontSize: '14px' }}>
                                                         {abstract}
                                                     </p>
                                                 )} */}
 
-                                                {/* Navigation Arrow */}
-                                                <IconButton
-                                                    className='itemh_btn'
-                                                    onClick={handleTitleClick}
-                                                    color="primary"
-                                                    style={{
-                                                        position: 'absolute',
-                                                        bottom: '3px',
-                                                        right: '14px',
-                                                        fontSize: '18px',
-                                                        cursor: 'pointer',
-                                                        padding: '5px',
-                                                        background: 'none',
-                                                    }}
-                                                >
-                                                    <img className="itemh_icon" src={iconsImgs.arrow} alt="Arrow" />
-                                                </IconButton>
-                                            </div>
-                                        </Grid>
-                                    );
-                                })
-                            )}
-                        </Grid>
+                                                    {/* Delete button */}
+                                                    {(isAdministrator || isAdmingroup) &&
+                                                        
+                                                            <IconButton
+                                                                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                                                                    e.stopPropagation();
+                                                                    uuid && toggleItemSelection(uuid);
+                                                                }}
+                                                                color="primary"
+                                                                style={{
+                                                                    fontSize: '18px',
+                                                                    cursor: 'pointer',
+                                                                    padding: '5px',
+                                                                    background: 'none',
+                                                                }}
+                                                                title='Delete'
+                                                            >
+                                                                <img className="itemh_icon" src={iconsImgs.remove} alt="Delete" />
+                                                            </IconButton>
+                                                        }
+
+                                                    <IconButton
+                                                        className='itemh_btn'
+                                                        onClick={handleTitleClick}
+                                                        color="primary"
+                                                        style={{
+                                                            position: 'absolute',
+                                                            bottom: '3px',
+                                                            right: '14px',
+                                                            fontSize: '18px',
+                                                            cursor: 'pointer',
+                                                            padding: '5px',
+                                                            background: 'none',
+                                                        }}
+                                                    >
+                                                        <img className="itemh_icon" src={iconsImgs.arrow} alt="Arrow" />
+                                                    </IconButton>
+                                                </div>
+                                            </Grid>
+                                        );
+                                    }
+                                    )
+                                )}
+                            </Grid>
+                        </>
                     )}
+
 
                 </div>
             </div>
+
+
+            <Dialog
+                open={deleteModalOpen}
+                onClose={handleCancelDelete}
+            >
+                <DialogTitle>Confirm Delete</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Are you sure you want to delete {selectedItems.length} selected item(s)?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCancelDelete} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleConfirmDelete} color="error">
+                        Delete
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
             <div style={{ bottom: 10, padding: "10px", }}>
                 <PaginationComponent
                     totalData={totalData}

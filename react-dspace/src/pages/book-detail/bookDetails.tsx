@@ -166,11 +166,25 @@ const BookDetails: React.FC = () => {
                                     <th>Date</th>
                                     <td>{dateIssued}</td>
                                 </tr>
-                                {originalBitstreams.length > 0 && (() => {
+                                 {(() => {
                                     const pdfBitstreams = originalBitstreams.filter(bitstream => /.pdf$/i.test(bitstream.name));
 
-                                    //  If only one PDF, show simple list format
-                                    if (pdfBitstreams.length === 1 || pdfBitstreams.length === 0) {
+                                     if (pdfBitstreams.length === 0) {
+                                        return (
+                                            <>
+                                             {isAuthenticated && (isAdministrator || isAccess) && (
+                                                    <tr>
+                                                        <td colSpan={2} className="text-end">
+                                                            <button className='custom-btn' style={{ width: '100%' }} onClick={() => navigate(`/edit-item/${id}`)}>
+                                                                Edit Item
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                )}
+                                        </>
+                                        );
+                                    }
+                                   if (pdfBitstreams.length === 1) {
                                         return (
                                             <>
                                                 <tr>
