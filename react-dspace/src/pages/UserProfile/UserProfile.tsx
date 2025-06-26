@@ -75,31 +75,36 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId }) => {
   };
 
   const handleSave = async () => {
-    const hasChanges =
-      userData.firstName !== originalData.firstName ||
-      userData.lastName !== originalData.lastName ||
-      userData.email !== originalData.email;
+    const changes: Partial<UserDetails> = {};
 
-    if (!hasChanges) {
+    if (userData.firstName !== originalData.firstName) {
+      changes.firstName = userData.firstName;
+    }
+    if (userData.lastName !== originalData.lastName) {
+      changes.lastName = userData.lastName;
+    }
+    if (userData.email !== originalData.email) {
+      changes.email = userData.email;
+    }
+
+    if (Object.keys(changes).length === 0) {
       setIsEditing(false);
       return;
     }
+
     setUpdating(true);
     try {
-      await updateUser(userId, {
-        firstName: userData.firstName,
-        lastName: userData.lastName,
-        email: userData.email
-      });
-
-      setOriginalData(userData);
-      setIsEditing(false);
+      await updateUser(userId, changes);
+      showToast("User updated successfully!", "success");
+      window.location.reload(); // 🔄 reload after success
     } catch (error) {
       console.error('Failed to update user:', error);
+      showToast("Failed to update user", "error");
     } finally {
       setUpdating(false);
     }
   };
+
 
   const handleResetPassword = () => {
     setEditUserModalOpen(true);
@@ -121,7 +126,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId }) => {
         minHeight: 430,
         mx: 'auto',
         mt: 6,
-        mb:6,
+        mb: 6,
         borderRadius: 4,
         overflow: 'hidden',
         position: 'relative',
