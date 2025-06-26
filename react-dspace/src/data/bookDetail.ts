@@ -61,7 +61,7 @@ export interface MetadataEntry {
   } 
 
   export interface PatchOperation {
-    op: 'replace' | 'remove' ;
+    op: 'replace' | 'remove' | 'add';
     path: string;
     value?: any; 
     from?: string; 
