@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { fetchItemInfo, patchItemMetadata } from "../../api/item";
 import Loader from "../loader/loader";
@@ -10,7 +10,11 @@ import {
     DialogTitle,
     DialogContent,
     DialogContentText,
-    DialogActions
+    DialogActions,
+    FormControl,
+    Select,
+    MenuItem,
+    SelectChangeEvent
 } from "@mui/material";
 import {
     Table,
@@ -32,7 +36,8 @@ import DownloadRoundedIcon from '@mui/icons-material/DownloadRounded';
 import { useNavigate } from "react-router-dom";
 import { ItemInfo } from "../../data/itemFormData";
 import { iconsImgs } from "../../utils/images";
- 
+import { fetchMetadataFields, MetadataField } from "../../api/metadata";
+
 
 const EditItem = () => {
     const { itemId } = useParams<{ itemId: string }>();
@@ -45,7 +50,7 @@ const EditItem = () => {
     } | null>(null);
     const [originalItemInfo, setOriginalItemInfo] = useState<ItemInfo | null>(null);
     const [editedValue, setEditedValue] = useState<string>("");
-    const [pendingUpdates, setPendingUpdates] = useState<any[]>([]);
+    const [pendingUpdates, setPendingUpdates] = useState<PatchOperation[]>([]);
     const [originalBitstreams, setOriginalBitstreams] = useState<Bitstream[]>([]);
     const [thumbnailBitstreams, setThumbnailBitstreams] = useState<Bitstream[]>([]);
     const [pendingBitstreamDeletions, setPendingBitstreamDeletions] = useState<string[]>([]);
@@ -53,6 +58,18 @@ const EditItem = () => {
     const Navigate = useNavigate();
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [bitstreamToDelete, setBitstreamToDelete] = useState<Bitstream | null>(null);
+    const [showAddMetadataTable, setShowAddMetadataTable] = useState(false);
+    const [metadataSchema, setMetadataSchema] = useState<MetadataField[]>([]);
+    const [selectedSchemaId, setSelectedSchemaId] = useState<any>("");
+    const [totalElements, setTotalElements] = useState(0);
+    const rowsPerPage = 10;
+    const [page, setPage] = useState<number>(1);
+    const [newMetadataValue, setNewMetadataValue] = useState("");
+    const menuRef = useRef<HTMLDivElement>(null);
+
+    const authToken = localStorage.getItem("authToken") || "";
+
+
     useEffect(() => {
         const fetchItemData = async () => {
             if (!itemId) return;
@@ -85,7 +102,7 @@ const EditItem = () => {
         const originalValue = itemInfo.metadata[key][index].value;
 
         if (editedValue !== originalValue) {
-            const newUpdate = {
+            const newUpdate: PatchOperation = {
                 op: "replace",
                 path: `/metadata/${key}/${index}`,
                 value: {
@@ -120,7 +137,7 @@ const EditItem = () => {
     const handleDeleteClick = (key: string, index: number) => {
         if (!itemInfo) return;
 
-        const deleteOperation = {
+        const deleteOperation: PatchOperation = {
             op: "remove",
             path: `/metadata/${key}/${index}`
         };
@@ -260,6 +277,100 @@ const EditItem = () => {
         setDeletedBitstreams([]);
     };
 
+    const handleShowTable = () => {
+        setShowAddMetadataTable(!showAddMetadataTable);
+    }
+    const handleMetadataChange = (event: SelectChangeEvent<string>) => {
+        setSelectedSchemaId(event.target.value);
+    };
+
+    useEffect(() => {
+        const loadMetadataFields = async () => {
+            try {
+                const fields = await fetchMetadataFields("", authToken, page - 1, rowsPerPage, "");
+
+                if (page === 1) {
+                    setMetadataSchema(fields.metadatafields);
+                } else {
+                    setMetadataSchema(prev => [...prev, ...fields.metadatafields]);
+                }
+
+                setTotalElements(fields.totalPages); 
+            } catch (err) {
+                setError("Failed to fetch metadata fields.");
+            }
+        };
+
+        loadMetadataFields();
+    }, [authToken, page]);
+
+    const handleAddMetadata = async () => {
+        if (!selectedSchemaId || !newMetadataValue.trim()) {
+            setError("Metadata field and value are required.");
+            return;
+        }
+
+        try {
+            const selectedSchema = metadataSchema.find(schema => schema.id === selectedSchemaId);
+            if (!selectedSchema) return;
+
+            const metadataKey = `${selectedSchema._embedded?.schema?.prefix}.${selectedSchema.element}` +
+                (selectedSchema.qualifier ? `.${selectedSchema.qualifier}` : '');
+
+            const addOperation: PatchOperation = {
+                op: "add",
+                path: `/metadata/${metadataKey}/-`,
+                value: {
+                    value: newMetadataValue,
+                    language: null,
+                    authority: null,
+                    confidence: -1
+                }
+            };
+
+            setPendingUpdates([...pendingUpdates, addOperation]);
+
+            const updatedMetadata = { ...itemInfo!.metadata };
+            if (!updatedMetadata[metadataKey]) {
+                updatedMetadata[metadataKey] = [];
+            }
+            updatedMetadata[metadataKey].push({
+                value: newMetadataValue,
+                // language: null,
+                // authority: null,
+                // confidence: -1
+            });
+
+            setItemInfo({
+                ...itemInfo!,
+                metadata: updatedMetadata
+            });
+
+            setNewMetadataValue("");
+            setSelectedSchemaId("");
+            setShowAddMetadataTable(false);
+            setError(null);
+        } catch (err) {
+            console.error("Error adding metadata:", err);
+            setError("Failed to add metadata field.");
+        }
+    };
+
+    const fetchNextPage = () => {
+        setPage((prevPage) => prevPage + 1);
+    };
+
+    const handleMenuScroll = (event: React.UIEvent<HTMLDivElement>) => {
+        const list = event.target as HTMLDivElement;
+        const scrollThreshold = 10;
+
+        if (list.scrollTop + list.clientHeight >= list.scrollHeight - scrollThreshold) {
+            if (page * rowsPerPage < totalElements) {
+                fetchNextPage();
+            }
+        }
+    };
+
     if (loading && !editingField) {
         return <Loader />;
     }
@@ -269,14 +380,14 @@ const EditItem = () => {
     }
 
     return (
-        <Container sx={{mt: 2, mb: 2}} >
+        <Container sx={{ mt: 2, mb: 2 }} >
             <Container sx={{ marginBottom: "30px" }} >
                 <Box
                     sx={{
                         display: "flex",
                         justifyContent: "space-between",
                         alignItems: "center",
-                        marginBottom: "20px", // Optional, for spacing below the row
+                        marginBottom: "20px",
                     }}
                     className="header_epeople"
                 >
@@ -302,8 +413,85 @@ const EditItem = () => {
                         >
                             Discard
                         </Button>
+                        <Button
+                            variant="contained"
+                            color="success"
+                            onClick={handleShowTable}
+                            sx={{ marginLeft: "10px" }}
+                        >
+                            Add {<img className="table_icon_add" src={iconsImgs.add} alt="Add" />}
+                        </Button>
                     </Box>
                 </Box>
+                {showAddMetadataTable && (
+                    <TableContainer component={Paper} sx={{
+                        border: "1px solid #ddd",
+                        borderRadius: "8px",
+                        overflow: "hidden",
+                        marginTop: 2,
+                    }}>
+                        <Table>
+                            <TableHead>
+                                <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
+                                    <TableCell><b>Field</b></TableCell>
+                                    <TableCell><b>Values</b></TableCell>
+                                    <TableCell><b>Actions</b></TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                <TableRow>
+                                    <TableCell>
+                                        <FormControl fullWidth sx={{}}>
+                                            <Select
+                                                value={selectedSchemaId}
+                                                onChange={handleMetadataChange}
+                                                displayEmpty
+                                                MenuProps={{
+                                                    PaperProps: {
+                                                        ref: menuRef,
+                                                        onScroll: handleMenuScroll,
+                                                        style: { maxHeight: 300 },
+                                                    },
+                                                }}
+                                            >
+                                                <MenuItem value="" disabled>
+                                                    Select Metadata Schema
+                                                </MenuItem>
+                                                {metadataSchema.map((schema) => (
+                                                    <MenuItem key={schema.id} value={schema.id}>
+                                                        {schema._embedded?.schema?.prefix}.{schema.element}
+                                                        {schema.qualifier ? `.${schema.qualifier}` : ''}
+                                                    </MenuItem>
+                                                ))}
+                                                {loading && page * rowsPerPage < totalElements && (
+                                                    <MenuItem disabled>Loading more...</MenuItem>
+                                                )}
+                                            </Select>
+                                        </FormControl>
+                                    </TableCell>
+                                    <TableCell >
+                                        <TextField
+                                            sx={{ marginTop: 2 }}
+                                            value={newMetadataValue}
+                                            onChange={(e) => setNewMetadataValue(e.target.value)}
+                                            fullWidth
+                                            placeholder="Enter value"
+                                            variant="outlined"
+                                            size="small"
+                                        />
+                                    </TableCell>
+                                    <TableCell>
+                                        <Button variant="contained" color="primary"
+                                            onClick={handleAddMetadata}
+                                        >
+                                            Add
+                                        </Button>
+                                    </TableCell>
+                                </TableRow>
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                )}
 
                 <TableContainer component={Paper} sx={{
                     border: "1px solid #ddd",
@@ -343,7 +531,7 @@ const EditItem = () => {
                                                         value={editedValue}
                                                         onChange={handleValueChange}
                                                         disabled={loading}
-                                                        sx={{ minWidth: 200,marginBottom: '0 !important' }}
+                                                        sx={{ minWidth: 200, marginBottom: '0 !important' }}
                                                     />
                                                 ) : (
                                                     <Typography
@@ -507,25 +695,25 @@ const EditItem = () => {
                     </TableBody>
                 </Table>
                 <Dialog
-                open={deleteModalOpen}
-                onClose={handleCancelDelete}
-            >
-                <DialogTitle>Confirm Delete</DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        Are you sure you want to delete the bitstream {" "}
-                        <strong>{bitstreamToDelete?.name}</strong>?
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCancelDelete} color="primary">
-                        Cancel
-                    </Button>
-                    <Button onClick={handleConfirmDelete} color="error">
-                        Delete
-                    </Button>
-                </DialogActions>
-            </Dialog>
+                    open={deleteModalOpen}
+                    onClose={handleCancelDelete}
+                >
+                    <DialogTitle>Confirm Delete</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText>
+                            Are you sure you want to delete the bitstream {" "}
+                            <strong>{bitstreamToDelete?.name}</strong>?
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleCancelDelete} color="primary">
+                            Cancel
+                        </Button>
+                        <Button onClick={handleConfirmDelete} color="error">
+                            Delete
+                        </Button>
+                    </DialogActions>
+                </Dialog>
             </Container>
         </Container>
     );
