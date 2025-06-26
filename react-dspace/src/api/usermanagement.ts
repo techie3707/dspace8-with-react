@@ -17,13 +17,13 @@ export interface EPerson {
 
 interface UserListResponse {
   _embedded: {
-      epersons: EPerson[];
+    epersons: EPerson[];
   };
-  page?: { 
-      size: number;
-      totalElements: number;
-      totalPages: number;
-      number: number;
+  page?: {
+    size: number;
+    totalElements: number;
+    totalPages: number;
+    number: number;
   };
 }
 const csrfToken = localStorage.getItem("csrfToken");
@@ -58,7 +58,7 @@ export const userList = async (page: number = 0, size: number = 10, query: strin
 export const removeUser = async (userId: string) => {
 
   try {
-   
+
     if (!csrfToken) {
       showToast("CSRF token is missing. Aborting delete request.", "error");
       return false;
@@ -112,12 +112,12 @@ export const addUser = async (userData: object) => {
   }
 };
 export const getUserById = async (userId: string, authToken: string) => {
-  try { 
-    const csrfToken = getCsrfToken() ?? ""; 
+  try {
+    const csrfToken = getCsrfToken() ?? "";
     const response = await fetch(`${siteConfig.apiEndpoint}/api/eperson/epersons/${userId}`, {
       method: "GET",
       headers: {
-        "X-XSRF-TOKEN": csrfToken, 
+        "X-XSRF-TOKEN": csrfToken,
         Authorization: authToken,
       },
     });
@@ -134,9 +134,6 @@ export const getUserById = async (userId: string, authToken: string) => {
 };
 export const updateUser = async (userId: string, userData: Record<string, any>) => {
   try {
-    if (!authToken || !csrfToken) {
-      throw new Error("Missing authentication tokens");
-    }
 
     const patchPayload: any[] = [];
 
@@ -162,21 +159,27 @@ export const updateUser = async (userId: string, userData: Record<string, any>) 
       });
     }
 
-    for (const patch of patchPayload) {
-      await axios.patch(`${siteConfig.apiEndpoint}/api/eperson/epersons/${userId}`, [patch], {
-        headers: {
-          'X-XSRF-TOKEN': csrfToken,
-          'Authorization': authToken || '',
-        },
-        withCredentials: true,
-      });
+    if (patchPayload.length === 0) return;
+
+    const csrfToken = await fetchCsrfToken();
+    if (!csrfToken) {
+      throw new Error("CSRF token not available. Login aborted.");
     }
-    showToast('User updated successfully!', 'success');
+
+    await axios.patch(`${siteConfig.apiEndpoint}/api/eperson/epersons/${userId}`, patchPayload, {
+      headers: {
+        'X-XSRF-TOKEN': csrfToken,
+        'Authorization': authToken || '',
+      },
+      withCredentials: true,
+    });
+
   } catch (error) {
     showToast("Failed to update user.", "error");
     throw error;
   }
 };
+
 
 
 

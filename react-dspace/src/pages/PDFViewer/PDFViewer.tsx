@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { Worker, Viewer } from "@react-pdf-viewer/core";
 import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
@@ -23,22 +23,6 @@ import { getAuthStatus } from "../../api/authApi";
 import { updateUserCart } from "../../api/cart";
 import { getAuthHeaders } from "../../api/searchApi";
 
-const parsePages = (input: string): number[] => {
-    const pages: number[] = [];
-    const parts = input.split(',');
-    parts.forEach((part) => {
-        if (part.includes('-')) {
-            const [start, end] = part.split('-').map(Number);
-            for (let i = start; i <= end; i++) {
-                pages.push(i);
-            }
-        } else {
-            pages.push(Number(part));
-        }
-    });
-    return pages;
-};
-
 const PDFViewer: React.FC = () => {
     const [pdfUrl, setPdfUrl] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
@@ -47,30 +31,23 @@ const PDFViewer: React.FC = () => {
     const uuid = searchParams.get("uuid");
     const itemId = searchParams.get("itemId");
 
-
     const [showForm, setShowForm] = useState(false);
     const [pageInput, setPageInput] = useState("");
-    const pageInputRef = React.useRef<HTMLInputElement>(null);
+    const pageInputRef = useRef<HTMLInputElement>(null);
+
+    const defaultLayoutPluginInstance = defaultLayoutPlugin();
+
     useEffect(() => {
         if (showForm && pageInputRef.current) {
             pageInputRef.current.focus();
         }
     }, [showForm]);
-    const defaultLayoutPluginInstance = defaultLayoutPlugin({
-        renderToolbar: (Toolbar) => (
-            <>
-                <Toolbar />
-                <OverlayControls />
-            </>
-        ),
-    });
 
     useEffect(() => {
         let pdfBlobUrl: string | null = null;
         const fetchPDF = async () => {
             try {
                 setLoading(true);
-
                 const headers = getAuthHeaders();
                 const response = await axios.get(
                     `${siteConfig.apiEndpoint}/api/core/bitstreams/${uuid}/content`,
@@ -79,8 +56,7 @@ const PDFViewer: React.FC = () => {
                         headers,
                     }
                 );
-
-                const pdfBlobUrl = URL.createObjectURL(response.data as Blob);
+                pdfBlobUrl = URL.createObjectURL(response.data as Blob);
                 setPdfUrl(pdfBlobUrl);
                 setLoading(false);
             } catch (error) {
@@ -143,14 +119,14 @@ const PDFViewer: React.FC = () => {
                         onClick={async () => {
                             const trimmedInput = pageInput.trim();
                             if (!trimmedInput) {
-                                console.error("Please enter valid pages.");
+                                alert("Please enter valid pages.");
                                 return;
                             }
 
                             try {
                                 const userID = await getAuthStatus();
                                 if (!userID) {
-                                    console.error("User not authenticated or no user ID found.");
+                                    alert("User not authenticated.");
                                     return;
                                 }
 
@@ -158,10 +134,12 @@ const PDFViewer: React.FC = () => {
                                 const bitstreamValue = `${itemId}_${uuid}_${today}_${trimmedInput}`;
                                 await updateUserCart(userID, bitstreamValue);
 
+                                alert("Document added successfully to your list.");
                                 setShowForm(false);
                                 setPageInput("");
                             } catch (error) {
-                                console.error("Error in Add to List operation:", error);
+                                console.error("Add to List error:", error);
+                                alert("Failed to add document. Please try again.");
                             }
                         }}
                     >
@@ -169,8 +147,6 @@ const PDFViewer: React.FC = () => {
                     </Button>
                 </Paper>
             </Slide>
-
-
         </Box>
     );
 
@@ -206,6 +182,7 @@ const PDFViewer: React.FC = () => {
                                 defaultScale={1.0}
                             />
                         )}
+                        <OverlayControls />
                     </Box>
                 </Worker>
             </Paper>

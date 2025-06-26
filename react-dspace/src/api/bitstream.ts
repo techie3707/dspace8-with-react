@@ -78,7 +78,6 @@ export const downloadPDF = async (
           "dc.Studentname": "Student Name",
           "dc.filenumber": "File Number",
           "dc.month": "Month",
-          "dc.identifier.uri": "Link"
         };
 
         const rows = Object.entries(map).reduce((html, [k, label]) => {
