@@ -1,25 +1,34 @@
 import React from "react";
-import "../../styles/about.css";
+import "./about.css";
 import { iconsImgs } from "../../utils/images";
 
 const About: React.FC = () => {
   return (
-    <>
-      <div className="career-container">
-     
-        <div className="career-content">
-          <h5>About Us</h5>
-          <h1>Rashtriya Ayurveda Vidyapeeth (RAV)</h1>
-          <div className="underline"></div>
-          <p>
-            an autonomous organization under the Ministry of Ayush, Govt. of India was constituted in 1988 with the objective of reviving classical practical and textual knowledge of Ayurveda through ancient Gurukula method of learning. The targeted learners here are the fresh graduates and post-graduates of Ayurveda still desirous of making themselves more proficient in classical Ayurvedic practices and principles.
-          </p>
-        </div>
+    <div className="about-container">
+      <div className="about-content">
+        <h5 className="about-subtitle">About Us</h5>
+        <h1 className="about-title">EasySmartDocs</h1>
+        <div className="about-underline"></div>
+        <p className="about-description">
+          <strong>EasySmartDocs</strong> is a powerful and intuitive Document Management System (DMS) solution
+          designed to simplify and streamline document handling across industries. We empower organizations to digitize, organize,
+          and manage documents securely while ensuring quick accessibility and version control.
+        </p>
+        <p className="about-description">
+          With our modern, scalable architecture and user-friendly interface, ESD adapts to sectors like:
+          <ul className="about-sectors">
+            <li><strong>Healthcare</strong>: Manage patient records, prescriptions, lab reports, and compliance documents efficiently.</li>
+            <li><strong>Education</strong>: Centralized management of academic records, certificates, and institutional archives.</li>
+            <li><strong>Legal</strong>: Secure storage of contracts, case files, and legal documentation with access control.</li>
+            <li><strong>Corporate & Government</strong>: Automate workflows, approvals, and policy documentation across departments.</li>
+          </ul>
+        </p>
+        <p className="about-description">
+          Our goal is to empower digital transformation with a secure, customizable, and collaborative document ecosystem.
+          Join us in making document management smarter with <strong>EasySmartDocs</strong>.
+        </p>
       </div>
-
-      
-     
-    </>
+    </div>
   );
 };
 

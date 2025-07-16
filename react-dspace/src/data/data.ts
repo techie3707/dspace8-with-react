@@ -16,8 +16,8 @@ export interface NavigationLink {
 
 
 export const siteConfig = {
-  name: "TechBets",
-  logo: "/assets/logo.png",
+  name: "EasySmartDocs",
+  logo: "/assets/images/easy.jpg",
   apiEndpoint: "http://localhost:8080/server"
 };
 
@@ -67,8 +67,9 @@ export const getNavigationLinks = (
     { id: 6, title: "Admin Search", image: iconsImgs.searchLight, path: "/adminSearch" },
     { id: 8, title: "systemInformation", image: iconsImgs.group, path: "/system-information" },
     {id: 9, title: "Processes", image: iconsImgs.report, path: "/processes"},
+    {id: 10, title: "Workflow", image: iconsImgs.registries, path: "/workflowSearch"},
      {  
-      id: 10, 
+      id: 11, 
       title: "Reports", 
       image: iconsImgs.report, 
       path: "/reports",

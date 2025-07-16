@@ -135,7 +135,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId }) => {
       {/* Gradient Header */}
       <Box
         sx={{
-          background: 'linear-gradient(135deg, #6e00ff, #b72eff)',
+          background: 'linear-gradient(135deg, #1e4cf2, #63c19e)', // Logo-matching gradient
           textAlign: 'center',
           p: 3,
           position: 'relative',
@@ -152,12 +152,19 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId }) => {
               right: 16,
               borderRadius: 3,
               textTransform: 'none',
-              background: 'linear-gradient(135deg, #6e00ff, #b72eff)',
-              boxShadow: 'none',
+              backgroundColor: 'white',
+              color: '#1e4cf2',
+              border: '1px solid #1e4cf2',
+              fontWeight: 600,
+              '&:hover': {
+                backgroundColor: '#f0f4ff',
+              },
             }}
           >
             Edit Profile
           </Button>
+
+
         )}
 
         <Avatar
@@ -167,7 +174,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId }) => {
             width: 72,
             height: 72,
             bgcolor: 'white',
-            color: '#6e00ff',
+            color: '#1e4cf2',
           }}
         >
           <Person />
@@ -176,6 +183,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId }) => {
           {userData.firstName} {userData.lastName}
         </Typography>
       </Box>
+
 
       {/* Profile Info */}
       <Box p={4}>
@@ -235,7 +243,10 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId }) => {
                   mr: 2,
                   borderRadius: 3,
                   textTransform: 'none',
-                  background: 'linear-gradient(135deg, #6e00ff, #b72eff)',
+                  background: 'linear-gradient(135deg, #1e4cf2, #63c19e)',
+                  '&:hover': {
+                    background: 'linear-gradient(135deg, #1c3dcc, #52b48f)',
+                  },
                 }}
               >
                 Save

@@ -1,0 +1,46 @@
+.about-container {
+  padding: 60px 20px;
+  background-color: #f9f9ff;
+  display: flex;
+  justify-content: center;
+}
+
+.about-content {
+  max-width: 900px;
+  text-align: center;
+}
+
+.about-subtitle {
+  color: #1e4cf2;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.about-title {
+  font-size: 2.8rem;
+  font-weight: bold;
+  color: #1e4cf2;
+  margin-top: 10px;
+}
+
+.about-underline {
+  width: 100px;
+  height: 4px;
+  background: linear-gradient(to right, #1e4cf2, #63c19e);
+  margin: 20px auto;
+  border-radius: 2px;
+}
+
+.about-description {
+  color: #333;
+  font-size: 1rem;
+  line-height: 1.8;
+  margin-top: 20px;
+}
+
+.about-sectors {
+  list-style: disc;
+  padding-left: 1.5rem;
+  text-align: left;
+  margin-top: 10px;
+}

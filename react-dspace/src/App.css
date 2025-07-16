@@ -189,10 +189,6 @@ button {
   border-left: none !important;
 }
 
-.search-container {
-  display: flex;
-  align-items: center;
-}
 
 .search-field .MuiInputBase-root {
   height: 40px !important;
@@ -239,12 +235,6 @@ button {
   width: 100%;
 }
 
-.search-container {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-}
-
 .search-container .form-container {
   display: flex;
   gap: 10px;
@@ -279,11 +269,6 @@ button {
   bottom: 8px;
 }
 
-.search-container {
-  margin-top: 16px;
-  display: flex;
-  align-items: center;
-}
 
 .search-field {
   width: 100%;
@@ -675,10 +660,10 @@ button {
     height: 3px;
     background: linear-gradient(
         to right,
-        rgba(255, 126, 95, 0) 0%,
-        #ff7e5f 40%,
-        #feb47b 60%,
-        rgba(254, 180, 123, 0) 100%
+        rgba(30, 76, 242, 0) 0%,
+        #1e4cf2 35%,
+        #63c19e 65%,
+        rgba(99, 193, 158, 0) 100%
     );
     border-radius: 0;
 }

@@ -95,6 +95,63 @@ const Carousel: React.FC = () => {
       ))}
 
       {/* Controls */}
+      {/* Controls */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: 16,
+          right: 16,
+          zIndex: 10,
+        }}
+      >
+        <IconButton
+          onClick={() => setIsPaused(!isPaused)}
+          sx={{
+            color: "#1e4cf2",
+            "&:hover": {
+              backgroundColor: "rgba(255, 255, 255, 0.3)",
+            },
+          }}
+        >
+          {isPaused ? <PlayArrow /> : <Pause />}
+        </IconButton>
+      </Box>
+
+      {/* Prev Button */}
+      <IconButton
+        onClick={goToPrevSlide}
+        sx={{
+          position: "absolute",
+          left: 16,
+          top: "50%",
+          transform: "translateY(-50%)",
+          color: "#1e4cf2",
+          "&:hover": {
+            backgroundColor: "rgba(255,255,255,0.3)",
+          },
+        }}
+      >
+        <ArrowBackIos />
+      </IconButton>
+
+      {/* Next Button */}
+      <IconButton
+        onClick={goToNextSlide}
+        sx={{
+          position: "absolute",
+          right: 16,
+          top: "50%",
+          transform: "translateY(-50%)",
+          color: "#1e4cf2",
+          "&:hover": {
+            backgroundColor: "rgba(255,255,255,0.3)",
+          },
+        }}
+      >
+        <ArrowForwardIos />
+      </IconButton>
+
+      {/* Progress Pills */}
       <Box
         sx={{
           position: "absolute",
@@ -102,65 +159,34 @@ const Carousel: React.FC = () => {
           width: "100%",
           display: "flex",
           justifyContent: "center",
-          alignItems: "center",
           gap: 1,
+          zIndex: 5,
         }}
       >
-        <IconButton
-          onClick={() => setIsPaused(!isPaused)}
-          sx={{
-            color: "red",
-          }}
-        >
-          {isPaused ? <PlayArrow /> : <Pause />}
-        </IconButton>
+        {ImageSlider.map((_, index) => {
+          const isActive = index === currentSlide;
+          const width = isActive && progress <= INTERVAL_DURATION
+            ? MIN_PILL_WIDTH + (MAX_PILL_WIDTH - MIN_PILL_WIDTH) * (progress / INTERVAL_DURATION)
+            : MIN_PILL_WIDTH;
 
-        <IconButton
-          onClick={goToPrevSlide}
-          sx={{
-            color: "red",
-            
-          }}
-        >
-          <ArrowBackIos />
-        </IconButton>
-
-        {/* Smooth Dot-to-Pill Transition */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          {ImageSlider.map((_, index) => {
-            const isActive = index === currentSlide;
-            const width =
-              isActive && progress <= INTERVAL_DURATION
-                ? MIN_PILL_WIDTH + (MAX_PILL_WIDTH - MIN_PILL_WIDTH) * (progress / INTERVAL_DURATION)
-                : MIN_PILL_WIDTH;
-
-            return (
-              <Box
-                key={index}
-                onClick={() => goToSlide(index)}
-                sx={{
-                  width: `${width}px`,
-                  height: "10px",
-                  borderRadius: "20px",
-                  backgroundColor: isActive ? "#ff1744" : "#ffffff",
-                  border: "1px solid #ff1744",
-                  cursor: "pointer",
-                  transition: "width 0.03s linear, background-color 0.3s ease",
-                }}
-              />
-            );
-          })}
-        </Box>
-
-        <IconButton
-          onClick={goToNextSlide}
-          sx={{
-            color: "red",
-          }}
-        >
-          <ArrowForwardIos />
-        </IconButton>
+          return (
+            <Box
+              key={index}
+              onClick={() => goToSlide(index)}
+              sx={{
+                width: `${width}px`,
+                height: "8px",
+                borderRadius: "20px",
+                backgroundColor: isActive ? "#1e4cf2" : "#fff",
+                border: "1px solid #1e4cf2",
+                cursor: "pointer",
+                transition: "width 0.05s linear, background-color 0.3s ease",
+              }}
+            />
+          );
+        })}
       </Box>
+
     </Box>
   );
 };
