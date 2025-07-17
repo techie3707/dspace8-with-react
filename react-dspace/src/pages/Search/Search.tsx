@@ -597,9 +597,9 @@ const Search: React.FC = () => {
                                     searchResults.map((result, index) => {
                                         const metadata = result._embedded?.indexableObject?.metadata;
                                         const type = result._embedded?.indexableObject?.type;
-                                    const title = metadata?.['dc.filenumber']?.[0]?.value || metadata?.['dc.filename']?.[0]?.value || metadata?.['dc.guruname']?.[0]?.value || 'Unknown Title';
+                                    const title = metadata?.['dc.title']?.[0]?.value || metadata?.['dc.filename']?.[0]?.value || metadata?.['dc.guruname']?.[0]?.value || 'Unknown Title';
                                         const uuid = result._embedded?.indexableObject?.uuid;
-                                        const abstract = metadata?.['dc.description.abstract']?.[0]?.value;
+                                        const abstract = metadata?.['dc.description']?.[0]?.value;
                                         const date = metadata?.['dc.date.issued']?.[0]?.value;
                                         const author = metadata?.['dc.contributor.author']?.[0]?.value;
                                         const publisher = metadata?.['dc.publisher']?.[0]?.value;
@@ -704,7 +704,7 @@ const Search: React.FC = () => {
 
                                                             {date && (
                                                                 <p style={{ margin: '0 0 10px 0', color: '#666', fontSize: '14px' }}>
-                                                                    ({publisher}, {date}) {author}
+                                                                    {date}
                                                                 </p>
                                                             )}
 
@@ -743,7 +743,7 @@ const Search: React.FC = () => {
                                     searchResults.map((result, index) => {
                                         const metadata = result._embedded?.indexableObject?.metadata;
                                         const type = result._embedded?.indexableObject?.type;
-                                    const title = metadata?.['dc.filenumber']?.[0]?.value || metadata?.['dc.filename']?.[0]?.value || metadata?.['dc.guruname']?.[0]?.value || 'Unknown Title';
+                                    const title = metadata?.['dc.title']?.[0]?.value || metadata?.['dc.filename']?.[0]?.value || metadata?.['dc.guruname']?.[0]?.value || 'Unknown Title';
                                         const uuid = result._embedded?.indexableObject?.uuid;
                                         const abstract = getMetadataValue(metadata, metadataFields.abstract);
                                         const date = getMetadataValue(metadata, metadataFields.date);
