@@ -58,7 +58,7 @@
   align-items: center;
 }
 .brand-logo {
-  width: 320px;
+  width: 150px;
   max-width: 100%;
   height: auto;
   object-fit: contain;
@@ -80,13 +80,13 @@
 
 @media screen and (max-width: 1024px) {
   .brand-logo {
-    width: 280px; 
+    width: 120px; 
   }
 }
 
 @media screen and (max-width: 768px) {
   .brand-logo {
-    width: 250px; 
+    width: 100px; 
   }
   .sidebar-toggler img {
     max-width: 25px;
@@ -96,7 +96,7 @@
 
 @media screen and (max-width: 480px) {
   .brand-logo {
-    width: 190px; 
+    width: 90px; 
   }
   .sidebar-toggler img {
     max-width: 20px;

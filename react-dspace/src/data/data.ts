@@ -16,9 +16,9 @@ export interface NavigationLink {
 
 
 export const siteConfig = {
-  name: "TechBets",
-  logo: "/assets/logo.png",
-  apiEndpoint: "http://localhost:8080/server"
+  name: "EasySmartDocs",
+  logo: "/assets/images/easy.jpg",
+  apiEndpoint: "http://192.168.29.211:8080/server"
 };
 
 
@@ -61,14 +61,14 @@ export const getNavigationLinks = (
   groupCategories: GroupCategories
 ): NavigationLink[] => {
   const links: NavigationLink[] = [
-    { id: 1, title: "Home", image: iconsImgs.home, path: "/" },
-    { id: 2, title: "User Management", image: iconsImgs.epople, path: "/UserManagement" },
-    { id: 4, title: "Groups", image: iconsImgs.group, path: "/groups" },
-    { id: 6, title: "Admin Search", image: iconsImgs.searchLight, path: "/adminSearch" },
-    { id: 8, title: "systemInformation", image: iconsImgs.group, path: "/system-information" },
-    {id: 9, title: "Processes", image: iconsImgs.report, path: "/processes"},
+    { id: 1, title: "User Management", image: iconsImgs.epople, path: "/UserManagement" },
+    { id: 2, title: "Groups", image: iconsImgs.group, path: "/groups" },
+    { id: 3, title: "Admin Search", image: iconsImgs.searchLight, path: "/adminSearch" },
+    { id: 4, title: "systemInformation", image: iconsImgs.group, path: "/system-information" },
+    {id: 5, title: "Processes", image: iconsImgs.report, path: "/processes"},
+    {id: 6, title: "Workflow", image: iconsImgs.registries, path: "/workflowSearch"},
      {  
-      id: 10, 
+      id: 11, 
       title: "Reports", 
       image: iconsImgs.report, 
       path: "/reports",

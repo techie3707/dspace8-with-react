@@ -30,7 +30,7 @@ export const formatSubjects = (subjects?: string[]): string[] => {
 
 export interface SearchFilters {
   [key: string]: string[] | boolean | null | undefined;
-  sectionname?: string[];
+  title?: string[];
   subject?: string[];
   date?: string[];
   fileType?: string[];
@@ -72,10 +72,10 @@ export const metadataFields = {
 
 export const sortOptions: SortOption[] = [
   { value: 'relevant', label: 'Most Relevant', apiValue: 'score,DESC' },
-  { value: 'title-asc', label: 'Title Ascending', apiValue: 'dc.guruname,ASC' },
-  { value: 'title-desc', label: 'Title Descending', apiValue: 'dc.guruname,DESC' },
-  { value: 'accessioned-asc', label: 'Accessioned Date Ascending', apiValue: 'dc.date.accessioned,ASC' },
-  { value: 'accessioned-desc', label: 'Accessioned Date Descending', apiValue: 'dc.date.accessioned,DESC' }
+  { value: 'title-asc', label: 'Title Ascending', apiValue: 'dc.title,ASC' },
+  { value: 'title-desc', label: 'Title Descending', apiValue: 'dc.title,DESC' },
+  { value: 'accessioned-asc', label: 'Accessioned Date Ascending', apiValue: 'dc.date.issued,ASC' },
+  { value: 'accessioned-desc', label: 'Accessioned Date Descending', apiValue: 'dc.date.issued,DESC' }
 ];
 
 export const resultsPerPageOptions: ResultsPerPageOption[] = [
@@ -88,10 +88,10 @@ export const resultsPerPageOptions: ResultsPerPageOption[] = [
 
 export const filterSections: FilterSection[] = [
   {
-    id: 'SectionName',
-    label: 'SectionName',
+    id: 'title',
+    label: 'Title',
     defaultExpanded: false,
-    fieldName: 'sectionname',
+    fieldName: 'title',
     filterType: 'checkbox'
   },
   {

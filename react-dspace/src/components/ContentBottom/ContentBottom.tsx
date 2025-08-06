@@ -37,7 +37,7 @@ const ContentBottom: React.FC = () => {
       {/* Left side: Copyright Text */}
       <Grid item xs="auto">
         <p tabIndex={0} style={{ margin: 0, whiteSpace: 'nowrap' }}>
-          © Copyright 2025 <b>TechBetsinfotech</b> All Rights Reserved.
+          © Copyright 2025 <b>EasySmartDocs</b> All Rights Reserved.
         </p>
       </Grid>
 

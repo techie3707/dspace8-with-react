@@ -121,13 +121,19 @@ const ContentTop: React.FC = () => {
     <div className="main-content-top flex items-center justify-between px-4 py-3 bg-white shadow-md">
       <div className="content-top-left flex items-center gap-3">
         {isAuthenticated && (
-          <button
-            type="button"
-            className="sidebar-toggler p-2 rounded-md hover:bg-gray-100 transition-colors"
-            onClick={toggleSidebar}
+          <Box
+            sx={{
+              display: { xs: 'block', sm: 'block', md: 'none' },
+            }}
           >
-            <img src={iconsImgs.menu} alt="Menu" className="w-6 h-6" />
-          </button>
+            <button
+              type="button"
+              className="sidebar-toggler p-2 rounded-md hover:bg-gray-100 transition-colors"
+              onClick={toggleSidebar}
+            >
+              <img src={iconsImgs.menu} alt="Menu" className="w-6 h-6" />
+            </button>
+          </Box>
         )}
         <img
           className="brand-logo w-10 h-10 cursor-pointer"
@@ -137,7 +143,6 @@ const ContentTop: React.FC = () => {
         />
       </div>
       <Box display="flex" alignItems="center" gap={2}>
-        {/* Desktop Navigation and Search (Visible >= 768px) */}
         <Box display={{ xs: "none", md: "flex" }} alignItems="center" gap={2}>
           <Box display="flex" alignItems="center" height={40}>
             {isSearchOpen ? (

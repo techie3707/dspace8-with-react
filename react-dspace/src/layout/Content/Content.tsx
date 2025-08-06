@@ -3,6 +3,8 @@ import "./Content.css";
 import ContentTop from '../../components/ContentTop/ContentTop';
 import ContentMain from '../../components/ContentMain/ContentMain';
 import ContentBottom from "../../components/ContentBottom/ContentBottom";
+import HeaderNavigation from "../../components/HeaderNavigation/HeaderNavigation";
+
 
 const Content: React.FC = () => {
   const location = useLocation();
@@ -12,6 +14,7 @@ const Content: React.FC = () => {
     <div className='main-content'>
       <div className='content'>
         {!hideHeaderFooter && <ContentTop />}
+        {!hideHeaderFooter && <HeaderNavigation />}
         <ContentMain />
       </div>
       {!hideHeaderFooter && <ContentBottom />}

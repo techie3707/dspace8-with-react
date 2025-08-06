@@ -70,7 +70,7 @@
     "yup": "^1.6.1"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "cross-env PORT=80 react-scripts start --port 80",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -102,6 +102,7 @@
     "@types/webpack": "^5.28.5",
     "@types/webpack-dev-server": "^4.7.1",
     "@types/yup": "^0.29.14",
+    "cross-env": "^7.0.3",
     "ts-node": "^10.9.2"
   }
 }

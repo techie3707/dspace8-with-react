@@ -89,14 +89,14 @@ const BookDetails: React.FC = () => {
         return metadataField && metadataField.length > 0 ? metadataField[0].value : null;
     };
 
-    const title = getMetadataValue('dc.filenumber') || getMetadataValue('dc.filename');
+    const title = getMetadataValue('dc.title');
     const subject = getMetadataValue('dc.subject');
-    const sectionname = getMetadataValue('dc.sectionname');
-    const Boxnumber = getMetadataValue('dc.boxnumber');
-    const Year = getMetadataValue('dc.yearrange');
+    const creator = getMetadataValue('dc.creator');
+    const description = getMetadataValue('dc.description');
+    const type = getMetadataValue('dc.type');
     const uri = getMetadataValue('dc.identifier.uri');
-    const guruname = getMetadataValue('dc.guruname');
-    const month = getMetadataValue('dc.month');
+    const format = getMetadataValue('dc.format');
+    const rights = getMetadataValue('dc.rights');
     const filetype = getMetadataValue('dc.filetype');
     const Studentname = getMetadataValue('dc.studentname');
     const shishyaname = getMetadataValue('dc.shishyaname');
@@ -135,10 +135,10 @@ const BookDetails: React.FC = () => {
                     <div className='col-lg-8 col-md-12 col-12'>
                         <table className='modern-table w-100'>
                             <tbody>
-                                {Boxnumber && (
+                                {description && (
                                     <tr>
-                                        <th>Box Number</th>
-                                        <td>{Boxnumber}</td>
+                                        <th>Description</th>
+                                        <td>{description}</td>
                                     </tr>
                                 )}
 
@@ -153,10 +153,10 @@ const BookDetails: React.FC = () => {
                                     </tr>
                                 )}
 
-                                {sectionname && (
+                                {creator && (
                                     <tr>
-                                        <th>Section Name</th>
-                                        <td>{sectionname}</td>
+                                        <th>Creator</th>
+                                        <td>{creator}</td>
                                     </tr>
                                 )}
 
@@ -167,24 +167,24 @@ const BookDetails: React.FC = () => {
                                     </tr>
                                 )}
 
-                                {guruname && (
+                                {format && (
                                     <tr>
-                                        <th>Guru Name</th>
-                                        <td>{guruname}</td>
+                                        <th>Format</th>
+                                        <td>{format}</td>
                                     </tr>
                                 )}
 
-                                {Year && (
+                                {type && (
                                     <tr>
-                                        <th>Year</th>
-                                        <td>{Year}</td>
+                                        <th>Type</th>
+                                        <td>{type}</td>
                                     </tr>
                                 )}
 
-                                {month && (
+                                {rights && (
                                     <tr>
-                                        <th>Month</th>
-                                        <td>{month}</td>
+                                        <th>Rights</th>
+                                        <td>{rights}</td>
                                     </tr>
                                 )}
 

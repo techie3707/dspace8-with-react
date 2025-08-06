@@ -21,8 +21,8 @@ import edit from "../assets/icons/edit.png";
 import remove from "../assets/icons/delete.png";
 import access from "../assets/icons/access-control.png";
 import person_one from "../assets/images/person_one.jpg";
-import brand_one from "../assets/images/rav-logo.png";
-import brand_two from "../assets/images/rav-logo-2.png";
+import brand_one from "../assets/images/easy.jpg";
+import brand_two from "../assets/images/esd.png";
 import home_main from "../assets/images/homepage.svg";
 import grid from "../assets/icons/grid.png";
 import list from "../assets/icons/list.png";
@@ -45,9 +45,10 @@ import preview from "../assets/images/about1.webp";
 import person from "../assets/images/person.png";
 import business_person from "../assets/images/business_person.png";
 import aboutBack from "../assets/images/aboutBack.jpg";
-import slide1 from "../assets/images/slider1.jpg";
-import slide2 from "../assets/images/slider2.jpg";
-import slide3 from "../assets/images/slider3.jpg";
+import slide1 from "../assets/images/1.avif";
+import slide2 from "../assets/images/2.jpg";
+import slide3 from "../assets/images/3.jpg";
+import slide4 from "../assets/images/4.avif";
 
 
 
@@ -109,7 +110,8 @@ interface About_US{
 export const ImageSlider: string[] = [
   slide1,
   slide2,
-  slide3
+  slide3,
+  slide4
 ];
 // Export typed objects
 export const iconsImgs: IconsImages = {
