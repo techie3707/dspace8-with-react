@@ -44,6 +44,7 @@ import SystemInformation from "../pages/system-information/system-information";
 import UserListTable from "../pages/reports/UserListWithGroups";
 import ItemReportTable from "../pages/reports/ItemListTable";
 import Processes from "../pages/processes/processes";
+import AssignRole from "../pages/assignRole/AssignRole";
 
 
 const ProtectedRoute = ({ element }: { element: React.ReactElement }) => {
@@ -99,6 +100,7 @@ const AppRoutes = () => {
         <Route path="/edit-Community-Collection" element={<EditCommunity />} />
         <Route path="/createPolicies/:uuid" element={<CreatePolicy />} />
         <Route path="/policies/:id" element={<Policies />} />
+        <Route path="/assignRole/:id" element={<AssignRole />} />
         <Route path="/edit-item/:itemId" element={<EditItem />} />
         <Route path="/add-bitstream/:itemId" element={<AddBitstream />} />
         <Route path="/workflowSearch" element={<Workflow />} />
