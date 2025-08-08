@@ -45,6 +45,7 @@ import UserListTable from "../pages/reports/UserListWithGroups";
 import ItemReportTable from "../pages/reports/ItemListTable";
 import Processes from "../pages/processes/processes";
 import AssignRole from "../pages/assignRole/AssignRole";
+import WorkflowTask from "../pages/workflow/workflowTask";
 
 
 const ProtectedRoute = ({ element }: { element: React.ReactElement }) => {
@@ -104,6 +105,7 @@ const AppRoutes = () => {
         <Route path="/edit-item/:itemId" element={<EditItem />} />
         <Route path="/add-bitstream/:itemId" element={<AddBitstream />} />
         <Route path="/workflowSearch" element={<Workflow />} />
+        <Route path="/WorkflowTask" element={<WorkflowTask />} />
         <Route path="/removeWorkflowItem/:id" element={<RemoveItem />} />
         <Route path="/resourcePolicy/:id" element={<ResourcePolicy />} />
         <Route path="/processes" element={<Processes />} />
