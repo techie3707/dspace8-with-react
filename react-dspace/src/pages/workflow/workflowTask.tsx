@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import { siteConfig } from '../../data/data';
+import { useEffect, useState } from 'react';
 import { Box, Button, Grid, IconButton, TextField } from '@mui/material';
 import { iconsImgs } from '../../utils/images';
 import {
@@ -16,7 +15,8 @@ import { FilterOption, Filtervalue } from '../../data/workflowdata';
 import '../Search/Search.css';
 import YearRangeSlider from '../Search/YearRangeSlider';
 import PaginationComponent from '../../components/Pagination/PaginationComponent';
-import { resultsPerPageOptions, sortOptions } from '../../data/searchData';
+import { resultsPerPageOptions } from '../../data/searchData';
+import { sortOptions } from '../../data/workflowTaskData';
 import { useNavigate } from 'react-router-dom';
 import Loader from '../loader/loader';
 import SecureImage from '../Search/SecureImage';
@@ -200,31 +200,69 @@ const WorkflowTask = () => {
     );
     const navigate = useNavigate();
 
+    const getFilterSuffix = (filterType: string): string => {
+        switch (filterType) {
+            case 'dateIssued': return ',equals';
+            case 'itemtype': return ',equals';
+            default: return ',authority';
+        }
+    };
+
+    const enhancedFilterOptions = FilterOption.map(option => ({
+        ...option,
+        suffix: getFilterSuffix(option.id)
+    }));
     const buildFilterParams = (currentFilters: Record<string, any>) => {
         const params: Record<string, string> = {};
-        
+
         Object.entries(currentFilters).forEach(([key, values]) => {
             if (values && values.length > 0) {
+                const filterOption = enhancedFilterOptions.find(opt => opt.id === key);
+                const suffix = filterOption?.suffix || getFilterSuffix(key);
+
                 if (key === 'dateIssued') {
                     const [startYear, endYear] = values[0].split(' - ');
-                    params[`f.${key}`] = `[${startYear} TO ${endYear}]`;
+                    params[`f.${key}`] = `[${startYear} TO ${endYear}]${suffix}`;
                 } else {
-                    params[`f.${key}`] = values.join(',');
+                    const formattedValues = Array.isArray(values)
+                        ? values.map(v => {
+                            const processedValue = key === 'itemtype'
+                                ? v.charAt(0).toUpperCase() + v.slice(1).toLowerCase()
+                                : key === 'namedresourcetype'
+                                    ? v.replace(/\s+/g, '').toLowerCase()
+                                    : key === 'submitter'
+                                        ? v.toLowerCase()
+                                        : v;
+                            return `${processedValue}${suffix}`;
+                        }).join(',')
+                        : (
+                            key === 'itemtype'
+                                ? `${values.charAt(0).toUpperCase() + values.slice(1).toLowerCase()}${suffix}`
+                                : key === 'namedresourcetype'
+                                    ? `${values.replace(/\s+/g, '').toLowerCase()}${suffix}`
+                                    : key === 'submitter'
+                                        ? `${values.toLowerCase()}${suffix}`
+                                        : `${values}${suffix}`
+                        );
+                    params[`f.${key}`] = formattedValues;
                 }
             }
         });
-        
+
         return params;
     };
 
     const fetchAllFacets = async (currentFilters: Record<string, any> = filters) => {
         try {
+            const filterParams = buildFilterParams(currentFilters);
+
             const params = {
                 query: inputValue,
                 page: page - 1,
                 size: size,
                 sort: getSortParam(),
-                ...buildFilterParams(currentFilters)
+                configuration: 'workflow',
+                ...filterParams
             };
 
             const [submitters, itemTypes, namedResourceTypes] = await Promise.all([
@@ -253,12 +291,15 @@ const WorkflowTask = () => {
         setIsLoading(true);
         try {
             const pageToFetch = resetPage ? 1 : currentPage;
+            const filterParams = buildFilterParams(currentFilters);
+
             const params = {
                 query: inputValue,
                 page: pageToFetch - 1,
                 size: itemsPerPage,
                 sort: sort,
-                ...buildFilterParams(currentFilters)
+                configuration: 'workflow',
+                ...filterParams
             };
 
             const result = await getWorkflowObjects(params) as WorkflowObjectsResponse;
@@ -267,7 +308,7 @@ const WorkflowTask = () => {
                 const items: EnhancedWorkflowItem[] = result._embedded.searchResult._embedded.objects.map(
                     obj => ({
                         ...obj._embedded.indexableObject.workflow,
-                        ...obj._embedded.indexableObject, 
+                        ...obj._embedded.indexableObject,
                         taskType: obj._embedded.indexableObject.type as "claimedtask" | "pooltask",
                         id: obj._embedded.indexableObject.id
                     })
@@ -357,19 +398,31 @@ const WorkflowTask = () => {
         });
     };
 
-    const updateFilter = (filterType: string, value: any, isChecked: boolean) => {
+    const updateFilter = (filterType: string, value: any, isChecked: boolean, authorityKey?: string) => {
         setFilters(prev => {
             let newValue;
             const section = FilterOption.find(s => s.id === filterType);
 
             if (!section) return prev;
 
+            const processedValue = filterType === 'itemtype'
+                ? value.charAt(0).toUpperCase() + value.slice(1).toLowerCase()
+                : value;
+
+            const filterValue = filterType === 'submitter' && authorityKey
+                ? authorityKey
+                : processedValue;
+
             if (section.filterType === 'range') {
-                newValue = isChecked ? [value] : [];
+                newValue = isChecked ? [filterValue] : [];
             } else {
                 newValue = isChecked
-                    ? [...(prev[filterType] || []), value]
-                    : (prev[filterType] || []).filter((item: string) => item !== value);
+                    ? [...(prev[filterType] || []), filterValue]
+                    : (prev[filterType] || []).filter((item: string) =>
+                        filterType === 'submitter'
+                            ? item !== authorityKey && item !== value
+                            : item.toLowerCase() !== processedValue.toLowerCase()
+                    );
             }
 
             const newFilters = {
@@ -380,7 +433,7 @@ const WorkflowTask = () => {
             fetchAllFacets(newFilters).then(() => {
                 handleSearch(newFilters, 1, size, true, getSortParam());
             });
-            
+
             return newFilters;
         });
     };
@@ -402,23 +455,38 @@ const WorkflowTask = () => {
 
                 return (
                     <ul style={{ listStyle: 'none', padding: '0' }}>
-                        {facets[section.id].map((option, index) => (
-                            <li key={index}>
-                                <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                                        <input
-                                            type="checkbox"
-                                            checked={(filters[section.id] || []).includes(option.label)}
-                                            onChange={(e) => updateFilter(section.id, option.label, e.target.checked)}
-                                        />
-                                        <span style={{ marginLeft: '10px' }}>{option.label}</span>
-                                    </div>
-                                    <span style={{ backgroundColor: '#eee', padding: '2px 5px', borderRadius: '33px' }}>
-                                        {option.count}
-                                    </span>
-                                </label>
-                            </li>
-                        ))}
+                        {facets[section.id].map((option, index) => {
+                            const displayLabel = section.id === 'itemtype'
+                                ? option.label.charAt(0).toUpperCase() + option.label.slice(1).toLowerCase()
+                                : option.label;
+                            const isChecked = section.id === 'submitter'
+                                ? (filters[section.id] || []).includes(option.authorityKey) ||
+                                (filters[section.id] || []).includes(option.label)
+                                : (filters[section.id] || []).includes(option.label);
+
+                            return (
+                                <li key={index}>
+                                    <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                                            <input
+                                                type="checkbox"
+                                                checked={isChecked}
+                                                onChange={(e) => updateFilter(
+                                                    section.id,
+                                                    option.label,
+                                                    e.target.checked,
+                                                    option.authorityKey ?? undefined
+                                                )}
+                                            />
+                                            <span style={{ marginLeft: '10px' }}>{displayLabel}</span>
+                                        </div>
+                                        <span style={{ backgroundColor: '#eee', padding: '2px 5px', borderRadius: '33px' }}>
+                                            {option.count}
+                                        </span>
+                                    </label>
+                                </li>
+                            );
+                        })}
 
                         {facets[section.id].length % facetPagination[section.id]?.size === 0 && (
                             <button
@@ -496,7 +564,7 @@ const WorkflowTask = () => {
                 <div className='filters-and-setting'>
                     <div className="filters col-3">
                         <div className="Zns0ac"><span className="I75YIf">Filter by</span></div>
-                        {FilterOption.map(section => {
+                        {enhancedFilterOptions.map(section => {
                             const shouldShowSection =
                                 section.filterType === 'range' ||
                                 (section.filterType === 'checkbox' && facets[section.id]?.length > 0);
@@ -785,7 +853,7 @@ const WorkflowTask = () => {
                                                                 }}
                                                                 title='Approve'
                                                             >
-                                                                <img className="itemh_icon" src={iconsImgs.edit} alt="Edit" />
+                                                                <img className="itemh_icon" src={iconsImgs.approved} alt="Edit" />
                                                             </IconButton>
                                                             <IconButton
                                                                 className='btn_table'
@@ -813,7 +881,7 @@ const WorkflowTask = () => {
                                                                 }}
                                                                 title='Return To Pool'
                                                             >
-                                                                <img className="itemh_icon" src={iconsImgs.group_icon_black} alt="Supervision" />
+                                                                <img className="itemh_icon" src={iconsImgs.return1} alt="Supervision" />
                                                             </IconButton>
                                                         </>
                                                     )}
@@ -886,7 +954,7 @@ const WorkflowTask = () => {
                                                                 }}
                                                                 title='Claim'
                                                             >
-                                                                <img className="itemh_icon" src={iconsImgs.edit} alt="Edit" />
+                                                                <img className="itemh_icon" src={iconsImgs.complain} alt="complain" />
                                                             </IconButton>
                                                             <IconButton
                                                                 className='btn_table'
@@ -916,7 +984,7 @@ const WorkflowTask = () => {
                                                                 }}
                                                                 title='Approve'
                                                             >
-                                                                <img className="itemh_icon" src={iconsImgs.edit} alt="Edit" />
+                                                                <img className="itemh_icon" src={iconsImgs.approved} alt="Edit" />
                                                             </IconButton>
                                                             <IconButton
                                                                 className='btn_table'
@@ -944,7 +1012,7 @@ const WorkflowTask = () => {
                                                                 }}
                                                                 title="Return To Pool"
                                                             >
-                                                                <img className="itemh_icon" src={iconsImgs.group_icon_black} alt="Supervision" />
+                                                                <img className="itemh_icon" src={iconsImgs.return1} alt="Supervision" />
                                                             </IconButton>
                                                         </>
                                                     )}

@@ -131,3 +131,16 @@ export interface WorkflowItem {
     };
   };
 }
+export interface SortOption {
+  value: string;
+  label: string;
+  apiValue: string;
+}
+
+export const sortOptions: SortOption[] = [
+  { value: 'relevant', label: 'Most Relevant', apiValue: 'lastModified,DESC' },
+  { value: 'title-asc', label: 'Title Ascending', apiValue: 'dc.title,ASC' },
+  { value: 'title-desc', label: 'Title Descending', apiValue: 'dc.title,DESC' },
+  { value: 'date-asc', label: 'Date Issued Ascending', apiValue: 'dc.date.issued,ASC' },
+  { value: 'date-desc', label: 'Date Issued Descending', apiValue: 'dc.date.issued,DESC' },
+];

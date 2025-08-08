@@ -15,17 +15,21 @@ export interface WorkflowSearchParams {
 export const getWorkflowObjects = async (params: WorkflowSearchParams = {}) => {
   const queryParams = new URLSearchParams();
   
-  queryParams.append('sort', params.sort || 'lastModified,DESC');
-  queryParams.append('page', (params.page || 0).toString());
-  queryParams.append('size', (params.size || 10).toString());
-  queryParams.append('configuration', params.configuration || 'workflow');
+  // Add standard params
+  if (params.sort) queryParams.append('sort', params.sort);
+  if (params.page !== undefined) queryParams.append('page', params.page.toString());
+  if (params.size) queryParams.append('size', params.size.toString());
+  if (params.configuration) queryParams.append('configuration', params.configuration);
+  if (params.query) queryParams.append('query', params.query);
   
+ Object.keys(params).forEach(key => {
+  if (key.startsWith('f.')) {
+    queryParams.append(key, (params as Record<string, any>)[key]);
+  }
+});
+
   queryParams.append('embed', 'thumbnail');
   queryParams.append('embed', 'item/thumbnail');
-
-  if (params.query) {
-    queryParams.append('query', params.query);
-  }
 
   try {
     const response = await axios.get(
@@ -66,6 +70,13 @@ const getWorkflowFacet = async (facetName: string, params: WorkflowSearchParams 
   if (params.query) {
     queryParams.append('query', params.query);
   }
+
+  // Add filter params (starting with 'f.')
+  Object.keys(params).forEach(key => {
+    if (key.startsWith('f.')) {
+      queryParams.append(key, (params as Record<string, any>)[key]);
+    }
+  });
 
   try {
     const response = await axios.get(

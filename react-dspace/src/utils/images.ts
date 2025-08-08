@@ -50,7 +50,9 @@ import slide2 from "../assets/images/2.jpg";
 import slide3 from "../assets/images/3.jpg";
 import slide4 from "../assets/images/4.avif";
 import edit_role from "../assets/icons/edit_role.png";
-
+import approved from "../assets/icons/approved.png";
+import complain from "../assets/icons/complain.png";
+import return1 from "../assets/icons/return.png";
 
 
 
@@ -96,6 +98,9 @@ interface IconsImages {
     whiteEditIcon: string;
     group_icon_black:string;
     aboutBack: string
+    approved: string
+    complain: string
+    return1: string
 }
 
 
@@ -118,7 +123,7 @@ export const ImageSlider: string[] = [
 ];
 // Export typed objects
 export const iconsImgs: IconsImages = {
-    alert, bell, bills, budget, card, check, empty_check, gears, home, menu, plane, plus, report, search, searchLight, user, wallet, wealth, login, edit, edit_role, remove, access, list, grid, arrow, back_btn, batchimport, group, epople, registries, collection, community , collectionname, save, cancel, add ,minus,whiteEditIcon,group_icon_black,aboutBack
+    alert, bell, bills, budget, card, check, empty_check, gears, home, menu, plane, plus, report, search, searchLight, user, wallet, wealth, login, edit, edit_role, remove, access, list, grid, arrow, back_btn, batchimport, group, epople, registries, collection, community , collectionname, save, cancel, add ,minus,whiteEditIcon,group_icon_black,aboutBack, approved, complain ,return1
 };
 
 export const personsImgs: PersonsImages = {
