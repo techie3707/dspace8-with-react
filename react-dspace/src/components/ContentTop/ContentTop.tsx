@@ -283,6 +283,23 @@ const ContentTop: React.FC = () => {
                   My List
                 </MenuItem>
                 <MenuItem
+                  onClick={() => {
+                    if (userId) {
+                      navigate(`/WorkflowTask`);
+                      handleClose();
+                    } else {
+                      showToast("User ID not available", "error");
+                    }
+                  }}
+                  sx={{
+                    '&:hover': {
+                      bgcolor: '#F3F4F6',
+                    },
+                  }}
+                >
+                  WorkflowTask
+                </MenuItem>
+                <MenuItem
                   onClick={handleLogout}
                   sx={{
                     '&:hover': {

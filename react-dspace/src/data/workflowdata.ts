@@ -82,6 +82,7 @@ export interface Filtervalue {
   defaultExpanded: boolean;
   fieldName: string;
   filterType: 'checkbox' | 'range';
+  suffix?: string; 
 }
 
 export const FilterOption: Filtervalue[] = [
@@ -90,35 +91,40 @@ export const FilterOption: Filtervalue[] = [
     label: 'Status',
     defaultExpanded: true,
     fieldName: 'namedresourcetype',
-    filterType: 'checkbox'
+    filterType: 'checkbox',
+    suffix: ',authority'
   },
   {
     id: 'submitter',
     label: 'Submitter',
     defaultExpanded: false,
     fieldName: 'submitter',
-    filterType: 'checkbox'
+    filterType: 'checkbox',
+    suffix: ',authority'
   },
   {
-    id: 'itemType',
+    id: 'itemtype',
     label: 'Item Type',
     defaultExpanded: false,
     fieldName: 'itemtype',
-    filterType: 'checkbox'
+    filterType: 'checkbox',
+    suffix: ',equals'
   },
   {
-    id: 'date',
+    id: 'dateIssued',
     label: 'Date',
     defaultExpanded: false,
     fieldName: 'dateIssued',
-    filterType: 'range'
+    filterType: 'range',
+    suffix: ',equals'
   },
   {
     id: 'supervisedBy',
     label: 'Supervised By',
     defaultExpanded: false,
     fieldName: 'supervisedBy',
-    filterType: 'checkbox'
+    filterType: 'checkbox',
+    suffix: ',authority'
   }
 ];
 

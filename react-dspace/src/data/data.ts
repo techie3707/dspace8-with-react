@@ -18,7 +18,7 @@ export interface NavigationLink {
 export const siteConfig = {
   name: "EasySmartDocs",
   logo: "/assets/images/easy.jpg",
-  apiEndpoint: "http://192.168.29.211:8080/server"
+  apiEndpoint: "http://localhost:8080/server"
 };
 
 

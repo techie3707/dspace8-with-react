@@ -320,6 +320,10 @@ const EditCommunity = () => {
         navigate(`/Policies/${collectionUuid}`);
     };
 
+    const handleAssingRole = (collectionUuid: string) => {
+        navigate(`/assignRole/${collectionUuid}`);
+    }
+
     const handleCommunityPolicyClick = (communityUuid: string) => {
         navigate(`/Policies/${communityUuid}`);
     };
@@ -550,7 +554,15 @@ const EditCommunity = () => {
                                                                                         onClick={() => handleCollectionPolicyClick(community.uuid, collection.uuid)}
                                                                                         title="CollectionPolicy"
                                                                                     >
-                                                                                        <img className="table_icon" src={iconsImgs.access} alt="Remove" />
+                                                                                        <img className="table_icon" src={iconsImgs.access} alt="CollectionPolicy" />
+                                                                                    </IconButton>
+                                                                                    <IconButton
+                                                                                        className='btn_table'
+                                                                                        color="secondary"
+                                                                                        onClick={() => handleAssingRole( collection.uuid)}
+                                                                                        title="Assing Role"
+                                                                                    >
+                                                                                        <img className="table_icon" src={iconsImgs.edit_role} alt="Assing Role" />
                                                                                     </IconButton>
                                                                                 </Box>
                                                                             )}
