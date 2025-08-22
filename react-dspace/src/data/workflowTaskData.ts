@@ -1,3 +1,28 @@
+// workflowTaskInterfaces.ts
+
+export interface SortOption {
+  value: string;
+  label: string;
+  apiValue: string;
+}
+
+export interface FacetResponse {
+  _embedded?: {
+    values?: FacetValue[];
+  };
+}
+
+export interface FacetValue {
+  label: string;
+  count: number;
+  authorityKey: string | null;
+  _links: {
+    search: {
+      href: string;
+    };
+  };
+}
+
 export interface WorkflowObjectsResponse {
   _embedded: {
     searchResult: {
@@ -77,8 +102,7 @@ export interface WorkflowItem {
             uuid: string;
             metadata: {
               'dc.title': { value: string }[];
-              // 'dc.source'?: { value: string }[];
-              [key: string]: { value: string }[]; 
+              [key: string]: { value: string }[];
             };
             accessConditions: any[];
             format?: {
@@ -104,7 +128,7 @@ export interface WorkflowItem {
           'dc.contributor.author'?: { value: string }[];
           'dc.publisher'?: { value: string }[];
           'dc.description.abstract'?: { value: string }[];
-          [key: string]: { value: string }[] | undefined; // More flexible metadata
+          [key: string]: { value: string }[] | undefined;
         };
         traditionalpagetwo?: Record<string, any>;
       };
@@ -131,10 +155,9 @@ export interface WorkflowItem {
     };
   };
 }
-export interface SortOption {
-  value: string;
-  label: string;
-  apiValue: string;
+
+export interface EnhancedWorkflowItem extends WorkflowItem {
+  taskType: "claimedtask" | "pooltask";
 }
 
 export const sortOptions: SortOption[] = [

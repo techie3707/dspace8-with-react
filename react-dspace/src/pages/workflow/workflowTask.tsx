@@ -16,164 +16,18 @@ import '../Search/Search.css';
 import YearRangeSlider from '../Search/YearRangeSlider';
 import PaginationComponent from '../../components/Pagination/PaginationComponent';
 import { resultsPerPageOptions } from '../../data/searchData';
-import { sortOptions } from '../../data/workflowTaskData';
+import { 
+  SortOption,
+  FacetResponse,
+  FacetValue,
+  WorkflowObjectsResponse,
+  WorkflowItem,
+  EnhancedWorkflowItem,
+  sortOptions
+} from '../../data/workflowTaskData';
 import { useNavigate } from 'react-router-dom';
 import Loader from '../loader/loader';
 import SecureImage from '../Search/SecureImage';
-
-interface FacetResponse {
-    _embedded?: {
-        values?: FacetValue[];
-    };
-}
-
-interface FacetValue {
-    label: string;
-    count: number;
-    authorityKey: string | null;
-    _links: {
-        search: {
-            href: string;
-        };
-    };
-}
-
-export interface WorkflowObjectsResponse {
-    _embedded: {
-        searchResult: {
-            _embedded: {
-                objects: Array<{
-                    _embedded: {
-                        indexableObject: {
-                            id: number;
-                            type: "claimedtask" | "pooltask";
-                            workflow: WorkflowItem;
-                        }
-                    };
-                }>;
-            };
-            page: {
-                totalElements: number;
-                totalPages: number;
-                number: number;
-                size: number;
-            };
-        };
-    };
-    _links: {
-        self: {
-            href: string;
-        };
-    };
-}
-
-export interface WorkflowItem {
-    id: number;
-    type: string;
-    lastModified?: string;
-    _links: {
-        self: { href: string };
-        step?: { href: string };
-        action?: { href: string };
-        owner?: { href: string };
-        workflowitem?: { href: string };
-    };
-    _embedded: {
-        owner?: {
-            id: string;
-            uuid: string;
-            name: string;
-            email: string;
-            metadata?: {
-                "eperson.firstname"?: { value: string }[];
-                "eperson.lastname"?: { value: string }[];
-            };
-            _links?: {
-                groups: { href: string };
-                self: { href: string };
-            };
-        };
-        action?: {
-            id: string;
-            options: string[];
-            type: string;
-            advanced: boolean;
-            _links?: {
-                self: { href: string };
-            };
-        };
-        workflowitem: {
-            id: number;
-            lastModified: string;
-            sections: {
-                license?: {
-                    url: string;
-                    acceptanceDate: string;
-                    granted: boolean;
-                };
-                upload?: {
-                    primary: null | string;
-                    files: {
-                        uuid: string;
-                        metadata: {
-                            'dc.title': { value: string }[];
-                            [key: string]: { value: string }[];
-                        };
-                        accessConditions: any[];
-                        format?: {
-                            id: number;
-                            shortDescription: string;
-                            mimetype: string;
-                            description?: string;
-                            supportLevel?: string;
-                        };
-                        sizeBytes?: number;
-                        checkSum?: {
-                            checkSumAlgorithm: string;
-                            value: string;
-                        };
-                        url?: string;
-                    }[];
-                };
-                collection?: string;
-                traditionalpageone?: {
-                    'dc.title'?: { value: string }[];
-                    'dc.type'?: { value: string }[];
-                    'dc.date.issued'?: { value: string }[];
-                    'dc.contributor.author'?: { value: string }[];
-                    'dc.publisher'?: { value: string }[];
-                    'dc.description.abstract'?: { value: string }[];
-                    [key: string]: { value: string }[] | undefined;
-                };
-                traditionalpagetwo?: Record<string, any>;
-            };
-            _links: {
-                item: { href: string };
-                collection?: { href: string };
-                submissionDefinition?: { href: string };
-                step?: { href: string };
-                submitter?: { href: string };
-                self?: { href: string };
-            };
-            _embedded?: {
-                submissionDefinition?: {
-                    id: string;
-                    name: string;
-                    isDefault: boolean;
-                    _links?: {
-                        collections: { href: string };
-                        sections: { href: string };
-                        self: { href: string };
-                    };
-                };
-            };
-        };
-    };
-}
-
-interface EnhancedWorkflowItem extends WorkflowItem {
-    taskType: "claimedtask" | "pooltask";
-}
 
 const WorkflowTask = () => {
     const [inputValue, setInputValue] = useState<string>('');
