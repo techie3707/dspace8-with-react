@@ -9,6 +9,8 @@ import {
   FormControl,
   SelectChangeEvent,
   CircularProgress,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
 import { uploadBatchImport } from "../../api/batchImport";
 import { fetchCollections } from "../../api/collection";
@@ -21,6 +23,8 @@ const BatchImport: React.FC = () => {
   const [selectedCollection, setSelectedCollection] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [validationChecked, setValidationChecked] = useState(false);
+  const [workflowChecked, setWorkflowChecked] = useState(false);
   const navigate = useNavigate();
   
   const { groupCategories, isAdministrator } = useUserGroups();
@@ -38,7 +42,7 @@ const BatchImport: React.FC = () => {
       group.name.replace('_Admin', '')
     );
 
-const allAccessGroups = Array.from(new Set([...uploadGroups, ...adminGroups]));    
+    const allAccessGroups = Array.from(new Set([...uploadGroups, ...adminGroups]));    
     return collections.filter(collection => 
       allAccessGroups.includes(collection.name)
     );
@@ -75,7 +79,42 @@ const allAccessGroups = Array.from(new Set([...uploadGroups, ...adminGroups]));
     setIsLoading(true);
 
     try {
-      const response = await uploadBatchImport(selectedCollection, selectedFile);
+      let properties;
+      
+      if (!validationChecked && !workflowChecked) {
+        // Both unchecked
+        properties = [
+          { name: "--add" },
+          { name: "--zip", value: selectedFile.name },
+          { name: "--collection", value: selectedCollection }
+        ];
+      } else if (validationChecked && !workflowChecked) {
+        // Only validation checked
+        properties = [
+          { name: "--add" },
+          { name: "--zip", value: selectedFile.name },
+          { name: "--collection", value: selectedCollection },
+          { name: "-v", value: true }
+        ];
+      } else if (!validationChecked && workflowChecked) {
+        // Only workflow checked
+        properties = [
+          { name: "--add" },
+          { name: "--zip", value: selectedFile.name },
+          { name: "--collection", value: selectedCollection },
+          { name: "-w", value: true }
+        ];
+      } else {
+        // Both checked
+        properties = [
+          { name: "-a", value: true },
+          { name: "-c", value: selectedCollection },
+          { name: "-z", value: selectedFile.name },
+          { name: "-w", value: true }
+        ];
+      }
+
+      const response = await uploadBatchImport(selectedCollection, selectedFile, properties);
 
       if (response.status === 202) {
         alert("ZIP file uploaded successfully!");
@@ -115,7 +154,28 @@ const allAccessGroups = Array.from(new Set([...uploadGroups, ...adminGroups]));
           ))}
         </Select>
       </FormControl>
-      
+
+      <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={validationChecked}
+              onChange={e => setValidationChecked(e.target.checked)}
+            />
+          }
+          label="Validation"
+        />
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={workflowChecked}
+              onChange={e => setWorkflowChecked(e.target.checked)}
+            />
+          }
+          label="Workflow"
+        />
+      </Box>
+
       <label htmlFor="file-upload" className="b_import_label">
         <Box
           className="upload-container"

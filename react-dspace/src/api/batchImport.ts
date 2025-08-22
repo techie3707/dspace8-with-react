@@ -8,20 +8,13 @@ const csrfToken = localStorage.getItem("csrfToken") || "";
 
 export const uploadBatchImport = async (
   selectedCollection: string,
-  selectedFile: File
+  selectedFile: File,
+  properties: any[]
 ): Promise<Awaited<ReturnType<typeof axios.post>>> => {
-
-
   try {
     const formData = new FormData();
 
-    const properties = [
-      { name: "--add" },
-      { name: "--zip", value: selectedFile.name },
-      { name: "--collection", value: selectedCollection }
-    ];
     formData.append("properties", JSON.stringify(properties));
-
     formData.append("file", selectedFile);
 
     const response = await axios.post(
