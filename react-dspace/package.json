@@ -95,6 +95,7 @@
   },
   "devDependencies": {
     "@types/axios": "^0.9.36",
+    "@types/html2canvas": "^0.5.35",
     "@types/pdfjs-dist": "^2.10.377",
     "@types/react-datepicker": "^6.2.0",
     "@types/react-slick": "^0.23.13",

@@ -1,11 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Box, IconButton } from "@mui/material";
-import {
-  ArrowBackIos,
-  ArrowForwardIos,
-  Pause,
-  PlayArrow,
-} from "@mui/icons-material";
+import { ArrowBackIos, ArrowForwardIos, Pause, PlayArrow } from "@mui/icons-material";
 import { ImageSlider } from "../../utils/images";
 
 const INTERVAL_DURATION = 5000; // 5 seconds
@@ -24,7 +19,7 @@ const Carousel: React.FC = () => {
     progressRef.current = 0;
     setProgress(0);
 
-    const steps = 200; // More steps = smoother
+    const steps = 200;
     const stepDuration = INTERVAL_DURATION / steps;
 
     const progressInterval = setInterval(() => {
@@ -64,22 +59,23 @@ const Carousel: React.FC = () => {
       sx={{
         position: "relative",
         width: "100%",
-        height: "400px",
+        height: "480px",
         overflow: "hidden",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
       }}
     >
-      {ImageSlider.map((img: string, index: number) => (
+      {/* Slides */}
+      {ImageSlider.map((img, index) => (
         <Box
           key={index}
           sx={{
-            display: index === currentSlide ? "block" : "none",
+            position: "absolute",
             width: "100%",
             height: "100%",
-            position: "absolute",
+            top: 0,
+            left: 0,
             transition: "opacity 0.5s ease-in-out",
+            opacity: index === currentSlide ? 1 : 0,
+            zIndex: index === currentSlide ? 2 : 1,
           }}
         >
           <img
@@ -94,8 +90,7 @@ const Carousel: React.FC = () => {
         </Box>
       ))}
 
-      {/* Controls */}
-      {/* Controls */}
+      {/* Play/Pause Button */}
       <Box
         sx={{
           position: "absolute",
@@ -108,9 +103,7 @@ const Carousel: React.FC = () => {
           onClick={() => setIsPaused(!isPaused)}
           sx={{
             color: "#1e4cf2",
-            "&:hover": {
-              backgroundColor: "rgba(255, 255, 255, 0.3)",
-            },
+            "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.3)" },
           }}
         >
           {isPaused ? <PlayArrow /> : <Pause />}
@@ -126,9 +119,8 @@ const Carousel: React.FC = () => {
           top: "50%",
           transform: "translateY(-50%)",
           color: "#1e4cf2",
-          "&:hover": {
-            backgroundColor: "rgba(255,255,255,0.3)",
-          },
+          "&:hover": { backgroundColor: "rgba(255,255,255,0.3)" },
+          zIndex: 10,
         }}
       >
         <ArrowBackIos />
@@ -143,9 +135,8 @@ const Carousel: React.FC = () => {
           top: "50%",
           transform: "translateY(-50%)",
           color: "#1e4cf2",
-          "&:hover": {
-            backgroundColor: "rgba(255,255,255,0.3)",
-          },
+          "&:hover": { backgroundColor: "rgba(255,255,255,0.3)" },
+          zIndex: 10,
         }}
       >
         <ArrowForwardIos />
@@ -160,12 +151,12 @@ const Carousel: React.FC = () => {
           display: "flex",
           justifyContent: "center",
           gap: 1,
-          zIndex: 5,
+          zIndex: 10,
         }}
       >
         {ImageSlider.map((_, index) => {
           const isActive = index === currentSlide;
-          const width = isActive && progress <= INTERVAL_DURATION
+          const width = isActive
             ? MIN_PILL_WIDTH + (MAX_PILL_WIDTH - MIN_PILL_WIDTH) * (progress / INTERVAL_DURATION)
             : MIN_PILL_WIDTH;
 
@@ -177,16 +168,17 @@ const Carousel: React.FC = () => {
                 width: `${width}px`,
                 height: "8px",
                 borderRadius: "20px",
-                backgroundColor: isActive ? "#1e4cf2" : "#fff",
+                background: isActive
+                  ? "linear-gradient(to right, #1e4cf2, #63c19e)"
+                  : "#fff",
                 border: "1px solid #1e4cf2",
                 cursor: "pointer",
-                transition: "width 0.05s linear, background-color 0.3s ease",
+                transition: "width 0.05s linear, background 0.3s ease",
               }}
             />
           );
         })}
       </Box>
-
     </Box>
   );
 };

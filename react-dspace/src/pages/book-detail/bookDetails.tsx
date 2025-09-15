@@ -89,17 +89,15 @@ const BookDetails: React.FC = () => {
         return metadataField && metadataField.length > 0 ? metadataField[0].value : null;
     };
 
-    const title = getMetadataValue('dc.title');
-    const subject = getMetadataValue('dc.subject');
-    const creator = getMetadataValue('dc.creator');
-    const description = getMetadataValue('dc.description');
-    const type = getMetadataValue('dc.type');
-    const uri = getMetadataValue('dc.identifier.uri');
-    const format = getMetadataValue('dc.format');
-    const rights = getMetadataValue('dc.rights');
-    const filetype = getMetadataValue('dc.filetype');
-    const Studentname = getMetadataValue('dc.studentname');
-    const shishyaname = getMetadataValue('dc.shishyaname');
+    const title = getMetadataValue("dc.title");
+    const doctype = getMetadataValue("dc.doctype");
+    const year = getMetadataValue("dc.year");
+    const author = getMetadataValue("dc.author");
+    const keyword = getMetadataValue("dc.keyword");
+    const publisher = getMetadataValue("dc.publisher");
+    const contentType = getMetadataValue("dc.contenttype");
+    const description = getMetadataValue("dc.description");
+    const createdDate = getMetadataValue("dc.date.created");
 
 
     if (isLoading) return <Loader />;
@@ -109,206 +107,243 @@ const BookDetails: React.FC = () => {
     return (
         <>
 
-            <div className='container main_bdtl_div'>
-                <div className='d-flex align-items-center mb-3'>
-                    <IconButton color="primary" className="back_btn" onClick={() => navigate(-1)} title="back_btn">
-                        <img className="back_icon" src={iconsImgs.back_btn} alt="Back" />
-                    </IconButton>
-                    <h1 className='bdtl_title ms-2'>{title}</h1>
-                </div>
-                <div className='row'>
-                    <div className='col-lg-4 col-md-12 col-12 text-center mb-3'>
-                        {thumbnailBitstreams
-                            .filter(bitstream => /\.(jpe?g|png)$/i.test(bitstream.name))
-                            .slice(0, 1)
-                            .map(bitstream => (
-                                <SecureImage
-                                    key={bitstream.uuid}
-                                    uuid={bitstream.uuid}
-                                    className="thumbnail-img img-fluid"
-                                    alt="Thumbnail"
-                                />
+<div className="container main_bdtl_div">
+  {/* Book Details Container */}
+  <div className="book-detail-container">
+    {/* Header Row (Back + Title) */}
+    <div className="header-row">
+      <IconButton
+        color="primary"
+        className="back_btn"
+        onClick={() => navigate(-1)}
+        title="back_btn"
+      >
+        <img className="back_icon" src={iconsImgs.back_btn} alt="Back" />
+      </IconButton>
+      <h1 className="bdtl_title">{title}</h1>
+    </div>
 
-                            ))}
-                    </div>
+    {/* Thumbnail Section */}
+    <div className="thumbnail-container">
+      {thumbnailBitstreams
+        .filter((bitstream) => /\.pdf$/i.test(bitstream.name))
+        .slice(0, 1)
+        .map((bitstream) => (
+          <SecureImage
+            key={bitstream.uuid}
+            uuid={bitstream.uuid}
+            className="thumbnail-img"
+            alt="PDF First Page"
+          />
+        ))}
+    </div>
 
-                    <div className='col-lg-8 col-md-12 col-12'>
-                        <table className='modern-table w-100'>
-                            <tbody>
-                                {description && (
-                                    <tr>
-                                        <th>Description</th>
-                                        <td>{description}</td>
-                                    </tr>
-                                )}
+    {/* Content Section */}
+    <div className="content-container">
+      <table className="modern-table">
+        <tbody>
+          {title && (
+            <tr>
+              <th>Title</th>
+              <td>{title}</td>
+            </tr>
+          )}
+          {doctype && (
+            <tr>
+              <th>Document Type</th>
+              <td>{doctype}</td>
+            </tr>
+          )}
+          {year && (
+            <tr>
+              <th>Year</th>
+              <td>{year}</td>
+            </tr>
+          )}
+          {author && (
+            <tr>
+              <th>Author</th>
+              <td>{author}</td>
+            </tr>
+          )}
+          {keyword && (
+            <tr>
+              <th>Keyword</th>
+              <td>{keyword}</td>
+            </tr>
+          )}
+          {publisher && (
+            <tr>
+              <th>Publisher</th>
+              <td>{publisher}</td>
+            </tr>
+          )}
+          {contentType && (
+            <tr>
+              <th>Content Type</th>
+              <td>{contentType}</td>
+            </tr>
+          )}
+          {description && (
+            <tr>
+              <th>Description</th>
+              <td>{description}</td>
+            </tr>
+          )}
+          {createdDate && (
+            <tr>
+              <th>Date Created</th>
+              <td>{createdDate}</td>
+            </tr>
+          )}
+          {originalBitstreams.length > 0 &&
+            (() => {
+              const pdfBitstreams = originalBitstreams.filter((bitstream) =>
+                /.pdf$/i.test(bitstream.name)
+              );
 
-                                {uri && (
-                                    <tr>
-                                        <th>URI</th>
-                                        <td>
-                                            <a href={uri} target="_blank" rel="noopener noreferrer">
-                                                {uri}
-                                            </a>
-                                        </td>
-                                    </tr>
-                                )}
+              if (pdfBitstreams.length === 1 || pdfBitstreams.length === 0) {
+                return (
+                  <>
+                    <tr>
+                      <th>Action</th>
+                      <td>
+                        <ul className="action-list">
+                          {pdfBitstreams.map((bitstream) => (
+                            <li key={bitstream.uuid}>
+                              <button
+                                className="custom-btn"
+                                onClick={() =>
+                                  window.open(
+                                    `/pdf-viewer?uuid=${encodeURIComponent(
+                                      bitstream.uuid
+                                    )}&itemId=${encodeURIComponent(id ?? "")}`,
+                                    "_blank"
+                                  )
+                                }
+                              >
+                                View PDF
+                              </button>
 
-                                {creator && (
-                                    <tr>
-                                        <th>Creator</th>
-                                        <td>{creator}</td>
-                                    </tr>
-                                )}
+                              <button
+                                className="custom-btn"
+                                onClick={() =>
+                                  window.open(
+                                    `/flip-book-viewer?uuid=${bitstream.uuid}`,
+                                    "_blank"
+                                  )
+                                }
+                              >
+                                View In Flip PDF
+                              </button>
+                              {isAuthenticated && (
+                                <button
+                                  className="custom-btn"
+                                  onClick={() =>
+                                    downloadPDF(
+                                      bitstream.uuid,
+                                      bitstream.name,
+                                      id || ""
+                                    )
+                                  }
+                                >
+                                  Download PDF
+                                </button>
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                      </td>
+                    </tr>
+                    {isAuthenticated && (isAdministrator || isAccess) && (
+                      <tr>
+                        <td colSpan={2} className="text-right">
+                          <button
+                            className="custom-btn full-width"
+                            onClick={() => navigate(`/edit-item/${id}`)}
+                          >
+                            Edit Item
+                          </button>
+                        </td>
+                      </tr>
+                    )}
+                  </>
+                );
+              }
 
-                                {subject && (
-                                    <tr>
-                                        <th>Subject</th>
-                                        <td>{subject}</td>
-                                    </tr>
-                                )}
+              return (
+                <>
+                  <tr>
+                    <th>PDF Files</th>
+                    <th>Actions</th>
+                  </tr>
+                  {pdfBitstreams.map((bitstream) => (
+                    <tr key={bitstream.uuid}>
+                      <td className="pdf-name-cell">{bitstream.name}</td>
+                      <td className="action-buttons-cell">
+                        <div className="actions-wrapper">
+                          <button
+                            className="custom-btn"
+                            onClick={() =>
+                              window.open(
+                                `/pdf-viewer?uuid=${bitstream.uuid}`,
+                                "_blank"
+                              )
+                            }
+                          >
+                            View PDF
+                          </button>
+                          <button
+                            className="custom-btn"
+                            onClick={() =>
+                              window.open(
+                                `/flip-book-viewer?uuid=${bitstream.uuid}`,
+                                "_blank"
+                              )
+                            }
+                          >
+                            Flip PDF
+                          </button>
+                          {isAuthenticated && (
+                            <button
+                              className="custom-btn"
+                              onClick={() =>
+                                downloadPDF(
+                                  bitstream.uuid,
+                                  bitstream.name,
+                                  id || ""
+                                )
+                              }
+                            >
+                              Download
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                  {isAuthenticated && (
+                    <tr>
+                      <td colSpan={2} className="text-right">
+                        <button
+                          className="custom-btn full-width"
+                          onClick={() => navigate(`/edit-item/${id}`)}
+                        >
+                          Edit Item
+                        </button>
+                      </td>
+                    </tr>
+                  )}
+                </>
+              );
+            })()}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
 
-                                {format && (
-                                    <tr>
-                                        <th>Format</th>
-                                        <td>{format}</td>
-                                    </tr>
-                                )}
 
-                                {type && (
-                                    <tr>
-                                        <th>Type</th>
-                                        <td>{type}</td>
-                                    </tr>
-                                )}
-
-                                {rights && (
-                                    <tr>
-                                        <th>Rights</th>
-                                        <td>{rights}</td>
-                                    </tr>
-                                )}
-
-                                {shishyaname && (
-                                    <tr>
-                                        <th>Shishya Name</th>
-                                        <td>{shishyaname}</td>
-                                    </tr>
-                                )}
-
-                                {filetype && (
-                                    <tr>
-                                        <th>File Type</th>
-                                        <td>{filetype}</td>
-                                    </tr>
-                                )}
-
-                                {Studentname && (
-                                    <tr>
-                                        <th>Student Name</th>
-                                        <td>{Studentname}</td>
-                                    </tr>
-                                )}
-
-                                {originalBitstreams.length > 0 && (() => {
-                                    const pdfBitstreams = originalBitstreams.filter(bitstream => /.pdf$/i.test(bitstream.name));
-
-                                    //  If only one PDF, show simple list format
-                                    if (pdfBitstreams.length === 1 || pdfBitstreams.length === 0) {
-                                        return (
-                                            <>
-                                                <tr>
-                                                    <th>Action</th>
-                                                    <td>
-                                                        <ul className='list-unstyled'>
-                                                            {pdfBitstreams.map(bitstream => (
-                                                                <li key={bitstream.uuid} className='mb-2'>
-                                                                    <button
-                                                                        className="custom-btn"
-                                                                        onClick={() =>
-                                                                            window.open(
-                                                                                `/pdf-viewer?uuid=${encodeURIComponent(bitstream.uuid)}&itemId=${encodeURIComponent(id ?? '')}`,
-                                                                                '_blank'
-                                                                            )
-                                                                        }
-                                                                    >
-                                                                        View PDF
-                                                                    </button>
-
-                                                                    <button className='custom-btn' onClick={() => window.open(`/flip-book-viewer?uuid=${bitstream.uuid}`, '_blank')}>
-                                                                        View In Flip PDF
-                                                                    </button>
-                                                                    {isAuthenticated && (
-                                                                        <>
-                                                                            <button className='custom-btn' onClick={() => downloadPDF(bitstream.uuid, bitstream.name, id || '')}>
-                                                                                Download PDF
-                                                                            </button>
-                                                                        </>
-                                                                    )}
-                                                                </li>
-                                                            ))}
-                                                        </ul>
-                                                    </td>
-                                                </tr>
-                                                {isAuthenticated && (isAdministrator || isAccess) && (
-                                                    <tr>
-                                                        <td colSpan={2} className="text-end">
-                                                            <button className='custom-btn' style={{ width: '100%' }} onClick={() => navigate(`/edit-item/${id}`)}>
-                                                                Edit Item
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                )}
-                                            </>
-                                        );
-                                    }
-                                    // If multiple PDFs, show table format
-                                    return (
-                                        <>
-                                            <tr>
-                                                <th>PDF Files</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                            {pdfBitstreams.map(bitstream => (
-                                                <tr key={bitstream.uuid}>
-                                                    <td className="pdf-name-cell">
-                                                        {bitstream.name}
-                                                    </td>
-                                                    <td className="action-buttons-cell">
-                                                        <div className="d-flex flex-wrap gap-2">
-                                                            <button className='custom-btn' onClick={() => window.open(`/pdf-viewer?uuid=${bitstream.uuid}`, '_blank')}>
-                                                                View PDF
-                                                            </button>
-                                                            <button className='custom-btn' onClick={() => window.open(`/flip-book-viewer?uuid=${bitstream.uuid}`, '_blank')}>
-                                                                Flip PDF
-                                                            </button>
-                                                            {isAuthenticated && (
-                                                                <button className='custom-btn' onClick={() => downloadPDF(bitstream.uuid, bitstream.name, id || '')}>
-                                                                    Download
-                                                                </button>
-                                                            )}
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            ))}
-
-                                            {isAuthenticated && (
-                                                <tr>
-                                                    <td colSpan={2} className="text-end">
-                                                        <button className='custom-btn' style={{ width: '100%' }} onClick={() => navigate(`/edit-item/${id}`)}>
-                                                            Edit Item
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            )}
-                                        </>
-                                    );
-                                })()}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-            </div>
         </>
     );
 };

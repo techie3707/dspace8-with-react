@@ -5,7 +5,7 @@ import axios from "axios";
 import { PDFDocument, rgb } from 'pdf-lib';
 import { getAuthHeaders } from "./searchApi";
 import html2canvas from 'html2canvas';
-import ravLogo from '../assets/images/rav-logo.png';
+import medantaLogo from '../assets/images/esd.png';
 import { fetchItemInfo } from "./item";
 import { personsImgs } from "../utils/images";
 
@@ -37,28 +37,32 @@ function parsePages(pageString: string): number[] {
   return Array.from(pages).sort((a, b) => a - b);
 }
 export const downloadPDF = async (
-  bitstreamId: string,     
-  fileName: string,       
+  bitstreamId: string,
+  fileName: string,
   itemId?: string | null,
-  pagesStr?: string | null 
+  pagesStr?: string | null,
+  includeWatermark: boolean = true,
+
 ) => {
   try {
     const headers: Record<string, string> = {
       Accept: 'application/json',
-      ...getAuthHeaders(),     
+      ...getAuthHeaders(),
     };
 
+    // fetch the original PDF
     const pdfResp = await fetch(
       `${siteConfig.apiEndpoint}/api/core/bitstreams/${bitstreamId}/content`,
       { method: 'GET', headers }
     );
     if (!pdfResp.ok) throw new Error('Failed to fetch PDF');
 
-    const pdfBytes   = await pdfResp.arrayBuffer();
-    const sourcePdf  = await PDFDocument.load(pdfBytes);
-    const pageCount  = sourcePdf.getPageCount();
-    const outPdf     = await PDFDocument.create();
+    const pdfBytes = await pdfResp.arrayBuffer();
+    const sourcePdf = await PDFDocument.load(pdfBytes);
+    const pageCount = sourcePdf.getPageCount();
+    const outPdf = await PDFDocument.create();
 
+    // ✅ Thumbnail page (metadata) if itemId present
     if (itemId) {
       const itemResp = await fetch(
         `${siteConfig.apiEndpoint}/api/core/items/${itemId}`,
@@ -68,16 +72,15 @@ export const downloadPDF = async (
         const itemData = await itemResp.json();
 
         const map: Record<string, string> = {
-          "dc.filename": "File Name",
-          "dc.boxnumber": "Box Number",
-          "dc.yearrange": "Year",
-          "dc.sectionname": "sectionname",
-          "dc.guruname": "Guru Name",
-          "dc.shishyaname": "Shishya Name",
-          "dc.subject": "Subject",
-          "dc.Studentname": "Student Name",
-          "dc.filenumber": "File Number",
-          "dc.month": "Month",
+          "dc.title": "Title",
+          "dc.doctype": "Document Type",
+          "dc.year": "Year",
+          "dc.author": "Author",
+          "dc.keyword": "Keyword",
+          "dc.publisher": "Publisher",
+          "dc.contenttype": "Content Type",
+          "dc.description": "Description",
+          "dc.date.created": "Date Created"
         };
 
         const rows = Object.entries(map).reduce((html, [k, label]) => {
@@ -85,120 +88,106 @@ export const downloadPDF = async (
           if (!v) return html;
 
           const valueCell =
-            k === 'dc.identifier.uri'
+            k === "dc.identifier.uri"
               ? `<a href="${v}" target="_blank" style="color:#3f51b5;text-decoration:none;">${v}</a>`
               : v;
 
           return (
             html +
             `<tr>
-               <th
-                 style="
-                   width: 200px;
-                   background:#e6e6e6;
-                   padding:12px 16px;
-                   text-align:left;
-                   font-weight:600;
-                   border-bottom:1px solid #dcdcdc;
-                 ">
+               <th style="width:200px;background:#e6e6e6;padding:12px 16px;text-align:left;font-weight:600;border-bottom:1px solid #dcdcdc;">
                  ${label}
                </th>
-               <td
-                 style="
-                   padding:12px 16px;
-                   background:#ffffff;
-                   border-bottom:1px solid #dcdcdc;
-                 ">
+               <td style="padding:12px 16px;background:#fff;border-bottom:1px solid #dcdcdc;">
                  ${valueCell}
                </td>
              </tr>`
           );
-        }, '');
+        }, "");
 
-        const html = document.createElement('div');
-        html.style.width  = '1123px';
-        html.style.height = '1587px';
-        html.style.padding = '40px';
-        html.style.fontFamily = 'Arial, sans-serif';
-        html.style.background = '#fff';
+        const html = document.createElement("div");
+        html.style.width = "440px";
+        html.style.height = "800px";
+        html.style.padding = "40px";
+        html.style.fontFamily = "Arial, sans-serif";
+        html.style.background = "#fff";
         html.innerHTML = `
           <div style="text-align:center;margin-bottom:32px;">
             <img src="${personsImgs.brand_one}" alt="Logo" style="max-height:100px;margin-bottom:12px;" />
           </div>
-
-          <table
-            style="
-              width:100%;
-              border-collapse:collapse;
-              border-radius:10px;
-              overflow:hidden;
-              font-size:16px;
-              box-shadow:0 0 10px rgba(0,0,0,0.1);
-            ">
-            <tbody>
-              ${rows}
-            </tbody>
+          <table style="width:100%;border-collapse:collapse;border-radius:10px;overflow:hidden;font-size:16px;box-shadow:0 0 10px rgba(0,0,0,0.1);">
+            <tbody>${rows}</tbody>
           </table>`;
 
         document.body.appendChild(html);
-        const canvas = await html2canvas(html, { backgroundColor: '#fff' });
-        const imgBytes = await fetch(canvas.toDataURL('image/png')).then(r => r.arrayBuffer());
+        const canvas = await html2canvas(html, { background: "#fff" });
+        const imgBytes = await fetch(canvas.toDataURL("image/png")).then(r => r.arrayBuffer());
         document.body.removeChild(html);
 
-        const imgEmbed  = await outPdf.embedPng(imgBytes);
-        const page      = outPdf.addPage([imgEmbed.width, imgEmbed.height]);
+        const imgEmbed = await outPdf.embedPng(imgBytes);
+        const page = outPdf.addPage([imgEmbed.width, imgEmbed.height]);
         page.drawImage(imgEmbed, { x: 0, y: 0, width: imgEmbed.width, height: imgEmbed.height });
       }
     }
 
+    // ✅ Pages to extract
     let indices: number[] = [];
     if (pagesStr) {
-      const wanted = parsePages(pagesStr);       
+      const wanted = parsePages(pagesStr);
       indices = wanted.filter(n => n >= 1 && n <= pageCount).map(n => n - 1);
     } else {
-      indices = Array.from(Array(pageCount), (_, i) => i);    
+      indices = Array.from(Array(pageCount), (_, i) => i);
     }
 
     if (indices.length === 0) {
-      showToast('No valid pages to extract', 'error');
+      showToast("No valid pages to extract", "error");
       return;
     }
 
-    const wmBytes   = await fetch(ravLogo).then(r => r.arrayBuffer());
-    const wmImg     = await outPdf.embedPng(wmBytes);
-    const wmScaled  = wmImg.scale(0.5);
-
+    // ✅ Copy pages and optionally watermark
     const pages = await outPdf.copyPages(sourcePdf, indices);
+
+    let wmImg: any;
+    let wmScaled: any;
+    if (includeWatermark) {
+      const wmBytes = await fetch(medantaLogo).then(r => r.arrayBuffer());
+      wmImg = await outPdf.embedPng(wmBytes);
+      wmScaled = wmImg.scale(0.1);
+    }
+
     pages.forEach(p => {
-      const { width, height } = p.getSize();
-      p.drawImage(wmImg, {
-        x: (width  - wmScaled.width)  / 2,
-        y: (height - wmScaled.height) / 2,
-        width:  wmScaled.width,
-        height: wmScaled.height,
-        opacity: 0.5,
-      });
+      if (includeWatermark && wmImg) {
+        const { width, height } = p.getSize();
+        p.drawImage(wmImg, {
+          x: (width - wmScaled.width) / 2,
+          y: (height - wmScaled.height) / 2,
+          width: wmScaled.width,
+          height: wmScaled.height,
+          opacity: 0.2,
+        });
+      }
       outPdf.addPage(p);
     });
 
+    // ✅ Save and download
     const outBytes = await outPdf.save();
-    const blob     = new Blob([outBytes], { type: 'application/pdf' });
-    const url      = URL.createObjectURL(blob);
-
-    const anchor   = document.createElement('a');
-    anchor.href    = url;
-    anchor.download = fileName.endsWith('.pdf') ? fileName : `${fileName}.pdf`;
+    const blob = new Blob([outBytes as unknown as BlobPart], { type: "application/pdf" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = fileName.endsWith(".pdf") ? fileName : `${fileName}.pdf`;
     document.body.appendChild(anchor);
     anchor.click();
     anchor.remove();
     URL.revokeObjectURL(url);
 
-    showToast(`Pages ${pagesStr ?? 'All'} downloaded`, 'success');
+    showToast(`Pages ${pagesStr ?? "All"} downloaded`, "success");
   } catch (err) {
     console.error(err);
-    showToast('Failed to download PDF', 'error');
+    showToast("Failed to download PDF", "error");
   }
 };
+
 
 
 

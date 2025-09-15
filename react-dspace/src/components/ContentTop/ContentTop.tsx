@@ -10,8 +10,8 @@ import { getAuthStatus, logout } from "../../api/authApi";
 import { showToast } from "../../contexts/ToastProvider";
 import { getUserById } from "../../api/usermanagement";
 import SearchIcon from "@mui/icons-material/Search";
-import CloseIcon from '@mui/icons-material/Close';
-import MenuIcon from '@mui/icons-material/Menu';
+import CloseIcon from "@mui/icons-material/Close";
+import MenuIcon from "@mui/icons-material/Menu";
 
 const ContentTop: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -89,7 +89,7 @@ const ContentTop: React.FC = () => {
 
   const handleCloseClick = () => {
     setIsSearchOpen(false);
-    setSearchQuery('');
+    setSearchQuery("");
   };
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -123,7 +123,7 @@ const ContentTop: React.FC = () => {
         {isAuthenticated && (
           <Box
             sx={{
-              display: { xs: 'block', sm: 'block', md: 'none' },
+              display: { xs: "block", sm: "block", md: "none" },
             }}
           >
             <button
@@ -154,25 +154,25 @@ const ContentTop: React.FC = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
+                  if (e.key === "Enter") {
                     handleSearchClick();
                   }
                 }}
                 sx={{
-                  backgroundColor: 'white',
+                  backgroundColor: "white",
                   borderRadius: 1,
-                  height: '100%',
-                  '& .MuiInputBase-root': {
-                    height: '100%',
+                  height: "100%",
+                  "& .MuiInputBase-root": {
+                    height: "100%",
                     fontSize: 14,
                     paddingY: 0,
-                    borderColor: '#D1D5DB',
+                    borderColor: "#D1D5DB",
                   },
-                  '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#D1D5DB',
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#D1D5DB",
                   },
-                  '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#9CA3AF',
+                  "&:hover .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#9CA3AF",
                   },
                 }}
                 InputProps={{
@@ -181,7 +181,7 @@ const ContentTop: React.FC = () => {
                       <IconButton
                         onClick={handleSearchClick}
                         edge="start"
-                        sx={{ p: 0.5, color: '#4B5563' }}
+                        sx={{ p: 0.5, color: "#4B5563" }}
                       >
                         <SearchIcon fontSize="small" />
                       </IconButton>
@@ -192,7 +192,7 @@ const ContentTop: React.FC = () => {
                       <IconButton
                         onClick={handleCloseClick}
                         edge="end"
-                        sx={{ p: 0.5, color: '#4B5563' }}
+                        sx={{ p: 0.5, color: "#4B5563" }}
                       >
                         <CloseIcon fontSize="small" />
                       </IconButton>
@@ -204,11 +204,11 @@ const ContentTop: React.FC = () => {
               <IconButton
                 onClick={handleSearchClick}
                 sx={{
-                  height: '100%',
+                  height: "100%",
                   p: 1,
-                  color: '#4B5563',
-                  '&:hover': {
-                    backgroundColor: '#E5E7EB',
+                  color: "#4B5563",
+                  "&:hover": {
+                    backgroundColor: "#E5E7EB",
                   },
                 }}
               >
@@ -216,22 +216,16 @@ const ContentTop: React.FC = () => {
               </IconButton>
             )}
           </Box>
-          <button
-            className="nav-link-btn text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
-            onClick={() => navigate("/about")}
-          >
+          <button className="nav-link-btn" onClick={() => navigate("/about")}>
             About Us
           </button>
-          <button
-            className="nav-link-btn text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
-            onClick={() => navigate("/contact")}
-          >
+          <button className="nav-link-btn" onClick={() => navigate("/contact")}>
             Contact Us
           </button>
           {isAuthenticated ? (
             <>
               <button
-                className="profile-btn welcome-btn text-sm font-medium text-gray-700 bg-gray-100  rounded-md hover:bg-gray-200 transition-colors"
+                className="profile-btn welcome-btn nav-link-btn"
                 onClick={handleClick}
               >
                 Welcome! {firstName || "User"}
@@ -242,9 +236,9 @@ const ContentTop: React.FC = () => {
                 onClose={handleClose}
                 PaperProps={{
                   sx: {
-                    bgcolor: '#FFFFFF',
-                    color: '#1F2937',
-                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                    bgcolor: "#FFFFFF",
+                    color: "#1F2937",
+                    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
                   },
                 }}
               >
@@ -257,11 +251,7 @@ const ContentTop: React.FC = () => {
                       showToast("User ID not available", "error");
                     }
                   }}
-                  sx={{
-                    '&:hover': {
-                      bgcolor: '#F3F4F6',
-                    },
-                  }}
+                  sx={{ "&:hover": { bgcolor: "#F3F4F6" } }}
                 >
                   View Profile
                 </MenuItem>
@@ -274,11 +264,7 @@ const ContentTop: React.FC = () => {
                       showToast("User ID not available", "error");
                     }
                   }}
-                  sx={{
-                    '&:hover': {
-                      bgcolor: '#F3F4F6',
-                    },
-                  }}
+                  sx={{ "&:hover": { bgcolor: "#F3F4F6" } }}
                 >
                   My List
                 </MenuItem>
@@ -291,21 +277,13 @@ const ContentTop: React.FC = () => {
                       showToast("User ID not available", "error");
                     }
                   }}
-                  sx={{
-                    '&:hover': {
-                      bgcolor: '#F3F4F6',
-                    },
-                  }}
+                  sx={{ "&:hover": { bgcolor: "#F3F4F6" } }}
                 >
                   WorkflowTask
                 </MenuItem>
                 <MenuItem
                   onClick={handleLogout}
-                  sx={{
-                    '&:hover': {
-                      bgcolor: '#F3F4F6',
-                    },
-                  }}
+                  sx={{ "&:hover": { bgcolor: "#F3F4F6" } }}
                 >
                   Logout
                 </MenuItem>
@@ -313,7 +291,7 @@ const ContentTop: React.FC = () => {
             </>
           ) : (
             <button
-              className="login-btn content-top-btn text-sm font-medium text-black bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
+              className="nav-link-btn login-btn"
               onClick={() => navigate("/login")}
             >
               Login
@@ -325,9 +303,9 @@ const ContentTop: React.FC = () => {
           <IconButton
             onClick={toggleDrawer}
             sx={{
-              color: '#1F2937',
-              '&:hover': {
-                backgroundColor: '#E5E7EB',
+              color: "#1F2937",
+              "&:hover": {
+                backgroundColor: "#E5E7EB",
               },
             }}
           >
@@ -343,10 +321,10 @@ const ContentTop: React.FC = () => {
         onClose={toggleDrawer}
         PaperProps={{
           sx: {
-            backgroundColor: '#FFFFFF',
-            color: '#1F2937',
-            width: '75%',
-            maxWidth: '300px',
+            backgroundColor: "#FFFFFF",
+            color: "#1F2937",
+            width: "75%",
+            maxWidth: "300px",
             padding: 2,
           },
         }}
@@ -354,10 +332,7 @@ const ContentTop: React.FC = () => {
         <Box display="flex" flexDirection="column" gap={2} p={2}>
           <IconButton
             onClick={toggleDrawer}
-            sx={{
-              alignSelf: 'flex-end',
-              color: '#1F2937',
-            }}
+            sx={{ alignSelf: "flex-end", color: "#1F2937" }}
           >
             <CloseIcon />
           </IconButton>
@@ -369,22 +344,22 @@ const ContentTop: React.FC = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === 'Enter') {
+                if (e.key === "Enter") {
                   handleSearchClick();
                 }
               }}
               sx={{
-                backgroundColor: '#FFFFFF',
+                backgroundColor: "#FFFFFF",
                 borderRadius: 1,
-                '& .MuiInputBase-root': {
+                "& .MuiInputBase-root": {
                   fontSize: 14,
                   paddingY: 0,
                 },
-                '& .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#D1D5DB',
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#D1D5DB",
                 },
-                '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#9CA3AF',
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#9CA3AF",
                 },
               }}
               InputProps={{
@@ -392,7 +367,7 @@ const ContentTop: React.FC = () => {
                   <InputAdornment position="start">
                     <IconButton
                       onClick={handleSearchClick}
-                      sx={{ p: 0.5, color: '#4B5563' }}
+                      sx={{ p: 0.5, color: "#4B5563" }}
                     >
                       <SearchIcon fontSize="small" />
                     </IconButton>
@@ -402,7 +377,7 @@ const ContentTop: React.FC = () => {
                   <InputAdornment position="end">
                     <IconButton
                       onClick={handleCloseClick}
-                      sx={{ p: 0.5, color: '#4B5563' }}
+                      sx={{ p: 0.5, color: "#4B5563" }}
                     >
                       <CloseIcon fontSize="small" />
                     </IconButton>
@@ -414,17 +389,15 @@ const ContentTop: React.FC = () => {
             <IconButton
               onClick={handleSearchClick}
               sx={{
-                color: '#4B5563',
-                '&:hover': {
-                  backgroundColor: '#E5E7EB',
-                },
+                color: "#4B5563",
+                "&:hover": { backgroundColor: "#E5E7EB" },
               }}
             >
               <SearchIcon />
             </IconButton>
           )}
           <button
-            className="nav-link-btn text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
+            className="nav-link-btn"
             onClick={() => {
               navigate("/about");
               toggleDrawer();
@@ -433,7 +406,7 @@ const ContentTop: React.FC = () => {
             About Us
           </button>
           <button
-            className="nav-link-btn text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
+            className="nav-link-btn"
             onClick={() => {
               navigate("/contact");
               toggleDrawer();
@@ -444,7 +417,7 @@ const ContentTop: React.FC = () => {
           {isAuthenticated ? (
             <>
               <button
-                className="nav-link-btn text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
+                className="nav-link-btn"
                 onClick={() => {
                   if (userId) {
                     navigate(`/userProfile/${userId}`);
@@ -457,7 +430,7 @@ const ContentTop: React.FC = () => {
                 View Profile
               </button>
               <button
-                className="nav-link-btn text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
+                className="nav-link-btn"
                 onClick={() => {
                   if (userId) {
                     navigate(`/userCart/${userId}`);
@@ -470,7 +443,7 @@ const ContentTop: React.FC = () => {
                 My List
               </button>
               <button
-                className="nav-link-btn text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
+                className="nav-link-btn"
                 onClick={async () => {
                   try {
                     await logout();
@@ -486,7 +459,7 @@ const ContentTop: React.FC = () => {
             </>
           ) : (
             <button
-              className="text-sm font-medium text-black bg-blue-600  rounded-md hover:bg-blue-700 transition-colors"
+              className="nav-link-btn login-btn"
               onClick={() => {
                 navigate("/login");
                 toggleDrawer();

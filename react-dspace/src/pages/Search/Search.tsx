@@ -15,7 +15,8 @@ import SecureImage from './SecureImage';
 import { Group } from '../../api/group';
 import { deleteItem } from '../../api/item';
 import { useUserGroups } from '../../contexts/groupTypeContext';
-
+import bgImage from "../../assets/images/easy.jpg";
+import { get } from 'axios';
 const Search: React.FC = () => {
     const initialParams = parseSearchParamsFromUrl();
 
@@ -58,16 +59,16 @@ const Search: React.FC = () => {
 
     const { groupCategories, isAdministrator } = useUserGroups();
 
-  const isAdmingroup = (groupCategories.admin as Group[]).some((group: Group) =>
-  group.name.toLowerCase().includes('admin')
-);
+    const isAdmingroup = (groupCategories.admin as Group[]).some((group: Group) =>
+        group.name.toLowerCase().includes('administrator')
+    );
 
 
     const toggleItemSelection = (uuid: string) => {
         setSelectedItems(prev => {
-             if (prev.includes(uuid)) {
-            return prev.filter(id => id !== uuid);
-        }
+            if (prev.includes(uuid)) {
+                return prev.filter(id => id !== uuid);
+            }
             return [...prev, uuid];
         });
     };
@@ -377,16 +378,16 @@ const Search: React.FC = () => {
     };
 
     const deleteAction = (
-        <div className="bulk-actions" 
-        style={{
-            margin: '10px 0',
-            padding: '10px',
-            backgroundColor: '#f5f5f5',
-            borderRadius: '4px',
-            display: selectedItems.length > 0 ? 'flex' : 'none',
-            justifyContent: 'space-between',
-            alignItems: 'center'
-        }}>
+        <div className="bulk-actions"
+            style={{
+                margin: '10px 0',
+                padding: '10px',
+                backgroundColor: '#f5f5f5',
+                borderRadius: '4px',
+                display: selectedItems.length > 0 ? 'flex' : 'none',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+            }}>
             <div>
                 <span>{selectedItems.length} item(s) selected</span>
             </div>
@@ -445,7 +446,7 @@ const Search: React.FC = () => {
                                         <h2 className='ZF0dQe'>{section.label}</h2>
                                         <button
                                             className={`toggle-button ${expandedSections[section.id] ? 'up' : 'down'}`}
-                                            
+
                                         ></button>
                                     </div>
                                     {expandedSections[section.id] && (
@@ -597,13 +598,24 @@ const Search: React.FC = () => {
                                     searchResults.map((result, index) => {
                                         const metadata = result._embedded?.indexableObject?.metadata;
                                         const type = result._embedded?.indexableObject?.type;
-                                    const title = metadata?.['dc.title']?.[0]?.value || metadata?.['dc.filename']?.[0]?.value || metadata?.['dc.guruname']?.[0]?.value || 'Unknown Title';
-                                        const uuid = result._embedded?.indexableObject?.uuid;
-                                        const abstract = metadata?.['dc.description']?.[0]?.value;
-                                        const date = metadata?.['dc.date.issued']?.[0]?.value;
-                                        const author = metadata?.['dc.contributor.author']?.[0]?.value;
-                                        const publisher = metadata?.['dc.publisher']?.[0]?.value;
-                                        const displayType = metadata?.['dc.type']?.[0]?.value || type;
+
+                                        const title =
+                                            metadata?.["dc.title"]?.[0]?.value ||
+                                            metadata?.["dc.uhid"]?.[0]?.value ||
+                                            "Unknown Title";
+
+                                            const uuid = result._embedded?.indexableObject?.uuid;
+                                           
+                                            const abstract = metadata?.["dc.description.abstract"]?.[0]?.value;
+                                            const date = metadata?.["dc.date.created"]?.[0]?.value;
+                                            const author = metadata?.["dc.author"]?.[0]?.value;
+                                            const entityType = metadata?.["dspace.entity.type"]?.[0]?.value;
+                                            const publisher = metadata?.["dc.publisher"]?.[0]?.value;
+                                            const doctype = metadata?.["dc.doctype"]?.[0]?.value;
+                                            const year = metadata?.["dec.year"]?.[0]?.value;
+                                            const keyword = metadata?.["dc.keyword"]?.[0]?.value;
+                                            const contenttype = metadata?.["dc.contenttype"]?.[0]?.value;
+                                            const description = metadata?.["dc.description"]?.[0]?.value;
 
                                         const handleTitleClick = () => {
                                             if (uuid) {
@@ -615,48 +627,60 @@ const Search: React.FC = () => {
 
                                         return (
                                             <Grid item xs={12} key={index}>
-                                                <div style={{
-                                                    display: 'flex',
-                                                    borderRadius: '8px',
-                                                    boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-                                                    marginBottom: '20px',
-                                                    overflow: 'hidden',
-                                                    backgroundColor: isSelected ? '#e3f2fd' : '#fff',
-                                                    border: isSelected ? '2px solid #1976d2' : 'none',
-                                                    position: 'relative'
-                                                }}>
-
+                                                <div
+                                                    style={{
+                                                        display: "flex",
+                                                        borderRadius: "8px",
+                                                        boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+                                                        marginBottom: "20px",
+                                                        overflow: "hidden",
+                                                        backgroundColor: isSelected ? "#e3f2fd" : "#fff",
+                                                        border: isSelected ? "2px solid #1976d2" : "none",
+                                                        position: "relative",
+                                                    }}
+                                                >
                                                     {/* Colored Sidebar */}
-                                                    <div style={{
-                                                        width: '100px',
-                                                        backgroundColor: '#f97316',
-                                                        display: 'flex',
-                                                        flexDirection: 'column',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center',
-                                                        color: '#fff',
-                                                        fontWeight: 'bold',
-                                                        position: 'relative'
-                                                    }}>
-                                                        <div style={{
-                                                            backgroundColor: '#fff',
-                                                            color: '#f97316',
-                                                            borderRadius: '50%',
-                                                            width: '48px',
-                                                            height: '48px',
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            justifyContent: 'center',
-                                                            fontSize: '20px',
-                                                            marginBottom: '5px'
-                                                        }}>
-                                                            <i className="fas fa-cube"></i> {/* Replace icon as needed */}
+                                                    <div
+                                                        style={{
+                                                            width: "100px",
+                                                            backgroundColor: "#f97316",
+                                                            display: "flex",
+                                                            flexDirection: "column",
+                                                            alignItems: "center",
+                                                            justifyContent: "center",
+                                                            color: "#fff",
+                                                            fontWeight: "bold",
+                                                            position: "relative",
+                                                        }}
+                                                    >
+                                                        <div
+                                                            style={{
+                                                                backgroundColor: "#fff",
+                                                                color: "#f97316",
+                                                                borderRadius: "50%",
+                                                                width: "48px",
+                                                                height: "48px",
+                                                                display: "flex",
+                                                                alignItems: "center",
+                                                                justifyContent: "center",
+                                                                fontSize: "20px",
+                                                                marginBottom: "5px",
+                                                            }}
+                                                        >
+                                                            <i className="fas fa-cube"></i>
                                                         </div>
 
                                                     </div>
 
                                                     {/* Thumbnail & Content */}
-                                                    <div style={{ display: 'flex', alignItems: 'center', padding: '15px', flex: 1 }}>
+                                                    <div
+                                                        style={{
+                                                            display: "flex",
+                                                            alignItems: "center",
+                                                            padding: "15px",
+                                                            flex: 1,
+                                                        }}
+                                                    >
                                                         {thumbnailsByItem[result._embedded?.indexableObject?.uuid]
                                                             ?.filter(bitstream => /\.(jpe?g|png)$/i.test(bitstream.name))
                                                             .slice(0, 1)
@@ -678,62 +702,102 @@ const Search: React.FC = () => {
 
                                                         {/* Right Text Section */}
                                                         <div style={{ flex: 1 }}>
-                                                            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-                                                                <span style={{
-                                                                    backgroundColor: '#f0f0f0',
-                                                                    padding: '4px 8px',
-                                                                    borderRadius: '4px',
-                                                                    marginRight: '10px',
-                                                                    fontSize: '13px'
-                                                                }}>
-                                                                    {displayType}
-                                                                </span>
-                                                                <h3
-                                                                    style={{
-                                                                        margin: '0',
-                                                                        cursor: 'pointer',
-                                                                        fontSize: '18px',
-                                                                        fontWeight: 600,
-                                                                        color: '#333'
-                                                                    }}
-                                                                    onClick={isSelected ? undefined : handleTitleClick}
-                                                                >
-                                                                    {title}
-                                                                </h3>
-                                                            </div>
+  <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+    <span
+      style={{
+        backgroundColor: '#f0f0f0',
+        padding: '4px 8px',
+        borderRadius: '4px',
+        marginRight: '10px',
+        fontSize: '13px',
+      }}
+    >
+      {doctype}
+    </span>
+    <h3
+      style={{
+        margin: '0',
+        cursor: 'pointer',
+        fontSize: '18px',
+        fontWeight: 600,
+        color: '#333',
+      }}
+      onClick={isSelected ? undefined : handleTitleClick}
+    >
+      {title}
+    </h3>
+  </div>
 
-                                                            {date && (
-                                                                <p style={{ margin: '0 0 10px 0', color: '#666', fontSize: '14px' }}>
-                                                                    {date}
-                                                                </p>
-                                                            )}
+  <div
+    style={{
+      display: 'flex',
+      flexWrap: 'wrap',
+      gap: '20px',
+      fontSize: '14px',
+      color: '#555',
+    }}
+  >
+    <span>
+      <strong>Author:</strong> {author}
+    </span>
+    <span>
+      <strong>Publisher:</strong> {publisher}
+    </span>
+    
+    <span>
+      <strong>Year:</strong> {year}
+    </span>
+    <span>
+      <strong>Keyword:</strong> {keyword}
+    </span>
+    <span>
+      <strong>Content Type:</strong> {contenttype}
+    </span>
+    <span>
+      <strong>Date Created:</strong> {date}
+    </span>
+  </div>
 
-                                                            {abstract && (
-                                                                <p style={{ margin: '10px 0', color: '#555', fontSize: '14px' }}>
-                                                                    {abstract}
-                                                                </p>
-                                                            )}
-                                                        </div>
-                                                        {/*Delete Button*/}
-                                                        {(isAdministrator || isAdmingroup) && <Box sx={{ display: 'flex', justifyContent: 'end', alignItems: 'center', marginLeft: '5px' }}>
-                                                            <IconButton
-                                                                // className='btn_table'
-                                                                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                                                                    e.stopPropagation();
-                                                                    uuid && toggleItemSelection(uuid);
+  {abstract && (
+    <p style={{ marginTop: '10px', fontSize: '14px', color: '#444' }}>
+      <strong>Abstract:</strong> {abstract}
+    </p>
+  )}
+
+  {description && (
+    <p style={{ marginTop: '6px', fontSize: '14px', color: '#666' }}>
+      <strong>Description:</strong> {description}
+    </p>
+  )}
+</div>
+                                                        {/* Delete Button */}
+                                                        {(isAdministrator || isAdmingroup) && (
+                                                            <Box
+                                                                sx={{
+                                                                    display: "flex",
+                                                                    justifyContent: "end",
+                                                                    alignItems: "center",
+                                                                    marginLeft: "5px",
                                                                 }}
-                                                                color="primary"
-                                                                style={{
-                                                                    fontSize: '18px',
-                                                                    cursor: 'pointer',
-                                                                    padding: '5px',
-                                                                    background: 'none',
-                                                                }}
-                                                                title='Delete'
                                                             >
-                                                                <img className="itemh_icon" src={iconsImgs.remove} alt="Delete" />
-                                                            </IconButton>
-                                                        </Box>}
+                                                                <IconButton
+                                                                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                                                                        e.stopPropagation();
+                                                                        uuid && toggleItemSelection(uuid);
+                                                                    }}
+                                                                    color="primary"
+                                                                    style={{
+                                                                        fontSize: "18px",
+                                                                        cursor: "pointer",
+                                                                        padding: "5px",
+                                                                        background: "none",
+                                                                    }}
+                                                                    title="Delete"
+                                                                >
+                                                                    <img className="itemh_icon" src={iconsImgs.remove} alt="Delete" />
+                                                                </IconButton>
+                                                            </Box>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </Grid>
@@ -743,32 +807,43 @@ const Search: React.FC = () => {
                                     searchResults.map((result, index) => {
                                         const metadata = result._embedded?.indexableObject?.metadata;
                                         const type = result._embedded?.indexableObject?.type;
-                                    const title = metadata?.['dc.title']?.[0]?.value || metadata?.['dc.filename']?.[0]?.value || metadata?.['dc.guruname']?.[0]?.value || 'Unknown Title';
+                                    
+                                        const title =
+                                            getMetadataValue(metadata, metadataFields.title) || 'Unknown Title';
+                                    
                                         const uuid = result._embedded?.indexableObject?.uuid;
                                         const abstract = getMetadataValue(metadata, metadataFields.abstract);
                                         const date = getMetadataValue(metadata, metadataFields.date);
                                         const author = getMetadataValue(metadata, metadataFields.author);
-                                        const entity = getMetadataValue(metadata, metadataFields.entityType);
+                                        const entityType = getMetadataValue(metadata, metadataFields.entityType);
                                         const publisher = getMetadataValue(metadata, metadataFields.publisher);
-                                        const displayType = entity || type;
-
+                                        const doctype = getMetadataValue(metadata, metadataFields.doctype);
+                                        const year = getMetadataValue(metadata, metadataFields.year);
+                                        const keyword = getMetadataValue(metadata, metadataFields.keyword);
+                                        const contenttype = getMetadataValue(metadata, metadataFields.contenttype);
+                                        const description = getMetadataValue(metadata, metadataFields.description);
+                                    
+                                        const displayType = doctype || entityType || type;
+                                    
                                         const handleTitleClick = () => {
                                             if (uuid) {
                                                 navigate(`/items/${uuid}`);
                                             }
                                         };
-
+                                    
                                         const isSelected = uuid && selectedItems.includes(uuid);
+                                    
                                         return (
-                                            <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+                                            <Grid item xs={12} sm={6} md={4} lg={4} key={index}>
                                                 <div
                                                     className="grid_main"
-                                                    onClick={isSelected
-                                                        ? (e: React.MouseEvent<HTMLDivElement>) => {
-                                                            e.stopPropagation();
-                                                            uuid && toggleItemSelection(uuid);
-                                                        }
-                                                        : handleTitleClick
+                                                    onClick={
+                                                        isSelected
+                                                            ? (e: React.MouseEvent<HTMLDivElement>) => {
+                                                                  e.stopPropagation();
+                                                                  uuid && toggleItemSelection(uuid);
+                                                              }
+                                                            : handleTitleClick
                                                     }
                                                     style={{
                                                         border: isSelected ? '2px solid #1976d2' : '1px solid #ddd',
@@ -781,81 +856,127 @@ const Search: React.FC = () => {
                                                     }}
                                                 >
                                                     {isSelected && (
-                                                        <div style={{
-                                                            position: 'absolute',
-                                                            top: '5px',
-                                                            right: '5px',
-                                                            width: '20px',
-                                                            height: '20px',
-                                                            backgroundColor: '#1976d2',
-                                                            borderRadius: '50%',
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            justifyContent: 'center',
-                                                            color: 'white',
-                                                            fontSize: '12px'
-                                                        }}>
+                                                        <div
+                                                            style={{
+                                                                position: 'absolute',
+                                                                top: '5px',
+                                                                right: '5px',
+                                                                width: '20px',
+                                                                height: '20px',
+                                                                backgroundColor: '#1976d2',
+                                                                borderRadius: '50%',
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                justifyContent: 'center',
+                                                                color: 'white',
+                                                                fontSize: '12px',
+                                                            }}
+                                                        >
                                                             ✓
                                                         </div>
                                                     )}
-                                                    {/* Title */}
-                                                    <h3 className='item_title' style={{ cursor: 'pointer' }}>
-                                                        {title}
-                                                    </h3>
-
-                                                    {/* Year */}
-                                                    {date && (
-                                                        <p className='item_date' style={{ marginLeft: '10px', color: '#666', fontSize: '14px' }}>
-                                                            {date}
+                                    
+                                                    {/* Thumbnail */}
+                                                    <div
+                                                        style={{
+                                                            display: 'flex',
+                                                            justifyContent: 'center',
+                                                            margin: '10px 0',
+                                                        }}
+                                                    >
+                                                        <div
+                                                            style={{
+                                                                display: 'flex',
+                                                                flexDirection: 'column',
+                                                                gap: '8px',
+                                                                padding: '10px 5px',
+                                                                border: '1px solid #ccc',
+                                                                borderRadius: '12px',
+                                                                boxShadow: '2px 2px 6px rgba(0,0,0,0.1)',
+                                                                width: '500px',
+                                                                height: '240px',
+                                                                backgroundImage: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(${bgImage})`,
+                                                                backgroundSize: 'contain',
+                                                                backgroundRepeat: 'no-repeat',
+                                                                backgroundPosition: 'center',
+                                                                color: '#fff',
+                                                            }}
+                                                        >
+                                                            <div>
+                                                                <strong>Type:</strong> {displayType}
+                                                            </div>
+                                                            <div>
+                                                                <strong>Author:</strong> {author}
+                                                            </div>
+                                                            <div>
+                                                                <strong>Publisher:</strong> {publisher}
+                                                            </div>
+                                                         
+                                                            <div>
+                                                                <strong>Year:</strong> {year}
+                                                            </div>
+                                                            <div>
+                                                                <strong>Keyword:</strong> {keyword}
+                                                            </div>
+                                                            <div>
+                                                                <strong>Date Created:</strong> {date}
+                                                            </div>
+                                                            <div>
+                                                                <strong>Content Type:</strong> {contenttype}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                    
+                                                    {abstract && (
+                                                        <p
+                                                            style={{
+                                                                margin: '10px 0',
+                                                                color: '#555',
+                                                                fontSize: '14px',
+                                                            }}
+                                                        >
+                                                            {abstract}
                                                         </p>
                                                     )}
-
-                                                    {/* Thumbnail */}
-                                                    <div style={{ display: 'flex', justifyContent: 'center', margin: '10px 0', height: '200px' }}>
-                                                        {thumbnailsByItem[result._embedded?.indexableObject?.uuid]
-                                                            ?.filter(bitstream => /\.(jpe?g|png)$/i.test(bitstream.name))
-                                                            .slice(0, 1)
-                                                            .map(bitstream => (
-                                                                <SecureImage
-                                                                    key={bitstream.uuid}
-                                                                    uuid={bitstream.uuid}
-                                                                    className="thumbnail-img img-fluid"
-                                                                    style={{ maxHeight: '300px' }}
-                                                                    alt="Thumbnail"
-                                                                />
-                                                            ))}
-                                                    </div>
-
-                                                    {/* Abstract */}
-                                                    {/* {abstract && (
-                                                    <p style={{ margin: '10px 0', color: '#666', fontSize: '14px' }}>
-                                                        {abstract}
-                                                    </p>
-                                                )} */}
-
+                                    
+                                                    {description && (
+                                                        <p
+                                                            style={{
+                                                                margin: '6px 0',
+                                                                color: '#666',
+                                                                fontSize: '13px',
+                                                            }}
+                                                        >
+                                                            {description}
+                                                        </p>
+                                                    )}
+                                    
                                                     {/* Delete button */}
-                                                    {(isAdministrator || isAdmingroup) &&
-                                                        
-                                                            <IconButton
-                                                                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                                                                    e.stopPropagation();
-                                                                    uuid && toggleItemSelection(uuid);
-                                                                }}
-                                                                color="primary"
-                                                                style={{
-                                                                    fontSize: '18px',
-                                                                    cursor: 'pointer',
-                                                                    padding: '5px',
-                                                                    background: 'none',
-                                                                }}
-                                                                title='Delete'
-                                                            >
-                                                                <img className="itemh_icon" src={iconsImgs.remove} alt="Delete" />
-                                                            </IconButton>
-                                                        }
-
+                                                    {(isAdministrator || isAdmingroup) && (
+                                                        <IconButton
+                                                            onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                                                                e.stopPropagation();
+                                                                uuid && toggleItemSelection(uuid);
+                                                            }}
+                                                            color="primary"
+                                                            style={{
+                                                                fontSize: '18px',
+                                                                cursor: 'pointer',
+                                                                padding: '5px',
+                                                                background: 'none',
+                                                            }}
+                                                            title="Delete"
+                                                        >
+                                                            <img
+                                                                className="itemh_icon"
+                                                                src={iconsImgs.remove}
+                                                                alt="Delete"
+                                                            />
+                                                        </IconButton>
+                                                    )}
+                                    
                                                     <IconButton
-                                                        className='itemh_btn'
+                                                        className="itemh_btn"
                                                         onClick={handleTitleClick}
                                                         color="primary"
                                                         style={{
@@ -868,7 +989,11 @@ const Search: React.FC = () => {
                                                             background: 'none',
                                                         }}
                                                     >
-                                                        <img className="itemh_icon" src={iconsImgs.arrow} alt="Arrow" />
+                                                        <img
+                                                            className="itemh_icon"
+                                                            src={iconsImgs.arrow}
+                                                            alt="Arrow"
+                                                        />
                                                     </IconButton>
                                                 </div>
                                             </Grid>
@@ -902,6 +1027,7 @@ const Search: React.FC = () => {
                     <Button onClick={handleConfirmDelete} color="error">
                         Delete
                     </Button>
+
                 </DialogActions>
             </Dialog>
 

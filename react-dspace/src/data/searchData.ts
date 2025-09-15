@@ -62,12 +62,18 @@ export interface FilterSection {
 }
 
 export const metadataFields = {
-  title: 'dc.filenumber',
+  title: 'dc.title',
   abstract: 'dc.description.abstract',
-  date: 'dc.date.issued',
-  author: 'dc.contributor.author',
+  date: 'dc.date.created',
+  author: 'dc.author',
   entityType: 'dspace.entity.type',
-  publisher: 'dc.publisher'
+  publisher: 'dc.publisher',
+  doctype: 'dc.doctype',
+  year: 'dc.year',
+  keyword: 'dc.keyword',
+  contenttype: 'dc.contenttype',
+  description: 'dc.description',
+
 } as const;
 
 export const sortOptions: SortOption[] = [

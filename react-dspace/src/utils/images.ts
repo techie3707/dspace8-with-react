@@ -45,9 +45,9 @@ import preview from "../assets/images/about1.webp";
 import person from "../assets/images/person.png";
 import business_person from "../assets/images/business_person.png";
 import aboutBack from "../assets/images/aboutBack.jpg";
-import slide1 from "../assets/images/1.avif";
-import slide2 from "../assets/images/2.jpg";
-import slide3 from "../assets/images/3.jpg";
+import slide1 from "../assets/images/easyslider1.png";
+import slide2 from "../assets/images/easyslider2.png";
+import slide3 from "../assets/images/easyslider3.jpg";
 import slide4 from "../assets/images/4.avif";
 import edit_role from "../assets/icons/edit_role.png";
 import approved from "../assets/icons/approved.png";
@@ -119,7 +119,7 @@ export const ImageSlider: string[] = [
   slide1,
   slide2,
   slide3,
-  slide4
+  
 ];
 // Export typed objects
 export const iconsImgs: IconsImages = {
