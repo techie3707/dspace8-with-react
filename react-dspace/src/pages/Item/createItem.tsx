@@ -66,7 +66,7 @@ const CreateItem: React.FC<CreateItemProps> = ({ collectionId }) => {
 
             setFormData((prevData) => ({
                 ...prevData,
-                "dc.date.issued": selectedDate,
+                "dc.date.created": selectedDate,
             }));
 
             return newDateParts;
@@ -141,7 +141,7 @@ const CreateItem: React.FC<CreateItemProps> = ({ collectionId }) => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        const requiredFields = ["dc.title", "dc.contributor.author", "dc.type"];
+        const requiredFields = ["dc.title", "dc.author", "dc.doctype"];
         const missingFields = requiredFields.filter((field) => !formData[field]);
 
         if (missingFields.length > 0) {
@@ -230,7 +230,7 @@ const CreateItem: React.FC<CreateItemProps> = ({ collectionId }) => {
                                     <TextField
                                         fullWidth
                                         label="Item Type"
-                                        name="dc.type"
+                                        name="dc.doctype"
                                         required
                                         onChange={handleChange}
                                         variant="outlined"

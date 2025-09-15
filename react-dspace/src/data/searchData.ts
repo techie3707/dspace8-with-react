@@ -30,16 +30,12 @@ export const formatSubjects = (subjects?: string[]): string[] => {
 
 export interface SearchFilters {
   [key: string]: string[] | boolean | null | undefined;
-  title?: string[];
-  subject?: string[];
-  date?: string[];
-  fileType?: string[];
-  hasFile?: boolean | null;
-  yearrange?: string[];
-  boxnumber?: string [];
-  guruname?: string [];
-  shishyaname?: string [];
-  studentname?: string [];
+
+  author?: string [];
+  contenttype?: string [];
+  publisher?: string [];
+  keyword?: string [];
+
 }
 
 export interface SortOption {
@@ -93,77 +89,43 @@ export const resultsPerPageOptions: ResultsPerPageOption[] = [
 ];
 
 export const filterSections: FilterSection[] = [
+ 
+
   {
-    id: 'title',
-    label: 'Title',
+    id: 'author',
+    label: 'Author',
     defaultExpanded: false,
-    fieldName: 'title',
+    fieldName: 'author',
     filterType: 'checkbox'
   },
   {
-    id: 'subject',
-    label: 'Subject',
+    id: 'contenttype',
+    label: 'Content Type',
     defaultExpanded: false,
-    fieldName: 'subject',
-    filterType: 'checkbox'
-  },
-  {
-    id: 'fileType',
-    label: 'File Type',
-    defaultExpanded: false,
-    fieldName: 'filetype',
+    fieldName: 'contenttype',
     filterType: 'checkbox'
   },
   {
     id: 'date',
-    label: 'Date',
+    label: 'Date Created',
     defaultExpanded: false,
     fieldName: 'dateIssued',
     filterType: 'range'
   },
-  // {
-  //   id: 'hasFiles',
-  //   label: 'Has File',
-  //   defaultExpanded: false,
-  //   fieldName: 'has_content_in_original_bundle',
-  //   filterType: 'boolean'
-  // },
-   {
-    id: 'YearRange',
-    label: 'Year Range',
+  {
+    id: 'publisher',
+    label: 'Publisher',
     defaultExpanded: false,
-    fieldName: 'yearrange',
+    fieldName: 'publisher',
     filterType: 'checkbox'
   },
-    {
-    id: 'BoxNumber',
-    label: 'Box Number',
+  {
+    id: 'keyword',
+    label: 'Keyword',
     defaultExpanded: false,
-    fieldName: 'boxnumber',
+    fieldName: 'keyword',
     filterType: 'checkbox'
   },
-    {
-    id: 'guruname',
-    label: 'Guru Name',
-    defaultExpanded: false,
-    fieldName: 'guruname',
-    filterType: 'checkbox'
-  },
-    {
-    id: 'shishyaname',
-    label: 'Shishya Name',
-    defaultExpanded: false,
-    fieldName: 'shishyaname',
-    filterType: 'checkbox'
-  },
-    {
-    id: 'studentname',
-    label: 'Student Name',
-    defaultExpanded: false,
-    fieldName: 'studentname',
-    filterType: 'checkbox'
-  },
- 
 ];
 
 export interface ObjectSearchResult {
