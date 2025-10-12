@@ -15,6 +15,7 @@ import {
     removeProcess
 } from '../../api/processes';
 import { iconsImgs } from '../../utils/images';
+import { useNavigate } from 'react-router-dom';
 
 function Processes() {
     const [activeTab, setActiveTab] = React.useState<number>(0);
@@ -30,6 +31,7 @@ function Processes() {
     const [page, setPage] = React.useState<number>(1);
     const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
     const [selectedProcessId, setSelectedProcessId] = React.useState<number | null>(null);
+    const navigate = useNavigate();
 
 
     const fetchFailedProcess = async () => {
@@ -180,27 +182,32 @@ function Processes() {
                             });
 
                             return (
-                                <TableRow
-                                    key={Process_ID}
-                                    sx={{
-                                        "&:hover": { backgroundColor: "#f0f0f0" },
-                                        cursor: "default",
-                                    }}
-                                >
-                                    <TableCell>{Process_ID}</TableCell>
-                                    <TableCell>{Name}</TableCell>
-                                    <TableCell>{Formatted_time}</TableCell>
-                                    <TableCell>
-                                        <IconButton
-                                            className='btn_table'
-                                            color="error"
-                                            title="Delete"
-                                            onClick={() => handleDeletClick(Process_ID)}
-                                        >
-                                            <img className="table_icon" src={iconsImgs.remove} alt="Remove" />
-                                        </IconButton>
-                                    </TableCell>
-                                </TableRow>
+                               <TableRow
+  key={Process_ID}
+  sx={{
+      "&:hover": { backgroundColor: "#f0f0f0" },
+      cursor: "pointer",   // 👈 change to pointer
+  }}
+  onClick={() => navigate(`/process/${Process_ID}`)}   // 👈 redirect to detail page
+>
+    <TableCell>{Process_ID}</TableCell>
+    <TableCell>{Name}</TableCell>
+    <TableCell>{Formatted_time}</TableCell>
+    <TableCell>
+        <IconButton
+            className='btn_table'
+            color="error"
+            title="Delete"
+            onClick={(e) => {
+                e.stopPropagation(); // 👈 prevent row click
+                handleDeletClick(Process_ID);
+            }}
+        >
+            <img className="table_icon" src={iconsImgs.remove} alt="Remove" />
+        </IconButton>
+    </TableCell>
+</TableRow>
+
                             );
                         })}
                     </TableBody>

@@ -46,6 +46,8 @@ import ItemReportTable from "../pages/reports/ItemListTable";
 import Processes from "../pages/processes/processes";
 import AssignRole from "../pages/assignRole/AssignRole";
 import WorkflowTask from "../pages/workflow/workflowTask";
+import ProcessDetail from "../pages/processes/ProcessDetail";
+import AuditTrailLogs from "../pages/AuditTrailLogs";
 
 
 const ProtectedRoute = ({ element }: { element: React.ReactElement }) => {
@@ -109,9 +111,11 @@ const AppRoutes = () => {
         <Route path="/removeWorkflowItem/:id" element={<RemoveItem />} />
         <Route path="/resourcePolicy/:id" element={<ResourcePolicy />} />
         <Route path="/processes" element={<Processes />} />
+        <Route path="/process/:id" element={<ProcessDetail />} />
         <Route path="/supervisionSelecter/:uuid" element={<SupervisionSelecter />} />
         <Route path="/createResourcePolicy/:uuid" element={<CreateResourcePolicy />} />
         <Route path="/usermanagement" element={<ProtectedRoute element={<UserManagement />} />} />
+         <Route path="/AuditTrailLogs" element={<ProtectedRoute element={<AuditTrailLogs />} />} />
         <Route path="/report/user" element={<ProtectedRoute element={<UserListTable />} />} />
         <Route path="/report/item" element={<ProtectedRoute element={<ItemReportTable />} />} />
         <Route path="/userProfile/:userId" element={<ProtectedRoute element={<UserProfileWrapper />} />}/>

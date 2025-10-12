@@ -61,7 +61,7 @@ export const metadataFields = {
   title: 'dc.title',
   abstract: 'dc.description.abstract',
   date: 'dc.date.created',
-  author: 'dc.author',
+  author: 'dc.contributor.author',
   entityType: 'dspace.entity.type',
   publisher: 'dc.publisher',
   doctype: 'dc.doctype',

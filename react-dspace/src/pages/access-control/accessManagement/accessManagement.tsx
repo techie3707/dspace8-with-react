@@ -35,7 +35,7 @@ import { iconsImgs } from "../../../utils/images";
 interface AccessManagementProps {
     open: boolean;
     onClose: (groups?: { uuid: string; groupName: string }[]) => void;
-    userId: string | null; 
+    userId: string | null;
 }
 
 interface CommunityWithCollections extends Community {
@@ -85,26 +85,28 @@ const AccessManagement: React.FC<AccessManagementProps> = ({ open, onClose, user
                 setGroupsList(groups);
 
                 const permissionsMap: {
-                    [key: string]: { permission: string; groupName: string; uuid: string }[]
+                    [collectionId: string]: { permission: string; groupName: string; uuid: string }[]
                 } = {};
 
+                // Dynamically parse collection UUID from group name
                 groups.forEach(group => {
-                    const match = group.name.match(/^(.+?)_(.+)$/);
+                    const match = group.name.match(/^COLLECTION_(.+?)_(.+)$/);
                     if (match) {
-                        const collectionName = match[1];
+                        const collectionId = match[1]; // dynamic collection UUID
                         const permission = match[2].toLowerCase();
 
-                        if (!permissionsMap[collectionName]) {
-                            permissionsMap[collectionName] = [];
+                        if (!permissionsMap[collectionId]) {
+                            permissionsMap[collectionId] = [];
                         }
 
-                        permissionsMap[collectionName].push({
+                        permissionsMap[collectionId].push({
                             permission,
                             groupName: group.name,
                             uuid: group.uuid,
                         });
                     }
                 });
+
                 setCollectionPermissions(permissionsMap);
             } catch (error) {
                 console.error("Error fetching groups:", error);
@@ -113,83 +115,82 @@ const AccessManagement: React.FC<AccessManagementProps> = ({ open, onClose, user
         fetchGroups();
     }, []);
 
-    useEffect(() => {
-        const fetchUserAssignedGroups = async () => {
-            if (!userId) {
-                setInitialUserGroups([]);
-                setSelectedGroups([]);
-                return;
-            }
-            
-            try {
-                const response = await fetchUserGroupsList(userId);
-                const userGroups: Group[] = response.groups || [];
-                const updatedPermissions: { [key: string]: Set<string> } = {};
-                const userGroupsArray = userGroups.map(group => ({ uuid: group.uuid, groupName: group.name }));
 
-                setInitialUserGroups(userGroupsArray);
-                setSelectedGroups(userGroupsArray);
+useEffect(() => {
+    const fetchUserAssignedGroups = async () => {
+        if (!userId) {
+            setInitialUserGroups([]);
+            setSelectedGroups([]);
+            return;
+        }
 
-                userGroups.forEach(group => {
-                    const match = group.name.match(/^(.+?)_(.+)$/);
-                    if (match) {
-                        const collectionTitle = match[1];
-                        const permission = match[2].toLowerCase();
-                        if (!updatedPermissions[collectionTitle]) {
-                            updatedPermissions[collectionTitle] = new Set();
-                        }
-                        updatedPermissions[collectionTitle].add(permission);
+        try {
+            const response = await fetchUserGroupsList(userId);
+            const userGroups: Group[] = response.groups || [];
+
+            const userGroupsArray = userGroups.map(group => ({ uuid: group.uuid, groupName: group.name }));
+
+            setInitialUserGroups(userGroupsArray);
+            setSelectedGroups(userGroupsArray);
+
+            const updatedPermissions: { [collectionId: string]: Set<string> } = {};
+
+            userGroups.forEach(group => {
+                const match = group.name.match(/^COLLECTION_(.+?)_(.+)$/);
+                if (match) {
+                    const collectionId = match[1];  // collection UUID now
+                    const permission = match[2].toLowerCase();
+
+                    if (!updatedPermissions[collectionId]) {
+                        updatedPermissions[collectionId] = new Set();
                     }
-                });
-                setSelectedPermissions(updatedPermissions);
-
-                if (userGroups.length > 0) {
-                    const firstPermission = userGroups[0].name.split('_')[1].toLowerCase();
-                    setSelectedPermissionLevel(firstPermission);
+                    updatedPermissions[collectionId].add(permission);
                 }
-            } catch (error) {
-                console.error("Error fetching user groups:", error);
-            } 
-        };
-        fetchUserAssignedGroups();
-    }, [userId]);
+            });
+
+            setSelectedPermissions(updatedPermissions);
+
+            if (userGroups.length > 0) {
+                const firstPermission = userGroups[0].name.split('_')[2]?.toLowerCase() || "";
+                setSelectedPermissionLevel(firstPermission);
+            }
+        } catch (error) {
+            console.error("Error fetching user groups:", error);
+        }
+    };
+
+    fetchUserAssignedGroups();
+}, [userId]);
+
 
     const handlePermissionLevelChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSelectedPermissionLevel(event.target.value);
     };
 
-    const handleCollectionCheckboxChange = (collectionTitle: string, isChecked: boolean) => {
-        const permissionGroups = collectionPermissions[collectionTitle]?.filter(
+    const handleCollectionCheckboxChange = (collectionId: string, isChecked: boolean) => {
+        const permissionGroups = collectionPermissions[collectionId]?.filter(
             g => g.permission === selectedPermissionLevel
         );
-    
-        if (!permissionGroups || permissionGroups.length === 0) {
-            console.warn(`No groups found for collection: ${collectionTitle} with permission: ${selectedPermissionLevel}`);
-            return;
-        }
-    
+
+        if (!permissionGroups || permissionGroups.length === 0) return;
+
         setSelectedPermissions(prev => {
             const newPermissions = { ...prev };
-            if (!newPermissions[collectionTitle]) {
-                newPermissions[collectionTitle] = new Set();
+            if (!newPermissions[collectionId]) {
+                newPermissions[collectionId] = new Set();
             }
-    
-            const updatedSet = new Set(newPermissions[collectionTitle]);
-            if (isChecked) {
-                updatedSet.add(selectedPermissionLevel);
-            } else {
-                updatedSet.delete(selectedPermissionLevel);
-            }
-    
-            return { ...newPermissions, [collectionTitle]: updatedSet };
+
+            const updatedSet = new Set(newPermissions[collectionId]);
+            if (isChecked) updatedSet.add(selectedPermissionLevel);
+            else updatedSet.delete(selectedPermissionLevel);
+
+            return { ...newPermissions, [collectionId]: updatedSet };
         });
-    
+
         setSelectedGroups(prev => {
             const groupUuidsToModify = new Set(permissionGroups.map(g => g.uuid));
             if (isChecked) {
-                const groupsToAdd = permissionGroups.filter(g => 
-                    !prev.some(existing => existing.uuid === g.uuid)
-                );
+                const groupsToAdd = permissionGroups.filter(g => !prev.some(existing => existing.uuid === g.uuid));
                 return [...prev, ...groupsToAdd];
             } else {
                 return prev.filter(g => !groupUuidsToModify.has(g.uuid));
@@ -197,25 +198,24 @@ const AccessManagement: React.FC<AccessManagementProps> = ({ open, onClose, user
         });
     };
 
-    const handleSelectAll = (community: CommunityWithCollections) => {
-        // Filter collections that have the selected permission level
-        const filteredCollections = community.collections.filter(collection => {
-            const collectionTitle = collection.metadata?.["dc.title"]?.[0]?.value || "Unnamed Collection";
-            return collectionPermissions[collectionTitle]?.some(p => p.permission === selectedPermissionLevel);
-        });
 
-        // Check if all collections are already selected
-        const allSelected = filteredCollections.every(collection => {
-            const collectionTitle = collection.metadata?.["dc.title"]?.[0]?.value || "Unnamed Collection";
-            return selectedPermissions[collectionTitle]?.has(selectedPermissionLevel);
-        });
+const handleSelectAll = (community: CommunityWithCollections) => {
+    const filteredCollections = community.collections.filter(collection => {
+        const collectionId = collection.id; // use collection ID
+        return collectionPermissions[collectionId]?.some(p => p.permission === selectedPermissionLevel);
+    });
 
-        // Update selected permissions and groups for all collections in the community
-        filteredCollections.forEach(collection => {
-            const collectionTitle = collection.metadata?.["dc.title"]?.[0]?.value || "Unnamed Collection";
-            handleCollectionCheckboxChange(collectionTitle, !allSelected);
-        });
-    };
+    const allSelected = filteredCollections.every(collection => {
+        const collectionId = collection.id;
+        return selectedPermissions[collectionId]?.has(selectedPermissionLevel);
+    });
+
+    filteredCollections.forEach(collection => {
+        const collectionId = collection.id;
+        handleCollectionCheckboxChange(collectionId, !allSelected);
+    });
+};
+
 
     const isAllSelected = (community: CommunityWithCollections): boolean => {
         const filteredCollections = community.collections.filter(collection => {
@@ -229,24 +229,24 @@ const AccessManagement: React.FC<AccessManagementProps> = ({ open, onClose, user
         });
     };
 
-     const handleGroupChanges = async (): Promise<void> => {
+    const handleGroupChanges = async (): Promise<void> => {
         if (userId) {
             // Existing user flow
             const prevGroupsSet = new Set(initialUserGroups.map(g => g.uuid));
             const newGroupsSet = new Set(selectedGroups.map(g => g.uuid));
-        
+
             const addedGroups = selectedGroups.filter(g => !prevGroupsSet.has(g.uuid));
             const removedGroups = initialUserGroups.filter(g => !newGroupsSet.has(g.uuid));
-        
+
             try {
                 await Promise.all(addedGroups.map(async (group) => {
                     await addMemberToGroup(group.uuid, userId);
                 }));
-            
+
                 await Promise.all(removedGroups.map(async (group) => {
                     await removeMemberToGroup(group.uuid, userId);
                 }));
-            
+
                 onClose(selectedGroups);
             } catch (error) {
                 console.error("Error updating user groups:", error);
@@ -261,81 +261,81 @@ const AccessManagement: React.FC<AccessManagementProps> = ({ open, onClose, user
         new Set(
             Object.values(collectionPermissions)
                 .flatMap(perms => perms.map(p => p.permission))
-    ));
+        ));
 
     return (
         <Modal open={open} onClose={() => onClose()} >
-        <Paper
-            sx={{ 
-                width: "80%", 
-                maxWidth: "1000px",
-                maxHeight: "90%", 
-                overflow: "auto",
-                padding: "20px"
-            }}
-            className="modal-paper"
-        >
-            <div className="modal-header-container">
-                <Typography variant="h5" className="modal-header">Collection wise permission</Typography>
-                <IconButton onClick={() => onClose()} className="close-icon">
-                    <CloseIcon />
-                </IconButton>
-            </div>
+            <Paper
+                sx={{
+                    width: "80%",
+                    maxWidth: "1000px",
+                    maxHeight: "90%",
+                    overflow: "auto",
+                    padding: "20px"
+                }}
+                className="modal-paper"
+            >
+                <div className="modal-header-container">
+                    <Typography variant="h5" className="modal-header">Collection wise permission</Typography>
+                    <IconButton onClick={() => onClose()} className="close-icon">
+                        <CloseIcon />
+                    </IconButton>
+                </div>
 
-            <Box sx={{ marginBottom: 2 }}>
-                <FormControl>
-                    <RadioGroup
-                        row
-                        aria-labelledby="permission-level-radio-buttons"
-                        name="permission-level"
-                        value={selectedPermissionLevel}
-                        onChange={handlePermissionLevelChange}
-                    >
-                        {permissionTypes.map(permission => (
-                            <FormControlLabel
-                                key={permission}
-                                value={permission}
-                                control={<Radio />}
-                                label={permission.charAt(0).toUpperCase() + permission.slice(1)}
-                            />
-                        ))}
-                    </RadioGroup>
-                </FormControl>
-            </Box>
+                <Box sx={{ marginBottom: 2 }}>
+                    <FormControl>
+                        <RadioGroup
+                            row
+                            aria-labelledby="permission-level-radio-buttons"
+                            name="permission-level"
+                            value={selectedPermissionLevel}
+                            onChange={handlePermissionLevelChange}
+                        >
+                            {permissionTypes.map(permission => (
+                                <FormControlLabel
+                                    key={permission}
+                                    value={permission}
+                                    control={<Radio />}
+                                    label={permission.charAt(0).toUpperCase() + permission.slice(1)}
+                                />
+                            ))}
+                        </RadioGroup>
+                    </FormControl>
+                </Box>
 
-            <Divider sx={{ my: 2 }} />
+                <Divider sx={{ my: 2 }} />
 
-            <Grid container spacing={2}>
-                {/* Left Panel - Communities */}
-                <Grid item xs={4} sx={{ borderRight: "1px solid #e0e0e0" }}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>
-                        Communities
-                    </Typography>
-                    <List dense sx={{ maxHeight: '400px', overflow: 'auto' }}>
-                        {communities.map(community => (
-                            <ListItem 
-                                key={community.id} 
-                                disablePadding
-                                sx={{
-                                    backgroundColor: selectedCommunity?.id === community.id ? '#f0f0f0' : 'transparent'
-                                }}
-                            >
-                                <ListItemButton 
-                                    onClick={() => setSelectedCommunity(community)}
-                                    sx={{ py: 1 }}
+                <Grid container spacing={2}>
+                    {/* Left Panel - Communities */}
+                    <Grid item xs={4} sx={{ borderRight: "1px solid #e0e0e0" }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>
+                            Communities
+                        </Typography>
+                        <List dense sx={{ maxHeight: '400px', overflow: 'auto' }}>
+                            {communities.map(community => (
+                                <ListItem
+                                    key={community.id}
+                                    disablePadding
+                                    sx={{
+                                        backgroundColor: selectedCommunity?.id === community.id ? '#f0f0f0' : 'transparent'
+                                    }}
                                 >
-                                    <ListItemText sx={{borderBottom: '1px solid #e0e0e0', py: 1}} primary={community.metadata["dc.title"]?.[0]?.value} />
-                                    {selectedCommunity?.id === community.id ? 
-                                        <img src={iconsImgs.minus} alt="Collapse" style={{ width: '16px', height: '16px' }} /> :
-                                        <img src={iconsImgs.arrow} alt="Expand" style={{ width: '16px', height: '16px' }} />}
-                                </ListItemButton>
-                            </ListItem>
-                        ))}
-                    </List>
-                </Grid>
+                                    <ListItemButton
+                                        onClick={() => setSelectedCommunity(community)}
+                                        sx={{ py: 1 }}
+                                    >
+                                        <ListItemText sx={{ borderBottom: '1px solid #e0e0e0', py: 1 }} primary={community.metadata["dc.title"]?.[0]?.value} />
+                                        {selectedCommunity?.id === community.id ?
+                                            <img src={iconsImgs.minus} alt="Collapse" style={{ width: '16px', height: '16px' }} /> :
+                                            <img src={iconsImgs.arrow} alt="Expand" style={{ width: '16px', height: '16px' }} />}
+                                    </ListItemButton>
+                                </ListItem>
+                            ))}
+                        </List>
+                    </Grid>
 
-                {/* Right Panel - Collections */}
-                <Grid item xs={8}>
+                    {/* Right Panel - Collections */}
+                    <Grid item xs={8}>
                         <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>
                             Collections
                         </Typography>
@@ -355,28 +355,29 @@ const AccessManagement: React.FC<AccessManagementProps> = ({ open, onClose, user
                                 <List dense sx={{ maxHeight: '400px', overflow: 'auto' }}>
                                     {selectedCommunity.collections
                                         .filter(collection => {
-                                            const collectionTitle = collection.metadata?.["dc.title"]?.[0]?.value || "Unnamed Collection";
-                                            return collectionPermissions[collectionTitle]?.some(p => p.permission === selectedPermissionLevel);
+                                            const collectionId = collection.id; // use id instead of title
+                                            return collectionPermissions[collectionId]?.some(p => p.permission === selectedPermissionLevel);
                                         })
                                         .map(collection => {
-                                            const collectionTitle = collection.metadata?.["dc.title"]?.[0]?.value || "Unnamed Collection";
-                                            const isCollectionChecked = selectedPermissions[collectionTitle]?.has(selectedPermissionLevel) || false;
+                                            const collectionId = collection.id;
+                                            const isCollectionChecked = selectedPermissions[collectionId]?.has(selectedPermissionLevel) || false;
 
                                             return (
-                                                <ListItem key={collection.id} disablePadding>
+                                                <ListItem key={collectionId} disablePadding>
                                                     <FormControlLabel
                                                         control={
                                                             <Checkbox
                                                                 checked={isCollectionChecked}
-                                                                onChange={(e) => handleCollectionCheckboxChange(collectionTitle, e.target.checked)}
+                                                                onChange={(e) => handleCollectionCheckboxChange(collectionId, e.target.checked)}
                                                             />
                                                         }
-                                                        label={collectionTitle}
-                                                        sx={{ width: '100%', ml: 0,borderBottom: '1px solid #e0e0e0' }}
+                                                        label={collection.metadata?.["dc.title"]?.[0]?.value || "Unnamed Collection"}
+                                                        sx={{ width: '100%', ml: 0, borderBottom: '1px solid #e0e0e0' }}
                                                     />
                                                 </ListItem>
                                             );
                                         })}
+
                                 </List>
                             </>
                         ) : (
@@ -385,24 +386,24 @@ const AccessManagement: React.FC<AccessManagementProps> = ({ open, onClose, user
                             </Typography>
                         )}
                     </Grid>
-            </Grid>
+                </Grid>
 
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3, mb: 2 }}>
-                <Button 
-                    variant="contained" 
-                    onClick={handleGroupChanges}
-                    sx={{ 
-                        backgroundColor: '#1976d2',
-                        '&:hover': { backgroundColor: '#1565c0' },
-                        textTransform: 'none',
-                        padding: '8px 20px'
-                    }}
-                >
-                    Give Access
-                </Button>
-            </Box>
-        </Paper>
-    </Modal>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3, mb: 2 }}>
+                    <Button
+                        variant="contained"
+                        onClick={handleGroupChanges}
+                        sx={{
+                            backgroundColor: '#1976d2',
+                            '&:hover': { backgroundColor: '#1565c0' },
+                            textTransform: 'none',
+                            padding: '8px 20px'
+                        }}
+                    >
+                        Give Access
+                    </Button>
+                </Box>
+            </Paper>
+        </Modal>
     );
 };
 
